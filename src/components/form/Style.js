@@ -7,8 +7,8 @@ export default makeStyles((theme) => ({
     height: "auto",
     display: "flex",
     flexDirection: "column",
-    padding: "0 10px",
-    borderRadius: 8,
+    padding: "0 16px",
+    borderRadius: 12,
     [theme.breakpoints.down("xs")]: {
       borderRadius: 0,
       border: 0,
@@ -20,8 +20,8 @@ export default makeStyles((theme) => ({
     height: "auto",
     display: "flex",
     alignItems: "center",
-    gap: 8,
-    padding: "15px 0 5px 0",
+    gap: 10,
+    padding: "16px 0 8px 0",
   },
 
   header__form: {
@@ -45,12 +45,12 @@ export default makeStyles((theme) => ({
       border: 0,
       outlineWidth: 0,
       paddingLeft: 10,
-      color: theme.palette.type === "dark" && "lightgrey",
+      color: theme.palette.text.primary,
       fontSize: 14,
       fontWeight: 600,
       backgroundColor: "transparent",
       "&::placeholder": {
-        color: theme.palette.type === "dark" && "grey",
+        color: theme.palette.text.secondary,
       },
     },
     "& > select": {
@@ -59,7 +59,7 @@ export default makeStyles((theme) => ({
       outlineWidth: 0,
       padding: "0 10px",
       backgroundColor: "transparent",
-      color: theme.palette.type === "dark" ? "lightgrey" : "#333",
+      color: theme.palette.text.primary,
       fontSize: 13,
       fontWeight: 600,
       borderLeft:
@@ -83,7 +83,7 @@ export default makeStyles((theme) => ({
       color: "white",
       cursor: "pointer",
       fontWeight: 600,
-      transition: "all 0.4s ease",
+      transition: "background-color 0.2s ease",
       "&:hover": {
         backgroundColor: theme.palette.primary.dark,
       },
@@ -94,18 +94,18 @@ export default makeStyles((theme) => ({
     flex: 1,
     "& .MuiInputBase-root": {
       height: "100%",
-      color: theme.palette.type === "dark" ? "lightgrey" : "inherit",
+      color: theme.palette.text.primary,
     },
     "& .MuiInputBase-input": {
       height: "100%",
       boxSizing: "border-box",
       padding: "0 10px",
-      color: theme.palette.type === "dark" ? "lightgrey" : "inherit",
+      color: theme.palette.text.primary,
       fontSize: 14,
       fontWeight: 600,
       backgroundColor: "transparent",
       "&::placeholder": {
-        color: theme.palette.type === "dark" ? "grey" : "inherit",
+        color: theme.palette.text.secondary,
         opacity: 1,
       },
     },
@@ -177,10 +177,10 @@ export default makeStyles((theme) => ({
       border: 0,
       overflow: "hidden",
       padding: "0px 10px",
-      color: theme.palette.type === "dark" ? "lightgrey" : "grey",
+      color: theme.palette.text.secondary,
       fontSize: 13,
       "&::placeholder": {
-        color: theme.palette.type === "dark" && "grey",
+        color: theme.palette.text.secondary,
       },
     },
 
@@ -219,7 +219,7 @@ export default makeStyles((theme) => ({
     borderRadius: 8,
     padding: "10px 12px",
     fontSize: 14,
-    color: theme.palette.type === "dark" ? "lightgrey" : "#222",
+    color: theme.palette.text.primary,
     backgroundColor: theme.palette.type === "dark" ? "rgba(0,0,0,0.25)" : "#fff",
   },
 
@@ -242,7 +242,7 @@ export default makeStyles((theme) => ({
     borderRadius: 8,
     padding: "9px 12px",
     fontSize: 13,
-    color: theme.palette.type === "dark" ? "lightgrey" : "#222",
+    color: theme.palette.text.primary,
     backgroundColor: theme.palette.type === "dark" ? "rgba(0,0,0,0.25)" : "#fff",
   },
 
@@ -293,7 +293,7 @@ export default makeStyles((theme) => ({
     height: 8,
     marginRight: 5,
     borderRadius: 10,
-    backgroundColor: theme.palette.type === "dark" ? darkSecondary : "lightgrey",
+    backgroundColor: theme.palette.type === "dark" ? theme.palette.action.hover : "#e0e0e0",
     "& > *": {
       backgroundColor: theme.palette.type === "dark" ? LinkedInLightBlue : LinkedInBlue,
     },
@@ -307,7 +307,7 @@ export default makeStyles((theme) => ({
     display: "flex",
     alignItems: "center",
     padding: "2px 0",
-    opacity: 0.8,
+    opacity: 1,
   },
 
   media__options: {
@@ -317,10 +317,10 @@ export default makeStyles((theme) => ({
     justifyContent: "center",
     alignItems: "center",
     cursor: "pointer",
-    borderRadius: 4,
-    transition: "all 0.4s ease",
+    borderRadius: 8,
+    transition: "background-color 0.2s ease",
     "&:hover": {
-      backgroundColor: theme.palette.type === "dark" ? darkSecondary : "lightgrey",
+      backgroundColor: theme.palette.action.hover,
     },
     "& > h4": {
       fontSize: 14,

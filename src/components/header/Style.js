@@ -9,6 +9,7 @@ export default makeStyles((theme) => ({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 0,
+    border: "none",
   },
   header__container: {
     minWidth: 1150,
@@ -62,7 +63,7 @@ export default makeStyles((theme) => ({
     display: "flex",
     alignItems: "center",
     padding: "0 10px",
-    borderRadius: 3,
+    borderRadius: 8,
     border: "1px solid transparent",
     backgroundColor: theme.palette.type === "dark" ? darkSecondary : "#eef3f8",
     transition: "border-color 0.2s ease, box-shadow 0.2s ease",
@@ -79,10 +80,11 @@ export default makeStyles((theme) => ({
       marginLeft: 5,
       border: 0,
       outlineWidth: 0,
-      color: theme.palette.type === "dark" && "lightgrey",
+      fontSize: 14,
+      color: theme.palette.text.primary,
       backgroundColor: "transparent",
       "&::placeholder": {
-        color: theme.palette.type === "dark" && "grey",
+        color: theme.palette.text.secondary,
       },
     },
   },
@@ -128,7 +130,7 @@ export default makeStyles((theme) => ({
   searchResultPrimary: {
     fontSize: 14,
     fontWeight: 600,
-    color: theme.palette.type === "dark" ? "lightgrey" : "#1d2226",
+    color: theme.palette.text.primary,
   },
   searchResultPrimaryRow: {
     display: "flex",
@@ -160,8 +162,8 @@ export default makeStyles((theme) => ({
     justifyContent: "space-between",
     alignItems: "center",
     "& > div:nth-child(6)": {
-      borderLeft: `1px solid ${theme.palette.type === "dark" ? darkPrimary : "lightgrey"}`,
-      borderRight: `1px solid ${theme.palette.type === "dark" ? darkPrimary : "lightgrey"}`,
+      borderLeft: `1px solid ${theme.palette.divider}`,
+      borderRight: `1px solid ${theme.palette.divider}`,
     },
     [theme.breakpoints.down("xs")]: {
       display: "none",
@@ -174,20 +176,21 @@ export default makeStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     position: "relative",
+    borderRadius: 4,
+    transition: `background-color 0.2s ease`,
     "&:hover": {
-      backgroundColor: theme.palette.type === "dark" ? darkSecondary : "lightgrey",
-      borderRadius: 2,
+      backgroundColor: theme.palette.action.hover,
     },
   },
   headerNavItemActive: {
     "&::after": {
       content: '""',
       position: "absolute",
-      left: "22%",
-      right: "22%",
+      left: "18%",
+      right: "18%",
       bottom: 0,
-      height: 3,
-      borderRadius: "3px 3px 0 0",
+      height: 2,
+      borderRadius: "2px 2px 0 0",
       backgroundColor: theme.palette.primary.main,
     },
   },
@@ -245,6 +248,7 @@ export default makeStyles((theme) => ({
   header__bottom__nav: {
     display: "none",
     borderRadius: 0,
+    border: "none",
     boxShadow: "none",
     [theme.breakpoints.down("xs")]: {
       position: "fixed",
@@ -258,7 +262,7 @@ export default makeStyles((theme) => ({
       padding: "0 6px",
       zIndex: 100,
       backgroundColor: theme.palette.background.paper,
-      borderTop: `1px solid ${theme.palette.type === "dark" ? darkSecondary : "#e0e0e0"}`,
+      borderTop: `1px solid ${theme.palette.divider}`,
     },
   },
   bottomNavIcon: {

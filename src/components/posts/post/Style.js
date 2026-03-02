@@ -8,8 +8,12 @@ export default makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    marginTop: 10,
-    borderRadius: 8,
+    marginTop: 8,
+    borderRadius: 12,
+    transition: "border-color 0.18s ease",
+    "&:hover": {
+      borderColor: theme.palette.type === "dark" ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.12)",
+    },
     [theme.breakpoints.down("xs")]: {
       borderRadius: 0,
       border: 0,
@@ -51,16 +55,16 @@ export default makeStyles((theme) => ({
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: 10,
+    padding: "14px 20px 8px",
     "& > .MuiAvatar-root": {
     },
     "& > .MuiSvgIcon-root": {
-      color: "grey",
+      color: theme.palette.text.secondary,
       cursor: "pointer",
       borderRadius: 999,
-      transition: "all 0.3s ease",
+      transition: "background-color 0.2s ease",
       "&:hover": {
-        backgroundColor: theme.palette.type === "dark" ? darkSecondary : "lightgrey",
+        backgroundColor: theme.palette.action.hover,
       },
     },
   },
@@ -69,11 +73,12 @@ export default makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
-    marginLeft: 10,
+    marginLeft: 12,
     "& > h4": {
-      fontSize: 15,
-      fontWeight: 500,
-      marginBottom: 3,
+      fontSize: 14,
+      fontWeight: 600,
+      marginBottom: 2,
+      letterSpacing: "-0.01em",
     },
   },
   header__meta: {
@@ -82,7 +87,7 @@ export default makeStyles((theme) => ({
     gap: 6,
     "& > p": {
       margin: 0,
-      color: "grey",
+      color: theme.palette.text.secondary,
       fontSize: 12,
     },
   },
@@ -91,7 +96,7 @@ export default makeStyles((theme) => ({
     border: "none",
     margin: 0,
     padding: 0,
-    color: "grey",
+    color: theme.palette.text.secondary,
     fontSize: 12,
     lineHeight: 1.2,
     fontWeight: 600,
@@ -111,8 +116,7 @@ export default makeStyles((theme) => ({
   body__description: {
     display: "flex",
     alignItems: "center",
-    padding: 10,
-    paddingTop: 5,
+    padding: "4px 20px 12px",
     "& > p": {
       fontSize: 14,
       margin: 0,
@@ -161,7 +165,7 @@ export default makeStyles((theme) => ({
     fontSize: 20,
     lineHeight: 1.25,
     fontWeight: 700,
-    color: theme.palette.type === "dark" ? "lightgrey" : "#1d2226",
+    color: theme.palette.text.primary,
     wordBreak: "break-word",
   },
   articlePreview: {
@@ -216,7 +220,7 @@ export default makeStyles((theme) => ({
     textDecoration: "none",
     borderRadius: 8,
     border: `1px solid ${theme.palette.type === "dark" ? "#455a64" : "#dce6f1"}`,
-    backgroundColor: theme.palette.type === "dark" ? darkSecondary : "#f3f8ff",
+    backgroundColor: theme.palette.type === "dark" ? theme.palette.action.hover : "#f3f8ff",
     padding: "10px 12px",
     transition: "border-color 0.2s ease, box-shadow 0.2s ease",
     "&:hover": {
@@ -227,7 +231,7 @@ export default makeStyles((theme) => ({
       margin: 0,
       fontSize: 13,
       fontWeight: 600,
-      color: theme.palette.type === "dark" ? "lightgrey" : "#1d2226",
+      color: theme.palette.text.primary,
       textTransform: "uppercase",
       letterSpacing: 0.5,
     },
@@ -270,7 +274,7 @@ export default makeStyles((theme) => ({
     color: theme.palette.common.white,
     border: "none",
     padding: "6px 16px",
-    borderRadius: 4,
+    borderRadius: 20,
     cursor: "pointer",
     fontWeight: 600,
     "&:disabled": {
@@ -283,7 +287,7 @@ export default makeStyles((theme) => ({
     color: theme.palette.text.primary,
     border: `1px solid ${theme.palette.divider}`,
     padding: "6px 16px",
-    borderRadius: 4,
+    borderRadius: 20,
     cursor: "pointer",
   },
   body__image: {
@@ -319,19 +323,19 @@ export default makeStyles((theme) => ({
       margin: 0,
       fontSize: 14,
       fontWeight: 600,
-      color: theme.palette.type === "dark" ? "lightgrey" : "#1d2226",
+      color: theme.palette.text.primary,
     },
     "& > p": {
       margin: "2px 0 0",
       fontSize: 12,
-      color: "grey",
+      color: theme.palette.text.secondary,
     },
   },
   repost__embedDescription: {
     margin: 0,
     padding: "0 10px 10px",
     fontSize: 14,
-    color: theme.palette.type === "dark" ? "lightgrey" : "#1d2226",
+    color: theme.palette.text.primary,
     wordBreak: "break-word",
     whiteSpace: "pre-wrap",
   },
@@ -372,14 +376,13 @@ export default makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
-    padding: 10,
-    paddingBottom: 0,
+    padding: "8px 20px 0",
   },
   footer__stats: {
     display: "flex",
     alignItems: "center",
     paddingBottom: 10,
-    borderBottom: `1px solid ${theme.palette.type === "dark" ? darkSecondary : "lightgrey"}`,
+    borderBottom: `1px solid ${theme.palette.divider}`,
     "& > div": {
       display: "flex",
       "& > .MuiSvgIcon-root": {
@@ -389,7 +392,7 @@ export default makeStyles((theme) => ({
     "& > h4": {
       fontSize: 12,
       fontWeight: 400,
-      color: "grey",
+      color: theme.palette.text.secondary,
       marginLeft: 4,
     },
   },
@@ -512,7 +515,7 @@ export default makeStyles((theme) => ({
     transition: "transform 0.14s ease, background-color 0.14s ease",
     "&:hover": {
       transform: "translateY(-3px) scale(1.1)",
-      backgroundColor: theme.palette.type === "dark" ? darkSecondary : "#eef3ee",
+      backgroundColor: theme.palette.action.hover,
     },
     "&:focus-visible": {
       outline: `2px solid ${theme.palette.primary.main}`,
@@ -520,7 +523,7 @@ export default makeStyles((theme) => ({
     },
   },
   reactionPickerButtonActive: {
-    backgroundColor: theme.palette.type === "dark" ? darkSecondary : "#eef3ee",
+    backgroundColor: theme.palette.action.hover,
     transform: "translateY(-2px)",
   },
   reactionPickerIcon: {
@@ -537,12 +540,13 @@ export default makeStyles((theme) => ({
     alignItems: "center",
     marginRight: 2,
     padding: "10px 0",
-    borderRadius: 4,
+    borderRadius: 8,
     cursor: "pointer",
-    transition: "all 0.3s ease",
-    color: theme.palette.type === "dark" ? "lightgrey" : darkSecondary,
+    transition: "all 0.18s ease",
+    color: theme.palette.text.secondary,
     "&:hover": {
-      backgroundColor: theme.palette.type === "dark" ? darkSecondary : "lightgrey",
+      backgroundColor: theme.palette.type === "dark" ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)",
+      color: theme.palette.text.primary,
     },
     [theme.breakpoints.down("xs")]: {
       "&:hover": {
@@ -552,7 +556,7 @@ export default makeStyles((theme) => ({
     "& > .MuiSvgIcon-root": {
       fontSize: 18,
       fontWeight: 500,
-      color: theme.palette.type === "dark" ? "lightgrey" : "grey",
+      color: theme.palette.text.secondary,
       [theme.breakpoints.down("xs")]: {
         fontSize: 14,
       },
@@ -560,7 +564,7 @@ export default makeStyles((theme) => ({
     "& > h4": {
       fontSize: 12,
       fontWeight: 400,
-      color: theme.palette.type === "dark" ? "lightgrey" : "grey",
+      color: theme.palette.text.secondary,
       marginLeft: 4,
       [theme.breakpoints.down("xs")]: {
         fontSize: 12,
@@ -571,9 +575,9 @@ export default makeStyles((theme) => ({
     width: "100%",
     display: "flex",
     flexDirection: "column",
-    gap: 10,
-    padding: "8px 4px 12px",
-    borderTop: `1px solid ${theme.palette.type === "dark" ? darkSecondary : "lightgrey"}`,
+    gap: 12,
+    padding: "12px 16px 16px",
+    borderTop: `1px solid ${theme.palette.divider}`,
   },
   comments__list: {
     width: "100%",
@@ -598,11 +602,11 @@ export default makeStyles((theme) => ({
     flex: 1,
     padding: "8px 10px",
     borderRadius: 12,
-    backgroundColor: theme.palette.type === "dark" ? darkSecondary : "#f3f2ef",
+    backgroundColor: theme.palette.type === "dark" ? theme.palette.action.hover : "#f3f2ef",
     "& > p": {
       marginTop: 4,
       fontSize: 13,
-      color: theme.palette.type === "dark" ? "lightgrey" : "#1d2226",
+      color: theme.palette.text.primary,
       wordBreak: "break-word",
     },
   },
@@ -614,11 +618,11 @@ export default makeStyles((theme) => ({
       margin: 0,
       fontSize: 13,
       fontWeight: 600,
-      color: theme.palette.type === "dark" ? "lightgrey" : "#1d2226",
+      color: theme.palette.text.primary,
     },
     "& > span": {
       fontSize: 11,
-      color: "grey",
+      color: theme.palette.text.secondary,
     },
   },
   comment__delete: {

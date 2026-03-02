@@ -7,17 +7,17 @@ export default makeStyles((theme) => ({
     position: "sticky",
     top: 0,
     zIndex: 100,
-    height: 50,
+    height: 52,
     display: "flex",
     justifyContent: "center",
   },
 
   app__body: {
     display: "flex",
-    minHeight: "calc(100vh - 50px)",
+    minHeight: "calc(100vh - 52px)",
     justifyContent: "center",
-    paddingTop: 50,
-    paddingBottom: 50,
+    paddingTop: 24,
+    paddingBottom: 40,
     [theme.breakpoints.down("xs")]: {
       paddingTop: 10,
       paddingBottom: 60,
@@ -36,7 +36,7 @@ export default makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    padding: "0 25px",
+    padding: "0 16px",
     paddingBottom: 25,
     [theme.breakpoints.down("sm")]: {
       minWidth: 0,

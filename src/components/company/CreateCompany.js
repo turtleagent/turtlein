@@ -65,7 +65,7 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
     gap: theme.spacing(1.5),
     padding: theme.spacing(1.5),
-    borderRadius: 10,
+    borderRadius: 8,
     border: `1px dashed ${fade(theme.palette.primary.main, 0.4)}`,
     backgroundColor: fade(theme.palette.primary.main, 0.04),
   },

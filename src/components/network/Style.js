@@ -65,10 +65,9 @@ export default makeStyles((theme) => ({
     borderRadius: 8,
     cursor: "pointer",
     outline: "none",
-    transition: "box-shadow 150ms ease, transform 150ms ease",
+    transition: "background-color 0.2s ease",
     "&:hover": {
-      boxShadow: `0px 4px 14px ${fade(theme.palette.primary.main, 0.18)}`,
-      transform: "translateY(-1px)",
+      backgroundColor: theme.palette.action.hover,
     },
     "&:focus-visible": {
       boxShadow: `0px 0px 0px 3px ${fade(theme.palette.primary.main, 0.25)}`,
@@ -127,7 +126,7 @@ export default makeStyles((theme) => ({
   connectButton: {
     borderColor: theme.palette.primary.main,
     color: theme.palette.primary.main,
-    borderRadius: 16,
+    borderRadius: 20,
     textTransform: "none",
     fontWeight: 600,
     minWidth: 92,
@@ -142,7 +141,7 @@ export default makeStyles((theme) => ({
   acceptButton: {
     backgroundColor: theme.palette.primary.main,
     color: "#fff",
-    borderRadius: 16,
+    borderRadius: 20,
     textTransform: "none",
     fontWeight: 600,
     minWidth: 82,
@@ -151,7 +150,7 @@ export default makeStyles((theme) => ({
     },
   },
   rejectButton: {
-    borderRadius: 16,
+    borderRadius: 20,
     textTransform: "none",
     fontWeight: 600,
     minWidth: 82,
@@ -159,7 +158,7 @@ export default makeStyles((theme) => ({
     color: "#757575",
   },
   followButton: {
-    borderRadius: 16,
+    borderRadius: 20,
     textTransform: "none",
     fontWeight: 600,
     minWidth: 92,

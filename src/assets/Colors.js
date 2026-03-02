@@ -1,15 +1,15 @@
-import { green } from "@material-ui/core/colors";
+import { tokens } from "./designTokens";
 
-export const LinkedInBlue = green[800];
+export const LinkedInBlue = tokens.color.primary;
 
-export const LinkedInLightBlue = "#66bb6a";
+export const LinkedInLightBlue = tokens.color.primaryLight;
 
-export const LinkedInBgColor = "#f3f2ef";
+export const LinkedInBgColor = tokens.color.light.bg;
 
 export const lightPrimary = "#f5f5f5";
 
-export const darkPrimary = "#363636";
+export const darkPrimary = tokens.color.dark.bg;
 
-export const darkSecondary = "#5c5c5c";
+export const darkSecondary = tokens.color.dark.hoverBg;
 
 export const FacebookBlue = "#2e81f4";

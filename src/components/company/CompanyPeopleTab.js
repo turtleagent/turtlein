@@ -11,7 +11,7 @@ import { resolvePhoto } from "../../utils/photo";
 const useStyles = makeStyles((theme) => ({
   card: {
     border: `1px solid ${theme.palette.divider}`,
-    borderRadius: 10,
+    borderRadius: 8,
     overflow: "hidden",
   },
   list: {
@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
     gap: theme.spacing(1.5),
     border: `1px solid ${theme.palette.divider}`,
-    borderRadius: 10,
+    borderRadius: 8,
     padding: theme.spacing(1.25, 1.5),
     cursor: "pointer",
     transition: "background-color 0.2s ease, border-color 0.2s ease",

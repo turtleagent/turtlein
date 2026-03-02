@@ -11,7 +11,7 @@ import { api } from "../../convex/_generated/api";
 const useStyles = makeStyles((theme) => ({
   suggestions: {
     overflow: "hidden",
-    borderRadius: 10,
+    borderRadius: 8,
   },
   heading: {
     padding: "16px 14px 10px",

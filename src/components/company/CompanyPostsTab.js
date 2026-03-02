@@ -11,7 +11,7 @@ import Post from "../posts/post/Post";
 const useStyles = makeStyles((theme) => ({
   card: {
     border: `1px solid ${theme.palette.divider}`,
-    borderRadius: 10,
+    borderRadius: 8,
     overflow: "hidden",
   },
   emptyState: {

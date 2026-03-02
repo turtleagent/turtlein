@@ -1,5 +1,4 @@
 import { makeStyles } from "@material-ui/core/styles";
-import { LinkedInLightBlue, darkSecondary } from "../../assets/Colors";
 
 export default makeStyles((theme) => ({
   widgets: {
@@ -9,7 +8,7 @@ export default makeStyles((theme) => ({
   },
   widgets__top: {
     overflow: "hidden",
-    borderRadius: 10,
+    borderRadius: 12,
   },
   heading: {
     width: "100%",
@@ -24,7 +23,7 @@ export default makeStyles((theme) => ({
     },
     "& > .MuiSvgIcon-root": {
       fontSize: 16,
-      color: "grey",
+      color: theme.palette.text.secondary,
     },
   },
   expand: {
@@ -34,14 +33,14 @@ export default makeStyles((theme) => ({
     justifyContent: "center",
     alignItems: "center",
     cursor: "pointer",
-    color: "grey",
-    transition: "all 0.4s ease",
+    color: theme.palette.text.secondary,
+    transition: "background-color 0.2s ease",
     "& > h4": {
       fontSize: 13,
       fontWeight: 600,
     },
     "&:hover": {
-      backgroundColor: theme.palette.type === "dark" ? darkSecondary : "lightgrey",
+      backgroundColor: theme.palette.action.hover,
     },
   },
   widgets__bottom: {
@@ -57,9 +56,9 @@ export default makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     padding: "12px 14px",
-    borderRadius: 10,
+    borderRadius: 12,
     overflow: "hidden",
-    border: `1px solid ${LinkedInLightBlue}`,
+    border: `1px solid ${theme.palette.divider}`,
     background:
       theme.palette.type === "dark"
         ? `linear-gradient(120deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`

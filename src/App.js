@@ -23,6 +23,7 @@ import Widgets from "./components/widgets/Widgets";
 import { api } from "./convex/_generated/api";
 import Styles from "./Style";
 import { LinkedInBgColor, LinkedInBlue, darkPrimary } from "./assets/Colors";
+import { tokens } from "./assets/designTokens";
 
 const CompanyPage = lazy(() => import("./components/company/CompanyPage"));
 const CreateCompany = lazy(() => import("./components/company/CreateCompany"));
@@ -99,8 +100,106 @@ const AppShell = () => {
         palette: {
           type: mode ? "dark" : "light",
           primary: {
-            main: LinkedInBlue,
+            main: tokens.color.primary,
+            light: tokens.color.primaryLight,
+            dark: tokens.color.primaryDark,
           },
+          background: {
+            default: mode ? tokens.color.dark.bg : tokens.color.light.bg,
+            paper: mode ? tokens.color.dark.surface : tokens.color.light.surface,
+          },
+          text: {
+            primary: mode ? tokens.color.dark.textPrimary : tokens.color.light.textPrimary,
+            secondary: mode ? tokens.color.dark.textSecondary : tokens.color.light.textSecondary,
+          },
+          divider: mode ? tokens.color.dark.divider : tokens.color.light.divider,
+        },
+        typography: {
+          fontFamily: tokens.type.family,
+          h4: { fontWeight: 700, letterSpacing: "-0.02em" },
+          h5: { fontWeight: 700, letterSpacing: "-0.01em" },
+          h6: { fontWeight: 700, letterSpacing: "-0.01em" },
+          body1: { letterSpacing: "-0.01em", lineHeight: 1.5 },
+          body2: { letterSpacing: "-0.01em", lineHeight: 1.5 },
+          button: { letterSpacing: "-0.01em" },
+        },
+        custom: tokens,
+        overrides: {
+          MuiPaper: {
+            root: {
+              border: `1px solid ${mode ? tokens.color.dark.cardBorder : tokens.color.light.cardBorder}`,
+            },
+            elevation0: { boxShadow: "none" },
+            elevation1: { boxShadow: "none" },
+            elevation2: { boxShadow: "none" },
+            elevation3: { boxShadow: tokens.shadow.dropdown },
+            rounded: { borderRadius: tokens.radius.card },
+          },
+          MuiButton: {
+            root: {
+              textTransform: "none",
+              fontWeight: tokens.type.weight.semibold,
+              fontSize: 14,
+              borderRadius: tokens.radius.button,
+              padding: "6px 20px",
+              letterSpacing: "-0.01em",
+              transition: `all ${tokens.transition.normal}`,
+            },
+            outlined: {
+              borderWidth: "1.5px",
+              "&:hover": { borderWidth: "1.5px" },
+            },
+            contained: {
+              boxShadow: "none",
+              "&:hover": { boxShadow: "none" },
+            },
+          },
+          MuiDivider: {
+            root: {
+              backgroundColor: mode ? tokens.color.dark.divider : tokens.color.light.divider,
+            },
+          },
+          MuiAvatar: {
+            root: {
+              border: "none",
+              fontFamily: tokens.type.family,
+              fontWeight: 600,
+            },
+          },
+          MuiTypography: {
+            root: { fontFamily: tokens.type.family },
+          },
+          MuiTab: {
+            root: {
+              textTransform: "none",
+              fontWeight: 600,
+              fontSize: 14,
+              letterSpacing: "-0.01em",
+            },
+          },
+          MuiChip: {
+            root: {
+              fontWeight: 500,
+              fontFamily: tokens.type.family,
+            },
+          },
+          MuiOutlinedInput: {
+            root: {
+              borderRadius: tokens.radius.input,
+              "&:hover .MuiOutlinedInput-notchedOutline": {
+                borderColor: mode ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.2)",
+              },
+            },
+          },
+          MuiDialog: {
+            paper: {
+              borderRadius: tokens.radius.dialog,
+            },
+          },
+        },
+        props: {
+          MuiPaper: { elevation: 0 },
+          MuiButton: { disableElevation: true },
         },
       }),
     [mode],
@@ -304,7 +403,7 @@ const AppShell = () => {
           container
           className={classes.app__header}
           style={{
-            boxShadow: mode && "0px 5px 10px -10px rgba(0,0,0,0.75)",
+            borderBottom: `1px solid ${mode ? tokens.color.dark.divider : tokens.color.light.divider}`,
           }}
         >
           <Header

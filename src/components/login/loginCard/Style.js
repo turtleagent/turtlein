@@ -67,7 +67,7 @@ export default makeStyles((theme) => ({
       justifyContent: "center",
       gap: 8,
       "&:hover": {
-        transform: "translateY(-1px)",
+        opacity: 0.92,
       },
       "&:disabled": {
         cursor: "not-allowed",

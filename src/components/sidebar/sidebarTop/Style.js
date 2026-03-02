@@ -1,10 +1,4 @@
 import { makeStyles } from "@material-ui/core/styles";
-import {
-  LinkedInBlue,
-  LinkedInLightBlue,
-  darkSecondary,
-  darkPrimary,
-} from "../../../assets/Colors";
 
 export default makeStyles((theme) => ({
   sidebar: {
@@ -12,7 +6,7 @@ export default makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    borderRadius: 10,
+    borderRadius: 12,
     overflow: "hidden",
     "& > .MuiAvatar-root": {
       width: "30%",
@@ -26,7 +20,7 @@ export default makeStyles((theme) => ({
   subtitle: {
     margin: "-6px 0 8px",
     fontSize: 12,
-    color: "grey",
+    color: theme.palette.text.secondary,
   },
   cover: {
     width: "100%",
@@ -41,22 +35,22 @@ export default makeStyles((theme) => ({
     width: "100%",
     display: "flex",
     justifyContent: "space-between",
-    color: "grey",
+    color: theme.palette.text.secondary,
     padding: "5px 10px",
     cursor: "pointer",
-    transition: "all 0.4s ease",
+    transition: "background-color 0.2s ease",
     "& > h4": {
       fontSize: 14,
       fontWeight: 400,
-      color: "grey",
+      color: theme.palette.text.secondary,
     },
     "& > p": {
       fontSize: 12,
       fontWeight: 600,
-      color: theme.palette.type === "dark" ? LinkedInLightBlue : LinkedInBlue,
+      color: theme.palette.primary.main,
     },
     "&:hover": {
-      backgroundColor: theme.palette.type === "dark" ? darkSecondary : "lightgrey",
+      backgroundColor: theme.palette.action.hover,
     },
   },
   myItems: {
@@ -66,8 +60,8 @@ export default makeStyles((theme) => ({
     alignItems: "center",
     cursor: "pointer",
     paddingLeft: 10,
-    color: theme.palette.type === "light" && darkPrimary,
-    transition: "all 0.4s ease",
+    color: theme.palette.text.primary,
+    transition: "background-color 0.2s ease",
     "& > h4": {
       fontSize: 14,
       fontWeight: 500,
@@ -77,7 +71,7 @@ export default makeStyles((theme) => ({
       fontSize: 20,
     },
     "&:hover": {
-      backgroundColor: theme.palette.type === "dark" ? darkSecondary : "lightgrey",
+      backgroundColor: theme.palette.action.hover,
     },
   },
   savedPostsLink: {

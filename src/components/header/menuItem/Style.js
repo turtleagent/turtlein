@@ -5,9 +5,9 @@ export default makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    color: theme.palette.type === "dark" ? "lightgrey" : "#6e6e6e",
+    color: theme.palette.text.secondary,
     cursor: "pointer",
-    transition: "all 0.35s ease",
+    transition: "color 0.2s ease",
     "& > .MuiSvgIcon-root": {
       fontSize: 24,
     },

@@ -93,7 +93,7 @@ export default makeStyles((theme) => ({
       backgroundColor: theme.palette.action.hover,
     },
     "&:active": {
-      backgroundColor: "#edf6ed",
+      backgroundColor: fade(theme.palette.primary.main, 0.06),
     },
     [theme.breakpoints.down("xs")]: {
       padding: "14px 12px",
@@ -102,7 +102,7 @@ export default makeStyles((theme) => ({
     },
   },
   unreadItem: {
-    borderLeft: `4px solid ${theme.palette.primary.main}`,
+    borderLeft: `3px solid ${theme.palette.primary.main}`,
     paddingLeft: 12,
     backgroundColor:
       theme.palette.type === "dark"
@@ -113,7 +113,7 @@ export default makeStyles((theme) => ({
     },
   },
   readItem: {
-    borderLeft: "4px solid transparent",
+    borderLeft: "3px solid transparent",
     paddingLeft: 12,
     [theme.breakpoints.down("xs")]: {
       paddingLeft: 8,
@@ -143,7 +143,7 @@ export default makeStyles((theme) => ({
   },
   timestamp: {
     fontSize: 12,
-    color: "#6b7280",
+    color: theme.palette.text.secondary,
   },
   emptyState: {
     minHeight: 220,

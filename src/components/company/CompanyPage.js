@@ -26,12 +26,12 @@ import CompanyPostsTab from "./CompanyPostsTab";
 const useStyles = makeStyles((theme) => ({
   pageCard: {
     border: `1px solid ${theme.palette.divider}`,
-    borderRadius: 10,
+    borderRadius: 8,
     overflow: "hidden",
   },
   stateCard: {
     border: `1px solid ${theme.palette.divider}`,
-    borderRadius: 10,
+    borderRadius: 8,
   },
   stateContent: {
     display: "flex",

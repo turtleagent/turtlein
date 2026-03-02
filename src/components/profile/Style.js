@@ -245,7 +245,7 @@ export default makeStyles((theme) => ({
     alignItems: "center",
     gap: theme.spacing(1.25),
     border: `1px solid ${fade(theme.palette.primary.main, 0.25)}`,
-    borderRadius: 10,
+    borderRadius: 8,
     padding: theme.spacing(1),
     cursor: "pointer",
     transition: "background-color 0.2s ease, border-color 0.2s ease",
@@ -300,7 +300,7 @@ export default makeStyles((theme) => ({
   },
   featuredSection: {
     border: `1px solid ${fade(theme.palette.primary.main, 0.2)}`,
-    borderRadius: 10,
+    borderRadius: 8,
     padding: theme.spacing(1.25, 1.5),
     backgroundColor: fade(theme.palette.primary.main, 0.03),
   },
@@ -360,10 +360,10 @@ export default makeStyles((theme) => ({
     padding: theme.spacing(1, 0),
   },
   activityCard: {
-    border: `1px solid ${fade(theme.palette.primary.main, 0.2)}`,
-    borderRadius: 10,
+    border: `1px solid ${theme.palette.divider}`,
+    borderRadius: 8,
     padding: theme.spacing(1.25, 1.5),
-    backgroundColor: "#fff",
+    backgroundColor: theme.palette.background.paper,
   },
   activityHeading: {
     fontSize: "0.8rem",

@@ -5,7 +5,7 @@ import { makeStyles, useTheme } from "@material-ui/core/styles";
 const useStyles = makeStyles((theme) => ({
   card: {
     border: `1px solid ${theme.palette.divider}`,
-    borderRadius: 10,
+    borderRadius: 8,
     overflow: "hidden",
   },
   section: {

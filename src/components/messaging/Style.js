@@ -1,4 +1,4 @@
-import { makeStyles } from "@material-ui/core/styles";
+import { fade, makeStyles } from "@material-ui/core/styles";
 
 export default makeStyles((theme) => ({
   root: {
@@ -106,12 +106,12 @@ export default makeStyles((theme) => ({
   },
   backButton: {
     color: theme.palette.primary.main,
-    backgroundColor: "#f1f8f1",
+    backgroundColor: fade(theme.palette.primary.main, 0.08),
     width: 44,
     height: 44,
     padding: 10,
     "&:hover": {
-      backgroundColor: "#e3f2e5",
+      backgroundColor: fade(theme.palette.primary.main, 0.14),
     },
   },
   threadTitle: {
@@ -150,7 +150,7 @@ export default makeStyles((theme) => ({
     borderBottomRightRadius: 6,
   },
   otherBubble: {
-    backgroundColor: theme.palette.type === "dark" ? "#37474f" : "#e0e0e0",
+    backgroundColor: theme.palette.type === "dark" ? "#2a2e32" : "#f0f0f0",
     color: theme.palette.text.primary,
     borderBottomLeftRadius: 6,
   },
