@@ -9,8 +9,8 @@ import {
   Paper,
   Avatar,
   Badge,
-  Button,
   ClickAwayListener,
+  Hidden,
   Typography,
 } from "@material-ui/core";
 import {
@@ -19,15 +19,15 @@ import {
   Users,
   Bell,
   MessageSquareMore,
-  Moon,
-  Sun,
   User,
   Building2,
   BadgeCheck,
+  ChevronDown,
 } from "lucide-react";
 import { api } from "../../convex/_generated/api";
 import useConvexUser from "../../hooks/useConvexUser";
 import MenuItem from "./menuItem/MenuItem";
+import MeDropdown from "./MeDropdown";
 import Style from "./Style";
 
 const Header = ({
@@ -49,6 +49,7 @@ const Header = ({
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedTerm, setDebouncedTerm] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isMeDropdownOpen, setIsMeDropdownOpen] = useState(false);
   const unreadCount = useQuery(
     api.notifications.getUnreadCount,
     isAuthenticated && user?._id ? { userId: user._id } : "skip"
@@ -113,12 +114,14 @@ const Header = ({
     const nextTerm = event.target.value;
     setSearchTerm(nextTerm);
     setIsSearchOpen(nextTerm.trim().length > 0);
+    setIsMeDropdownOpen(false);
   };
 
   const handleSearchFocus = () => {
     if (searchTerm.trim().length > 0) {
       setIsSearchOpen(true);
     }
+    setIsMeDropdownOpen(false);
   };
 
   const handleResultKeyDown = (event, onActivate) => {
@@ -159,6 +162,11 @@ const Header = ({
 
     navigate(`/company/${encodeURIComponent(slug)}`);
     clearSearch();
+  };
+
+  const handleMeTriggerClick = () => {
+    closeSearch();
+    setIsMeDropdownOpen((prev) => !prev);
   };
 
   const isHomeActive = activeTab === "home";
@@ -212,18 +220,6 @@ const Header = ({
       arrow: false,
       onClick: () => setActiveTab("notifications"),
       isActive: isNotificationsActive,
-    },
-    {
-      key: "profile",
-      Icon: <Avatar src={photoURL} />,
-      title: "Me",
-      arrow: true,
-      onClick: () =>
-        onNavigateProfile({
-          username: user?.username ?? null,
-          userId: user?._id ?? null,
-        }),
-      isActive: false,
     },
   ];
 
@@ -457,17 +453,40 @@ const Header = ({
               <MenuItem Icon={Icon} title={title} arrow={arrow} onClick={onClick} />
             </div>
           ))}
-          <div className={classes.headerNavItem}>
-            <MenuItem
-              Icon={mode ? <Moon size={24} strokeWidth={1.75} /> : <Sun size={24} strokeWidth={1.75} />}
-              title={"Theme"}
-              onClick={() => dispatch(ChangeTheme())}
-            />
-          </div>
         </div>
-        <Button className={classes.signOutButton} onClick={() => signOut()} variant="outlined">
-          Sign Out
-        </Button>
+
+        <div className={classes.headerNavDivider} />
+
+        <div className={classes.meTrigger__wrapper}>
+          <div className={classes.meTrigger} onClick={handleMeTriggerClick}>
+            <Avatar src={photoURL} className={classes.meTrigger__avatar} />
+            <Hidden mdDown>
+              <div className={classes.meTrigger__label}>
+                <span>Me</span>
+                <ChevronDown size={16} strokeWidth={1.75} />
+              </div>
+            </Hidden>
+          </div>
+          <MeDropdown
+            open={isMeDropdownOpen}
+            user={user}
+            isDarkMode={mode}
+            onToggleTheme={() => dispatch(ChangeTheme())}
+            onViewProfile={() => {
+              onNavigateProfile({
+                username: user?.username ?? null,
+                userId: user?._id ?? null,
+              });
+              setIsMeDropdownOpen(false);
+            }}
+            onSignOut={() => {
+              signOut();
+              setIsMeDropdownOpen(false);
+            }}
+            onClose={() => setIsMeDropdownOpen(false)}
+          />
+        </div>
+
         <Paper className={classes.header__bottom__nav}>
           {tabItems.map(({ key, icon: Icon, onClick, isActive }) => (
             <Icon

@@ -1,5 +1,5 @@
 import { fade, makeStyles } from "@material-ui/core/styles";
-import { darkSecondary, darkPrimary } from "../../assets/Colors";
+import { darkSecondary } from "../../assets/Colors";
 
 export default makeStyles((theme) => ({
   header: {
@@ -156,15 +156,11 @@ export default makeStyles((theme) => ({
     color: theme.palette.type === "dark" ? "#9ca3af" : "#6b7280",
   },
   header__nav: {
-    flex: 5.5,
+    flex: 4,
     height: "100%",
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    "& > div:nth-child(6)": {
-      borderLeft: `1px solid ${theme.palette.divider}`,
-      borderRight: `1px solid ${theme.palette.divider}`,
-    },
     [theme.breakpoints.down("xs")]: {
       display: "none",
     },
@@ -194,55 +190,55 @@ export default makeStyles((theme) => ({
       backgroundColor: theme.palette.primary.main,
     },
   },
-  signOutButton: {
-    marginLeft: 10,
-    textTransform: "none",
-    borderColor: theme.palette.primary.main,
-    color: theme.palette.primary.main,
-    fontWeight: 600,
-    borderRadius: 999,
-    minWidth: 100,
-    "&:hover": {
-      borderColor: theme.palette.primary.dark,
-      color: theme.palette.primary.dark,
-      backgroundColor: fade(theme.palette.primary.main, 0.08),
-    },
+  headerNavDivider: {
+    width: 1,
+    height: "60%",
+    backgroundColor: theme.palette.divider,
+    flexShrink: 0,
+    margin: "0 4px",
     [theme.breakpoints.down("xs")]: {
       display: "none",
     },
   },
-  signInButton: {
-    marginLeft: 10,
-    textTransform: "none",
-    backgroundColor: theme.palette.primary.main,
-    color: "#fff",
-    fontWeight: 600,
-    borderRadius: 999,
-    minWidth: 100,
-    boxShadow: "none",
-    "&:hover": {
-      backgroundColor: theme.palette.primary.dark,
-      boxShadow: "none",
-    },
+  meTrigger__wrapper: {
+    position: "relative",
+    display: "flex",
+    alignItems: "center",
+    flexShrink: 0,
     [theme.breakpoints.down("xs")]: {
       display: "none",
     },
   },
-  mobileSignInButton: {
-    display: "none",
-    [theme.breakpoints.down("xs")]: {
-      display: "inline-flex",
-      marginLeft: 10,
-      textTransform: "none",
-      backgroundColor: theme.palette.primary.main,
-      color: "#fff",
-      fontWeight: 600,
-      borderRadius: 999,
-      minWidth: 80,
-      padding: "4px 12px",
-      "&:hover": {
-        backgroundColor: theme.palette.primary.dark,
-      },
+  meTrigger: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    cursor: "pointer",
+    padding: "4px 12px",
+    borderRadius: 4,
+    transition: "background-color 0.2s ease",
+    color: theme.palette.text.secondary,
+    "&:hover": {
+      backgroundColor: theme.palette.action.hover,
+      color: theme.palette.text.primary,
+    },
+  },
+  meTrigger__avatar: {
+    width: 24,
+    height: 24,
+  },
+  meTrigger__label: {
+    display: "flex",
+    alignItems: "center",
+    gap: 2,
+    "& > span": {
+      fontSize: 12,
+      fontWeight: 400,
+    },
+    "& > svg": {
+      width: 16,
+      height: 16,
     },
   },
   header__bottom__nav: {
