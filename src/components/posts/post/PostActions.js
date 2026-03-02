@@ -1,11 +1,6 @@
 import React from "react";
 import { useTheme } from "@material-ui/core/styles";
-import ThumbUpAltIcon from "@material-ui/icons/ThumbUpAlt";
-import ThumbUpAltOutlinedIcon from "@material-ui/icons/ThumbUpAltOutlined";
-import CommentOutlinedIcon from "@material-ui/icons/CommentOutlined";
-import ShareOutlinedIcon from "@material-ui/icons/ShareOutlined";
-import BookmarkBorderOutlinedIcon from "@material-ui/icons/BookmarkBorderOutlined";
-import BookmarkIcon from "@material-ui/icons/Bookmark";
+import { ThumbsUp, MessageSquare, Share2, Bookmark } from "lucide-react";
 import { REACTION_ITEMS } from "../../../utils/reactions";
 
 const PostActions = ({
@@ -166,14 +161,17 @@ const PostActions = ({
           style={!canInteract ? { opacity: 0.45, cursor: "not-allowed" } : undefined}
         >
           {isLikeActive ? (
-            <ThumbUpAltIcon
+            <ThumbsUp
+              size={18}
+              strokeWidth={2.25}
+              fill="currentColor"
               style={{
                 transform: "scaleX(-1)",
                 color: selectedReactionItem?.color ?? theme.palette.primary.main,
               }}
             />
           ) : (
-            <ThumbUpAltOutlinedIcon style={{ transform: "scaleX(-1)" }} />
+            <ThumbsUp size={18} strokeWidth={1.75} style={{ transform: "scaleX(-1)" }} />
           )}
           <h4
             style={
@@ -187,7 +185,9 @@ const PostActions = ({
         </div>
       </div>
       <div className={classes.action__icons} onClick={onToggleComments}>
-        <CommentOutlinedIcon
+        <MessageSquare
+          size={18}
+          strokeWidth={1.75}
           style={showComments ? { color: theme.palette.primary.main } : undefined}
         />
         <h4 style={showComments ? { color: theme.palette.primary.main } : undefined}>Comment</h4>
@@ -197,7 +197,7 @@ const PostActions = ({
         onClick={onRepostClick}
         style={!canInteract ? { opacity: 0.45, cursor: "not-allowed" } : undefined}
       >
-        <ShareOutlinedIcon />
+        <Share2 size={18} strokeWidth={1.75} />
         <h4>Repost</h4>
       </div>
       <div
@@ -206,9 +206,9 @@ const PostActions = ({
         style={!canInteract ? { opacity: 0.45, cursor: "not-allowed" } : undefined}
       >
         {isBookmarked ? (
-          <BookmarkIcon style={{ color: theme.palette.primary.main }} />
+          <Bookmark size={18} strokeWidth={1.75} fill="currentColor" style={{ color: theme.palette.primary.main }} />
         ) : (
-          <BookmarkBorderOutlinedIcon />
+          <Bookmark size={18} strokeWidth={1.75} />
         )}
         <h4 style={isBookmarked ? { color: theme.palette.primary.main } : undefined}>
           {isBookmarked ? "Saved" : "Save"}

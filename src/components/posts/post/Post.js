@@ -7,8 +7,7 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import Paper from "@material-ui/core/Paper";
 import Snackbar from "@material-ui/core/Snackbar";
 import TextField from "@material-ui/core/TextField";
-import FiberManualRecordRoundedIcon from "@material-ui/icons/FiberManualRecordRounded";
-import RepeatIcon from "@material-ui/icons/Repeat";
+import { Circle, Repeat2 } from "lucide-react";
 import ReactPlayer from "react-player";
 import { useNavigate } from "react-router-dom";
 import { api } from "../../../convex/_generated/api";
@@ -745,8 +744,11 @@ const Post = forwardRef(
           {textStats.map((statText, index) => (
             <React.Fragment key={statText}>
               {(totalReactionCount > 0 || index > 0) && (
-                <FiberManualRecordRoundedIcon
-                  style={{ fontSize: 6, color: "grey", margin: "0 4px" }}
+                <Circle
+                  size={6}
+                  fill="grey"
+                  strokeWidth={0}
+                  style={{ margin: "0 4px" }}
                 />
               )}
               <h4>{statText}</h4>
@@ -761,7 +763,7 @@ const Post = forwardRef(
         <Paper ref={ref} className={classes.post} id={`post-${postId}`}>
           {isRepost && (
             <div className={classes.repost__header}>
-              <RepeatIcon className={classes.repost__headerIcon} />
+              <Repeat2 size={16} strokeWidth={1.75} className={classes.repost__headerIcon} />
               <span
                 className={classes.repost__headerText}
                 onClick={canNavigateProfile ? handleProfileClick : undefined}

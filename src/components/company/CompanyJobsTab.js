@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, CardContent, Typography } from "@material-ui/core";
 import { useTheme } from "@material-ui/core/styles";
-import WorkOutlineIcon from "@material-ui/icons/WorkOutline";
+import { Briefcase } from "lucide-react";
 
 const CompanyJobsTab = () => {
   const theme = useTheme();
@@ -25,7 +25,7 @@ const CompanyJobsTab = () => {
           textAlign: "center",
         }}
       >
-        <WorkOutlineIcon style={{ fontSize: 36, color: theme.palette.text.secondary }} />
+        <Briefcase size={36} strokeWidth={1.75} style={{ color: theme.palette.text.secondary }} />
         <Typography variant="body1" style={{ color: theme.palette.text.secondary }}>
           No job postings yet. Check back soon!
         </Typography>

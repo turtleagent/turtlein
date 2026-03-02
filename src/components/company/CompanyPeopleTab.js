@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Avatar, Card, CardContent, Paper, Typography } from "@material-ui/core";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import { fade } from "@material-ui/core/styles/colorManipulator";
-import PersonIcon from "@material-ui/icons/Person";
+import { User } from "lucide-react";
 import { api } from "../../convex/_generated/api";
 import { resolvePhoto } from "../../utils/photo";
 
@@ -150,7 +150,7 @@ const CompanyPeopleTab = ({ company }) => {
                     alt={person.displayName}
                     className={classes.avatar}
                   >
-                    {!person.photoURL ? <PersonIcon fontSize="small" /> : null}
+                    {!person.photoURL ? <User size={18} strokeWidth={1.75} /> : null}
                   </Avatar>
                   <div className={classes.personInfo}>
                     <Typography variant="body1" className={classes.name}>

@@ -2,7 +2,7 @@ import React from "react";
 import Avatar from "@material-ui/core/Avatar";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
-import MoreHorizOutlinedIcon from "@material-ui/icons/MoreHorizOutlined";
+import { Ellipsis } from "lucide-react";
 import ReactTimeago from "react-timeago";
 
 const PostHeader = ({
@@ -57,7 +57,7 @@ const PostHeader = ({
     </div>
     {canShowPostMenu && (
       <>
-        <MoreHorizOutlinedIcon onClick={onMenuOpen} />
+        <Ellipsis size={20} strokeWidth={1.75} onClick={onMenuOpen} />
         <Menu anchorEl={menuAnchorEl} keepMounted open={isMenuOpen} onClose={onMenuClose}>
           {isOwnPost ? (
             <>

@@ -11,7 +11,7 @@ import {
   Typography,
 } from "@material-ui/core";
 import { fade, makeStyles } from "@material-ui/core/styles";
-import BusinessIcon from "@material-ui/icons/Business";
+import { Building2 } from "lucide-react";
 import { api } from "../../convex/_generated/api";
 
 const INDUSTRY_OPTIONS = [
@@ -363,7 +363,7 @@ const CreateCompany = () => {
 
           <div className={classes.logoRow}>
             <Avatar className={classes.logoPreview} src={logoPreviewURL || undefined}>
-              {!logoPreviewURL ? <BusinessIcon /> : null}
+              {!logoPreviewURL ? <Building2 size={24} strokeWidth={1.75} /> : null}
             </Avatar>
             <div className={classes.logoMeta}>
               <Typography className={classes.logoName}>

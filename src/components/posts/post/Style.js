@@ -58,7 +58,7 @@ export default makeStyles((theme) => ({
     padding: "14px 20px 8px",
     "& > .MuiAvatar-root": {
     },
-    "& > .MuiSvgIcon-root": {
+    "& > svg": {
       color: theme.palette.text.secondary,
       cursor: "pointer",
       borderRadius: 999,
@@ -385,8 +385,9 @@ export default makeStyles((theme) => ({
     borderBottom: `1px solid ${theme.palette.divider}`,
     "& > div": {
       display: "flex",
-      "& > .MuiSvgIcon-root": {
-        fontSize: 16,
+      "& > svg": {
+        width: 16,
+        height: 16,
       },
     },
     "& > h4": {
@@ -553,12 +554,13 @@ export default makeStyles((theme) => ({
         backgroundColor: "transparent",
       },
     },
-    "& > .MuiSvgIcon-root": {
-      fontSize: 18,
-      fontWeight: 500,
+    "& > svg": {
+      width: 18,
+      height: 18,
       color: theme.palette.text.secondary,
       [theme.breakpoints.down("xs")]: {
-        fontSize: 14,
+        width: 14,
+        height: 14,
       },
     },
     "& > h4": {

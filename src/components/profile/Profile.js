@@ -18,9 +18,7 @@ import {
   LinearProgress,
 } from "@material-ui/core";
 import { Skeleton } from "@material-ui/lab";
-import ArrowBackIcon from "@material-ui/icons/ArrowBack";
-import CameraAltIcon from "@material-ui/icons/CameraAlt";
-import LocationOnIcon from "@material-ui/icons/LocationOn";
+import { ArrowLeft, Camera, MapPin } from "lucide-react";
 import ReactTimeago from "react-timeago";
 import { api } from "../../convex/_generated/api";
 import { generateConversationKey } from "../../utils/crypto";
@@ -1109,7 +1107,7 @@ const Profile = ({
             variant="text"
             onClick={onBack}
             className={classes.backButton}
-            startIcon={<ArrowBackIcon fontSize="small" />}
+            startIcon={<ArrowLeft size={18} strokeWidth={1.75} />}
           >
             Back to feed
           </Button>
@@ -1153,7 +1151,7 @@ const Profile = ({
                     className={classes.coverUploadButton}
                     aria-label="Update cover photo"
                   >
-                    <CameraAltIcon fontSize="small" />
+                    <Camera size={18} strokeWidth={1.75} />
                   </IconButton>
                   <input
                     ref={profilePhotoInputRef}
@@ -1200,7 +1198,7 @@ const Profile = ({
             <div className={classes.metaRow}>
               {location && (
                 <Typography variant="body2" color="textSecondary" className={classes.metaItem}>
-                  <LocationOnIcon style={{ fontSize: 16, marginRight: 4 }} />
+                  <MapPin size={16} strokeWidth={1.75} style={{ marginRight: 4 }} />
                   <span>{location}</span>
                 </Typography>
               )}

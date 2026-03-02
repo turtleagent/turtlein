@@ -1,24 +1,15 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useConvexAuth, useMutation } from "convex/react";
 import { useNavigate } from "react-router-dom";
-import { Chip, Paper, Snackbar, TextField } from "@material-ui/core";
+import { Snackbar, useMediaQuery } from "@material-ui/core";
 import { useTheme } from "@material-ui/core/styles";
+import Dialog from "@material-ui/core/Dialog";
 import Alert from "@material-ui/lab/Alert";
-import VideocamOutlinedIcon from "@material-ui/icons/VideocamOutlined";
-import OndemandVideoOutlinedIcon from "@material-ui/icons/OndemandVideoOutlined";
-import ImageOutlinedIcon from "@material-ui/icons/ImageOutlined";
-import EditOutlinedIcon from "@material-ui/icons/EditOutlined";
-import PollIcon from "@material-ui/icons/Poll";
-import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
-import HighlightOffRoundedIcon from "@material-ui/icons/HighlightOffRounded";
-// Colors import removed — using green branding directly
-import Styles from "./Style";
-import LinkOutlinedIcon from "@material-ui/icons/LinkOutlined";
-import HighlightOffIcon from "@material-ui/icons/HighlightOff";
+import FormClosedCard from "./FormClosedCard";
+import FormModalContent from "./FormModalContent";
 import { imageUploadHandler } from "./form.utils";
 import { api } from "../../convex/_generated/api";
 import useConvexUser from "../../hooks/useConvexUser";
-import MentionAutocomplete from "../mentions/MentionAutocomplete";
 
 const MAX_POST_IMAGES = 4;
 const MIN_POLL_OPTIONS = 2;
@@ -31,10 +22,7 @@ const getNormalizedPollPayload = (pollDraft) => {
     .map((option) => option.trim())
     .filter((option) => option.length > 0);
 
-  return {
-    question,
-    options,
-  };
+  return { question, options };
 };
 
 const getActiveMention = (value, caretPosition) => {
@@ -60,29 +48,23 @@ const getActiveMention = (value, caretPosition) => {
 };
 
 const Form = () => {
-  const classes = Styles();
   const theme = useTheme();
   const navigate = useNavigate();
+  const isXs = useMediaQuery(theme.breakpoints.down("xs"));
   const createPost = useMutation(api.posts.createPost);
   const createPoll = useMutation(api.polls.createPoll);
   const generateImageUploadUrl = useMutation(api.posts.generateImageUploadUrl);
   const { isAuthenticated } = useConvexAuth();
   const user = useConvexUser();
 
-  const [uploadData, setUploadData] = useState({
-    description: "",
-    files: [],
-  });
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [uploadData, setUploadData] = useState({ description: "", files: [] });
   const [openURL, setOpenURL] = useState(false);
   const [URL, setURL] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [postVisibility, setPostVisibility] = useState("public");
   const [isPollComposerOpen, setIsPollComposerOpen] = useState(false);
-  const [pollDraft, setPollDraft] = useState({
-    question: "",
-    options: ["", ""],
-  });
+  const [pollDraft, setPollDraft] = useState({ question: "", options: ["", ""] });
   const [mentionState, setMentionState] = useState({
     open: false,
     query: "",
@@ -95,41 +77,39 @@ const Form = () => {
     severity: "info",
     autoHideDuration: 4000,
   });
+
   const descriptionInputRef = useRef(null);
+  const pendingActionRef = useRef(null);
+
+  // Deferred action: when the modal opens after a toolbar click, trigger the file input
+  useEffect(() => {
+    if (isModalOpen && pendingActionRef.current) {
+      const action = pendingActionRef.current;
+      pendingActionRef.current = null;
+      requestAnimationFrame(() => {
+        const targetId = action === "photo" ? "upload-image" : "upload-video";
+        document.getElementById(targetId)?.click();
+      });
+    }
+  }, [isModalOpen]);
 
   const showSnackbar = (message, severity = "info", autoHideDuration = 4000) => {
-    setSnackbarState({
-      open: true,
-      message,
-      severity,
-      autoHideDuration,
-    });
+    setSnackbarState({ open: true, message, severity, autoHideDuration });
   };
 
   const handleSnackbarClose = (_, reason) => {
     if (reason === "clickaway") {
       return;
     }
-    setSnackbarState((previousValue) => ({
-      ...previousValue,
-      open: false,
-    }));
+    setSnackbarState((prev) => ({ ...prev, open: false }));
   };
 
   const closeMentionAutocomplete = () => {
-    setMentionState({
-      open: false,
-      query: "",
-      start: -1,
-      end: -1,
-    });
+    setMentionState({ open: false, query: "", start: -1, end: -1 });
   };
 
   const resetPollDraft = () => {
-    setPollDraft({
-      question: "",
-      options: ["", ""],
-    });
+    setPollDraft({ question: "", options: ["", ""] });
   };
 
   const updateMentionState = (value, caretPosition) => {
@@ -138,20 +118,13 @@ const Form = () => {
       closeMentionAutocomplete();
       return;
     }
-
-    setMentionState({
-      open: true,
-      ...activeMention,
-    });
+    setMentionState({ open: true, ...activeMention });
   };
 
   const handleDescriptionChange = (event) => {
     const nextDescription = event.target.value;
     const caretPosition = event.target.selectionStart;
-    setUploadData((previousValue) => ({
-      ...previousValue,
-      description: nextDescription,
-    }));
+    setUploadData((prev) => ({ ...prev, description: nextDescription }));
     updateMentionState(nextDescription, caretPosition);
   };
 
@@ -174,16 +147,10 @@ const Form = () => {
 
     const currentDescription = uploadData.description;
     const mentionText = `@${selectedUser.username} `;
-    const nextDescription = `${currentDescription.slice(
-      0,
-      mentionStart,
-    )}${mentionText}${currentDescription.slice(mentionEnd)}`;
+    const nextDescription = `${currentDescription.slice(0, mentionStart)}${mentionText}${currentDescription.slice(mentionEnd)}`;
     const nextCursorPosition = mentionStart + mentionText.length;
 
-    setUploadData((previousValue) => ({
-      ...previousValue,
-      description: nextDescription,
-    }));
+    setUploadData((prev) => ({ ...prev, description: nextDescription }));
     closeMentionAutocomplete();
 
     requestAnimationFrame(() => {
@@ -194,8 +161,38 @@ const Form = () => {
     });
   };
 
-  const handleSubmitButton = async (e) => {
-    e.preventDefault();
+  const resetState = () => {
+    setUploadData({ description: "", files: [] });
+    setOpenURL(false);
+    setURL("");
+    setPostVisibility("public");
+    setIsPollComposerOpen(false);
+    resetPollDraft();
+    closeMentionAutocomplete();
+  };
+
+  const handleClose = () => {
+    const hasContent =
+      uploadData.description.trim() ||
+      uploadData.files.length > 0 ||
+      URL.trim() ||
+      isPollComposerOpen;
+
+    if (hasContent) {
+      const shouldDiscard = window.confirm("Discard this post?");
+      if (!shouldDiscard) {
+        return;
+      }
+    }
+
+    resetState();
+    setIsModalOpen(false);
+  };
+
+  const handleSubmit = async (e) => {
+    if (e) {
+      e.preventDefault();
+    }
 
     if (isSubmitting) {
       return;
@@ -214,9 +211,7 @@ const Form = () => {
     }
 
     const shouldCreatePoll = isPollComposerOpen;
-    const normalizedPollPayload = shouldCreatePoll
-      ? getNormalizedPollPayload(pollDraft)
-      : null;
+    const normalizedPollPayload = shouldCreatePoll ? getNormalizedPollPayload(pollDraft) : null;
 
     if (shouldCreatePoll && !normalizedPollPayload.question) {
       showSnackbar("Please add a poll question.", "warning");
@@ -238,13 +233,11 @@ const Form = () => {
         setURL("");
         return;
       }
-
       if (URL.includes("youtu.be") || URL.includes("youtube")) {
         showSnackbar("Youtube videos are not allowed", "warning");
         setURL("");
         return;
       }
-
       if (!URL.startsWith("http")) {
         showSnackbar("Please enter valid image url", "warning");
         setURL("");
@@ -272,9 +265,7 @@ const Form = () => {
             const uploadUrl = await generateImageUploadUrl({});
             const uploadResponse = await fetch(uploadUrl, {
               method: "POST",
-              headers: {
-                "Content-Type": file.blob.type || "application/octet-stream",
-              },
+              headers: { "Content-Type": file.blob.type || "application/octet-stream" },
               body: file.blob,
             });
 
@@ -315,6 +306,7 @@ const Form = () => {
       }
 
       resetState();
+      setIsModalOpen(false);
       showSnackbar("Post created!", "success", 1500);
     } catch (error) {
       console.error("Failed to create post:", error);
@@ -324,276 +316,157 @@ const Form = () => {
     }
   };
 
-  const resetState = () => {
-    setUploadData({
-      description: "",
-      files: [],
-    });
-    setOpenURL(false);
-    setURL("");
-    setPostVisibility("public");
-    setIsPollComposerOpen(false);
-    resetPollDraft();
-    closeMentionAutocomplete();
-  };
-
   const handleRemoveFile = (indexToRemove) => {
-    setUploadData((previousValue) => ({
-      ...previousValue,
-      files: previousValue.files.filter((_, fileIndex) => fileIndex !== indexToRemove),
+    setUploadData((prev) => ({
+      ...prev,
+      files: prev.files.filter((_, i) => i !== indexToRemove),
     }));
   };
 
-  const toggleURL_Tab = () => {
+  const toggleURL = () => {
     if (uploadData.files.length > 0) {
       setOpenURL(false);
     } else if (URL === "") {
-      setOpenURL(!openURL);
-    } else {
-      setOpenURL(true);
-    }
-  };
-
-  const closeURL_Tab = () => {
-    if (URL === "") {
-      setOpenURL(false);
+      setOpenURL((prev) => !prev);
     } else {
       setOpenURL(true);
     }
   };
 
   const togglePollComposer = () => {
-    setIsPollComposerOpen((previousValue) => {
-      const nextValue = !previousValue;
-      if (!nextValue) {
+    setIsPollComposerOpen((prev) => {
+      const next = !prev;
+      if (!next) {
         resetPollDraft();
       }
-      return nextValue;
+      return next;
     });
   };
 
+  const toggleVisibility = () => {
+    setPostVisibility((prev) => (prev === "public" ? "connections" : "public"));
+  };
+
   const handlePollQuestionChange = (event) => {
-    const nextQuestion = event.target.value;
-    setPollDraft((previousValue) => ({
-      ...previousValue,
-      question: nextQuestion,
-    }));
+    setPollDraft((prev) => ({ ...prev, question: event.target.value }));
   };
 
   const handlePollOptionChange = (optionIndex, nextValue) => {
-    setPollDraft((previousValue) => ({
-      ...previousValue,
-      options: previousValue.options.map((option, index) =>
-        index === optionIndex ? nextValue : option,
-      ),
+    setPollDraft((prev) => ({
+      ...prev,
+      options: prev.options.map((opt, i) => (i === optionIndex ? nextValue : opt)),
     }));
   };
 
   const addPollOption = () => {
-    setPollDraft((previousValue) => {
-      if (previousValue.options.length >= MAX_POLL_OPTIONS) {
-        return previousValue;
+    setPollDraft((prev) => {
+      if (prev.options.length >= MAX_POLL_OPTIONS) {
+        return prev;
       }
-
-      return {
-        ...previousValue,
-        options: [...previousValue.options, ""],
-      };
+      return { ...prev, options: [...prev.options, ""] };
     });
   };
 
   const removePollOption = (optionIndex) => {
-    setPollDraft((previousValue) => {
-      if (previousValue.options.length <= MIN_POLL_OPTIONS) {
-        return previousValue;
+    setPollDraft((prev) => {
+      if (prev.options.length <= MIN_POLL_OPTIONS) {
+        return prev;
       }
-
-      return {
-        ...previousValue,
-        options: previousValue.options.filter((_, index) => index !== optionIndex),
-      };
+      return { ...prev, options: prev.options.filter((_, i) => i !== optionIndex) };
     });
   };
 
-  const onWriteArticle = () => {
-    navigate("/write-article");
+  // Closed card callbacks
+  const openModal = () => setIsModalOpen(true);
+
+  const openModalWithAction = (action) => {
+    pendingActionRef.current = action;
+    setIsModalOpen(true);
   };
+
+  const onWriteArticle = () => navigate("/write-article");
 
   if (!isAuthenticated || !user?._id) {
     return null;
   }
 
   return (
-    <Paper className={classes.upload}>
-      <div className={classes.upload__header}>
-        <form className={classes.header__form} onSubmit={handleSubmitButton}>
-          <EditOutlinedIcon />
-          <TextField
-            className={classes.headerTextField}
-            placeholder="Start a post"
-            inputRef={descriptionInputRef}
-            value={uploadData.description}
-            onChange={handleDescriptionChange}
-            onClick={handleDescriptionCursorChange}
-            onKeyUp={handleDescriptionCursorChange}
-            InputProps={{ disableUnderline: true }}
-            inputProps={{ "aria-label": "Start a post" }}
-          />
-          <input
-            id="upload-image"
-            type="file"
-            accept="image/*"
-            hidden
-            multiple
-            onChange={(e) => {
-              imageUploadHandler(e, "image", setUploadData, { maxImageCount: MAX_POST_IMAGES });
-              setOpenURL(false);
-              setURL("");
-            }}
-          />
-          <input
-            id="upload-video"
-            type="file"
-            accept="video/*"
-            hidden
-            onChange={(e) => {
-              imageUploadHandler(e, "video", setUploadData);
-              setOpenURL(false);
-            }}
-          />
-          <select
-            aria-label="Post visibility"
-            value={postVisibility}
-            onChange={(e) => setPostVisibility(e.target.value)}
-            disabled={isSubmitting}
-          >
-            <option value="public">Public</option>
-            <option value="connections">Connections Only</option>
-          </select>
-          <button type="submit" disabled={isSubmitting}>{isSubmitting ? "Posting..." : "Post"}</button>
-        </form>
-        <button type="button" className={classes.writeArticleButton} onClick={onWriteArticle}>
-          Write article
-        </button>
-        <MentionAutocomplete
-          anchorEl={descriptionInputRef.current}
-          open={mentionState.open}
-          query={mentionState.query}
-          onSelect={handleMentionSelect}
-          onClose={closeMentionAutocomplete}
-        />
-      </div>
-      {!openURL && uploadData.files.length > 0 && (
-        <div className={classes.selectedFile}>
-          {uploadData.files.map((file, fileIndex) => (
-            <Chip
-              key={`${file.name}-${fileIndex}`}
-              color="primary"
-              size="small"
-              onDelete={() => handleRemoveFile(fileIndex)}
-              icon={
-                file.type === "image" ? (
-                  <ImageOutlinedIcon />
-                ) : (
-                  <VideocamOutlinedIcon />
-                )
-              }
-              label={file.name}
-            />
-          ))}
-        </div>
-      )}
-      {openURL && (
-        <div className={classes.pasteURL_Input}>
-          <LinkOutlinedIcon />
-          <input
-            placeholder="Paste an image URL"
-            value={URL}
-            onChange={(e) => setURL(e.target.value)}
-          />
-          {URL !== "" && (
-            <HighlightOffIcon
-              style={{ color: "orange", fontSize: 16 }}
-              onClick={() => setURL("")}
-            />
-          )}
-        </div>
-      )}
-      {isPollComposerOpen && (
-        <div className={classes.pollComposer}>
-          <label className={classes.pollLabel} htmlFor="poll-question">
-            Poll Question
-          </label>
-          <input
-            id="poll-question"
-            className={classes.pollInput}
-            placeholder="Ask a question..."
-            value={pollDraft.question}
-            onChange={handlePollQuestionChange}
-          />
-          <div className={classes.pollOptions}>
-            {pollDraft.options.map((option, optionIndex) => (
-              <div className={classes.pollOptionRow} key={`poll-option-${optionIndex}`}>
-                <input
-                  className={classes.pollOptionInput}
-                  placeholder={`Option ${optionIndex + 1}`}
-                  value={option}
-                  onChange={(event) => handlePollOptionChange(optionIndex, event.target.value)}
-                />
-                {pollDraft.options.length > MIN_POLL_OPTIONS && (
-                  <button
-                    type="button"
-                    className={classes.pollRemoveOption}
-                    aria-label={`Remove option ${optionIndex + 1}`}
-                    onClick={() => removePollOption(optionIndex)}
-                  >
-                    <HighlightOffRoundedIcon />
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-          <button
-            type="button"
-            className={classes.pollAddOption}
-            onClick={addPollOption}
-            disabled={pollDraft.options.length >= MAX_POLL_OPTIONS}
-          >
-            <AddCircleOutlineIcon />
-            Add option
-          </button>
-          <p className={classes.pollHint}>Add between 2 and 4 options.</p>
-        </div>
-      )}
+    <>
+      <FormClosedCard
+        user={user}
+        onStartPost={openModal}
+        onPhotoClick={() => openModalWithAction("photo")}
+        onVideoClick={() => openModalWithAction("video")}
+        onWriteArticle={onWriteArticle}
+      />
 
-      <div className={classes.upload__media}>
-        <label
-          htmlFor={URL === "" ? "upload-image" : ""}
-          onClick={closeURL_Tab}
-          className={classes.media__options}
-        >
-          <ImageOutlinedIcon
-            style={{ color: theme.palette.primary.main }}
-          />
-          <h4>Photo</h4>
-        </label>
-        <label
-          htmlFor={URL === "" ? "upload-video" : ""}
-          onClick={closeURL_Tab}
-          className={classes.media__options}
-        >
-          <OndemandVideoOutlinedIcon style={{ color: "orange" }} />
-          <h4>Video</h4>
-        </label>
-        <div className={classes.media__options} onClick={toggleURL_Tab}>
-          <LinkOutlinedIcon style={{ color: "#e88ee4", fontSize: 30 }} />
-          <h4>URL</h4>
-        </div>
-        <div className={classes.media__options} onClick={togglePollComposer}>
-          <PollIcon style={{ color: theme.palette.primary.main }} />
-          <h4>{isPollComposerOpen ? "Cancel Poll" : "Create Poll"}</h4>
-        </div>
-      </div>
+      <Dialog
+        open={isModalOpen}
+        onClose={handleClose}
+        fullWidth
+        maxWidth="sm"
+        fullScreen={isXs}
+        scroll="body"
+        PaperProps={{ style: { overflow: "visible", borderRadius: isXs ? 0 : 12 } }}
+      >
+        <input
+          id="upload-image"
+          type="file"
+          accept="image/*"
+          hidden
+          multiple
+          onChange={(e) => {
+            imageUploadHandler(e, "image", setUploadData, { maxImageCount: MAX_POST_IMAGES });
+            setOpenURL(false);
+            setURL("");
+          }}
+        />
+        <input
+          id="upload-video"
+          type="file"
+          accept="video/*"
+          hidden
+          onChange={(e) => {
+            imageUploadHandler(e, "video", setUploadData);
+            setOpenURL(false);
+          }}
+        />
+
+        <FormModalContent
+          user={user}
+          description={uploadData.description}
+          files={uploadData.files}
+          url={URL}
+          isUrlOpen={openURL}
+          isPollOpen={isPollComposerOpen}
+          pollDraft={pollDraft}
+          postVisibility={postVisibility}
+          isSubmitting={isSubmitting}
+          mentionState={mentionState}
+          descriptionInputRef={descriptionInputRef}
+          onDescriptionChange={handleDescriptionChange}
+          onDescriptionCursorChange={handleDescriptionCursorChange}
+          onMentionSelect={handleMentionSelect}
+          onCloseMentions={closeMentionAutocomplete}
+          onRemoveFile={handleRemoveFile}
+          onUrlChange={setURL}
+          onClearUrl={() => setURL("")}
+          onToggleUrl={toggleURL}
+          onTogglePoll={togglePollComposer}
+          onPollQuestionChange={handlePollQuestionChange}
+          onPollOptionChange={handlePollOptionChange}
+          onAddPollOption={addPollOption}
+          onRemovePollOption={removePollOption}
+          onToggleVisibility={toggleVisibility}
+          onSubmit={handleSubmit}
+          onClose={handleClose}
+          onPhotoClick={() => document.getElementById("upload-image")?.click()}
+          onVideoClick={() => document.getElementById("upload-video")?.click()}
+          minPollOptions={MIN_POLL_OPTIONS}
+          maxPollOptions={MAX_POLL_OPTIONS}
+        />
+      </Dialog>
+
       <Snackbar
         open={snackbarState.open}
         autoHideDuration={snackbarState.autoHideDuration}
@@ -604,7 +477,7 @@ const Form = () => {
           {snackbarState.message}
         </Alert>
       </Snackbar>
-    </Paper>
+    </>
   );
 };
 

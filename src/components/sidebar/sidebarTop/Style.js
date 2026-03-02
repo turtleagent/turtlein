@@ -67,8 +67,9 @@ export default makeStyles((theme) => ({
       fontWeight: 500,
       marginLeft: 10,
     },
-    "& > .MuiSvgIcon-root": {
-      fontSize: 20,
+    "& > svg": {
+      width: 20,
+      height: 20,
     },
     "&:hover": {
       backgroundColor: theme.palette.action.hover,

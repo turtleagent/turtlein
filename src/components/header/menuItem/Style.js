@@ -8,8 +8,9 @@ export default makeStyles((theme) => ({
     color: theme.palette.text.secondary,
     cursor: "pointer",
     transition: "color 0.2s ease",
-    "& > .MuiSvgIcon-root": {
-      fontSize: 24,
+    "& > svg": {
+      width: 24,
+      height: 24,
     },
     "& > .MuiAvatar-root": {
       width: 24,
@@ -28,8 +29,9 @@ export default makeStyles((theme) => ({
       fontSize: 12,
       fontWeight: 400,
     },
-    "& > .MuiSvgIcon-root": {
-      fontSize: 20,
+    "& > svg": {
+      width: 20,
+      height: 20,
       padding: 0,
       margin: -5,
       marginLeft: 0,

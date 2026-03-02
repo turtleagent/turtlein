@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import { Paper } from "@material-ui/core";
-import FiberManualRecordIcon from "@material-ui/icons/FiberManualRecord";
-import InfoOutlinedIcon from "@material-ui/icons/InfoOutlined";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import { Circle, Info, ChevronDown } from "lucide-react";
 import HeaderInfo from "../../components/util/HeadLine";
 import { LinkedInLightBlue } from "../../assets/Colors";
 import CompanySuggestions from "../company/CompanySuggestions";
@@ -17,17 +15,16 @@ const Widgets = () => {
       <Paper className={classes.widgets__top}>
         <div className={classes.heading}>
           <h4>TurtleIn News</h4>
-          <InfoOutlinedIcon />
+          <Info size={16} strokeWidth={1.75} />
         </div>
         {top_1.map((title, i) => (
           <HeaderInfo
             key={`widgets-top_1_${i}`}
             Icon={
-              <FiberManualRecordIcon
-                style={{
-                  color: LinkedInLightBlue,
-                  fontSize: 12,
-                }}
+              <Circle
+                size={12}
+                fill={LinkedInLightBlue}
+                strokeWidth={0}
               />
             }
             title={title}
@@ -39,7 +36,7 @@ const Widgets = () => {
           top_2.map((title, i) => (
             <HeaderInfo
               key={`widgets-top_2_${i}`}
-              Icon={<FiberManualRecordIcon style={{ color: LinkedInLightBlue, fontSize: 12 }} />}
+              Icon={<Circle size={12} fill={LinkedInLightBlue} strokeWidth={0} />}
               title={title}
               time={true}
               count={true}
@@ -47,7 +44,7 @@ const Widgets = () => {
           ))}
         <div className={classes.expand} onClick={() => setExpand(!expand)}>
           <h4>{expand ? "Show less" : "Show more"}</h4>
-          <ExpandMoreIcon style={{ transform: expand ? "rotate(180deg)" : "" }} />
+          <ChevronDown size={20} strokeWidth={1.75} style={{ transform: expand ? "rotate(180deg)" : "", transition: "transform 0.2s ease" }} />
         </div>
       </Paper>
       <div className={classes.widgets__suggestions}>

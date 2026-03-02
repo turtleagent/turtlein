@@ -148,7 +148,7 @@ export default makeStyles((theme) => ({
     alignItems: "center",
     fontSize: "0.8rem",
     minWidth: 0,
-    "& > .MuiSvgIcon-root": {
+    "& > svg": {
       flexShrink: 0,
     },
     "& > span": {

@@ -13,21 +13,18 @@ import {
   ClickAwayListener,
   Typography,
 } from "@material-ui/core";
-import SearchIcon from "@material-ui/icons/Search";
-import HomeIcon from "@material-ui/icons/Home";
-import HomeOutlinedIcon from "@material-ui/icons/HomeOutlined";
-import PeopleAltIcon from "@material-ui/icons/PeopleAlt";
-import NotificationsIcon from "@material-ui/icons/Notifications";
-import NotificationsOutlinedIcon from "@material-ui/icons/NotificationsOutlined";
-import PeopleAltOutlinedIcon from "@material-ui/icons/PeopleAltOutlined";
-import ForumIcon from "@material-ui/icons/Forum";
-import ForumOutlinedIcon from "@material-ui/icons/ForumOutlined";
-import NightsStayOutlinedIcon from "@material-ui/icons/NightsStayOutlined";
-import WbSunnyOutlinedIcon from "@material-ui/icons/WbSunnyOutlined";
-import PersonIcon from "@material-ui/icons/Person";
-import PersonOutlineIcon from "@material-ui/icons/PersonOutline";
-import BusinessIcon from "@material-ui/icons/Business";
-import VerifiedUserIcon from "@material-ui/icons/VerifiedUser";
+import {
+  Search,
+  House,
+  Users,
+  Bell,
+  MessageSquareMore,
+  Moon,
+  Sun,
+  User,
+  Building2,
+  BadgeCheck,
+} from "lucide-react";
 import { api } from "../../convex/_generated/api";
 import useConvexUser from "../../hooks/useConvexUser";
 import MenuItem from "./menuItem/MenuItem";
@@ -168,16 +165,14 @@ const Header = ({
   const isNetworkActive = activeTab === "network";
   const isMessagingActive = activeTab === "messaging";
   const isNotificationsActive = activeTab === "notifications";
-  const notificationsNavIcon = isNotificationsActive ? (
-    <NotificationsIcon />
-  ) : (
-    <NotificationsOutlinedIcon />
+  const notificationsNavIcon = (
+    <Bell size={24} strokeWidth={isNotificationsActive ? 2.25 : 1.75} />
   );
 
   const items = [
     {
       key: "home",
-      Icon: isHomeActive ? <HomeIcon /> : <HomeOutlinedIcon />,
+      Icon: <House size={24} strokeWidth={isHomeActive ? 2.25 : 1.75} />,
       title: "Home",
       arrow: false,
       onClick: () => setActiveTab("home"),
@@ -185,7 +180,7 @@ const Header = ({
     },
     {
       key: "network",
-      Icon: <PeopleAltOutlinedIcon />,
+      Icon: <Users size={24} strokeWidth={isNetworkActive ? 2.25 : 1.75} />,
       title: "My Network",
       arrow: false,
       onClick: () => setActiveTab("network"),
@@ -193,7 +188,7 @@ const Header = ({
     },
     {
       key: "messaging",
-      Icon: <ForumOutlinedIcon />,
+      Icon: <MessageSquareMore size={24} strokeWidth={isMessagingActive ? 2.25 : 1.75} />,
       title: "Messaging",
       arrow: false,
       onClick: () => setActiveTab("messaging"),
@@ -243,34 +238,31 @@ const Header = ({
   const tabItems = [
     {
       key: "home",
-      icon: activeTab === "home" ? HomeIcon : HomeOutlinedIcon,
+      icon: House,
       onClick: navigateToHome,
       isActive: activeTab === "home",
     },
     {
       key: "network",
-      icon: activeTab === "network" ? PeopleAltIcon : PeopleAltOutlinedIcon,
+      icon: Users,
       onClick: () => setActiveTab("network"),
       isActive: activeTab === "network",
     },
     {
       key: "messaging",
-      icon: activeTab === "messaging" ? ForumIcon : ForumOutlinedIcon,
+      icon: MessageSquareMore,
       onClick: () => setActiveTab("messaging"),
       isActive: activeTab === "messaging",
     },
     {
       key: "notifications",
-      icon:
-        activeTab === "notifications"
-          ? NotificationsIcon
-          : NotificationsOutlinedIcon,
+      icon: Bell,
       onClick: () => setActiveTab("notifications"),
       isActive: activeTab === "notifications",
     },
     {
       key: "profile",
-      icon: activeTab === "profile" ? PersonIcon : PersonOutlineIcon,
+      icon: User,
       onClick: () =>
         onNavigateProfile({
           username: user?.username ?? null,
@@ -307,7 +299,7 @@ const Header = ({
           <ClickAwayListener onClickAway={closeSearch}>
             <div className={classes.search__wrapper}>
               <div className={classes.search}>
-                <SearchIcon />
+                <Search size={20} strokeWidth={1.75} />
                 <input
                   placeholder="Search"
                   value={searchTerm}
@@ -408,7 +400,7 @@ const Header = ({
                               alt={company.name}
                               className={classes.searchResultAvatar}
                             >
-                              {!company.logoURL ? <BusinessIcon fontSize="small" /> : null}
+                              {!company.logoURL ? <Building2 size={16} strokeWidth={1.75} /> : null}
                             </Avatar>
                             <div className={classes.searchResultContent}>
                               <div className={classes.searchResultPrimaryRow}>
@@ -416,8 +408,10 @@ const Header = ({
                                   {company.name}
                                 </Typography>
                                 {company.isVerified ? (
-                                  <VerifiedUserIcon
+                                  <BadgeCheck
                                     className={classes.searchVerifiedIcon}
+                                    size={16}
+                                    strokeWidth={1.75}
                                     aria-label="Verified company"
                                   />
                                 ) : null}
@@ -465,7 +459,7 @@ const Header = ({
           ))}
           <div className={classes.headerNavItem}>
             <MenuItem
-              Icon={mode ? <NightsStayOutlinedIcon /> : <WbSunnyOutlinedIcon />}
+              Icon={mode ? <Moon size={24} strokeWidth={1.75} /> : <Sun size={24} strokeWidth={1.75} />}
               title={"Theme"}
               onClick={() => dispatch(ChangeTheme())}
             />
@@ -478,6 +472,8 @@ const Header = ({
           {tabItems.map(({ key, icon: Icon, onClick, isActive }) => (
             <Icon
               key={key}
+              size={28}
+              strokeWidth={isActive ? 2.25 : 1.75}
               onClick={onClick}
               aria-label={key}
               className={`${classes.bottomNavIcon} ${

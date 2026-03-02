@@ -12,7 +12,7 @@ import {
   Typography,
 } from "@material-ui/core";
 import { Autocomplete } from "@material-ui/lab";
-import BusinessIcon from "@material-ui/icons/Business";
+import { Building2 } from "lucide-react";
 import { fade, useTheme } from "@material-ui/core/styles";
 import { api } from "../../convex/_generated/api";
 
@@ -158,7 +158,7 @@ const ExperienceSection = ({
                 fontSize: "0.75rem",
               }}
             >
-              {!companyLogoURL ? <BusinessIcon style={{ fontSize: 16 }} /> : null}
+              {!companyLogoURL ? <Building2 size={16} strokeWidth={1.75} /> : null}
             </Avatar>
             <Typography
               variant="body2"

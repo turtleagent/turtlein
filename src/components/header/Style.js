@@ -71,7 +71,7 @@ export default makeStyles((theme) => ({
       borderColor: theme.palette.primary.main,
       boxShadow: `0 0 0 1px ${fade(theme.palette.primary.main, 0.15)}`,
     },
-    "& > .MuiSvgIcon-root": {
+    "& > svg": {
       color: theme.palette.type === "dark" ? "lightgrey" : "#546e7a",
     },
     "& > input": {

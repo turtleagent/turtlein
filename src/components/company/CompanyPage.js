@@ -15,9 +15,7 @@ import {
 } from "@material-ui/core";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
-import BusinessIcon from "@material-ui/icons/Business";
-import MoreVertIcon from "@material-ui/icons/MoreVert";
-import VerifiedUserIcon from "@material-ui/icons/VerifiedUser";
+import { Building2, EllipsisVertical, BadgeCheck } from "lucide-react";
 import { api } from "../../convex/_generated/api";
 import CompanyAboutTab from "./CompanyAboutTab";
 import CompanyPeopleTab from "./CompanyPeopleTab";
@@ -261,7 +259,7 @@ const CompanyPage = ({ slug: slugProp }) => {
       <CardContent className={classes.headerContent}>
         <div className={classes.topRow}>
           <Avatar src={company.logoURL || undefined} alt={company.name} className={classes.logo}>
-            {!company.logoURL ? <BusinessIcon /> : null}
+            {!company.logoURL ? <Building2 size={40} strokeWidth={1.75} /> : null}
           </Avatar>
 
           {isAdmin ? (
@@ -271,7 +269,7 @@ const CompanyPage = ({ slug: slugProp }) => {
                 aria-label="Company admin actions"
                 onClick={(event) => setAdminMenuAnchor(event.currentTarget)}
               >
-                <MoreVertIcon />
+                <EllipsisVertical size={20} strokeWidth={1.75} />
               </IconButton>
 
               <Menu
@@ -294,7 +292,7 @@ const CompanyPage = ({ slug: slugProp }) => {
               {company.name}
             </Typography>
             {company.isVerified ? (
-              <VerifiedUserIcon className={classes.verifiedIcon} aria-label="Verified company" />
+              <BadgeCheck size={22} strokeWidth={1.75} className={classes.verifiedIcon} aria-label="Verified company" />
             ) : null}
           </div>
           <Typography variant="body2" className={classes.companyDetails}>

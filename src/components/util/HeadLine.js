@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import FiberManualRecordIcon from "@material-ui/icons/FiberManualRecord";
+import { Circle } from "lucide-react";
 import { makeStyles } from "@material-ui/core/styles";
 import { darkSecondary } from "../../assets/Colors";
 
@@ -27,8 +27,9 @@ const HeadLine = ({ Icon, title, time, count }) => {
         fontWeight: time ? 500 : 400,
         color: !time && "grey",
       },
-      "& > .MuiSvgIcon-root": {
-        fontSize: 18,
+      "& > svg": {
+        width: 18,
+        height: 18,
       },
     },
     bottom: {
@@ -41,8 +42,9 @@ const HeadLine = ({ Icon, title, time, count }) => {
         fontWeight: 400,
         color: "grey",
       },
-      "& > .MuiSvgIcon-root": {
-        fontSize: 6,
+      "& > svg": {
+        width: 6,
+        height: 6,
         color: "grey",
         margin: "0 5px",
       },
@@ -68,7 +70,7 @@ const HeadLine = ({ Icon, title, time, count }) => {
         {time && (
           <>
             <h4>{days}d ago</h4>
-            <FiberManualRecordIcon />
+            <Circle size={6} fill="grey" strokeWidth={0} />
           </>
         )}
         {count && <h4>{readers} readers</h4>}

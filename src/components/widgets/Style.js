@@ -21,8 +21,9 @@ export default makeStyles((theme) => ({
       fontSize: 15,
       fontWeight: 600,
     },
-    "& > .MuiSvgIcon-root": {
-      fontSize: 16,
+    "& > svg": {
+      width: 16,
+      height: 16,
       color: theme.palette.text.secondary,
     },
   },

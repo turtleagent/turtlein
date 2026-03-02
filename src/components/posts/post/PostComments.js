@@ -1,7 +1,7 @@
 import React from "react";
 import { useMutation, useQuery } from "convex/react";
 import Avatar from "@material-ui/core/Avatar";
-import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
+import { Trash2 } from "lucide-react";
 import ReactTimeago from "react-timeago";
 import { api } from "../../../convex/_generated/api";
 
@@ -67,10 +67,12 @@ const PostComments = ({
                   />
                 </span>
                 {currentUserId && comment.authorId === currentUserId && (
-                  <DeleteOutlineIcon
+                  <Trash2
+                    size={16}
+                    strokeWidth={1.75}
                     className={classes.comment__delete}
                     onClick={() => handleDeleteComment(comment._id)}
-                    titleAccess="Delete comment"
+                    aria-label="Delete comment"
                   />
                 )}
               </div>

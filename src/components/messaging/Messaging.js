@@ -9,8 +9,7 @@ import {
   TextField,
   Typography,
 } from "@material-ui/core";
-import ArrowBackIcon from "@material-ui/icons/ArrowBack";
-import SendIcon from "@material-ui/icons/Send";
+import { ArrowLeft, Send } from "lucide-react";
 import { api } from "../../convex/_generated/api";
 import useConvexUser from "../../hooks/useConvexUser";
 import useErrorToast from "../../hooks/useErrorToast";
@@ -263,7 +262,7 @@ const Messaging = () => {
             }}
             aria-label="Back to conversations"
           >
-            <ArrowBackIcon />
+            <ArrowLeft size={20} strokeWidth={1.75} />
           </IconButton>
           <Typography className={classes.threadTitle}>{threadTitle}</Typography>
         </div>
@@ -318,7 +317,7 @@ const Messaging = () => {
             className={classes.sendButton}
             type="submit"
             variant="contained"
-            endIcon={<SendIcon />}
+            endIcon={<Send size={18} strokeWidth={1.75} />}
             disabled={!body.trim()}
           >
             Send

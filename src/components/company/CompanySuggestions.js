@@ -3,8 +3,7 @@ import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import { Avatar, Button, Paper, Typography } from "@material-ui/core";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import { fade } from "@material-ui/core/styles/colorManipulator";
-import BusinessIcon from "@material-ui/icons/Business";
-import VerifiedUserIcon from "@material-ui/icons/VerifiedUser";
+import { Building2, BadgeCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../../convex/_generated/api";
 
@@ -193,13 +192,15 @@ const CompanySuggestions = () => {
               >
                 <div className={classes.companyInfo}>
                   <Avatar className={classes.avatar} src={company.logoURL || undefined}>
-                    {!company.logoURL ? <BusinessIcon fontSize="small" /> : null}
+                    {!company.logoURL ? <Building2 size={18} strokeWidth={1.75} /> : null}
                   </Avatar>
                   <div className={classes.textBlock}>
                     <div className={classes.nameRow}>
                       <Typography className={classes.name}>{company.name}</Typography>
                       {company.isVerified ? (
-                        <VerifiedUserIcon
+                        <BadgeCheck
+                          size={16}
+                          strokeWidth={1.75}
                           className={classes.verifiedIcon}
                           aria-label="Verified company"
                         />

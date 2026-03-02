@@ -1,334 +1,83 @@
-import { fade, makeStyles } from "@material-ui/core/styles";
-import { darkSecondary, LinkedInBlue, LinkedInLightBlue } from "../../assets/Colors";
+import { makeStyles } from "@material-ui/core/styles";
 
 export default makeStyles((theme) => ({
-  upload: {
+  closedCard: {
     width: "100%",
-    height: "auto",
+    borderRadius: 12,
+    padding: theme.spacing(1.5, 2),
     display: "flex",
     flexDirection: "column",
-    padding: "0 16px",
-    borderRadius: 12,
+    gap: theme.spacing(1),
     [theme.breakpoints.down("xs")]: {
       borderRadius: 0,
-      border: 0,
       boxShadow: "none",
     },
   },
-
-  upload__header: {
-    height: "auto",
+  topRow: {
     display: "flex",
     alignItems: "center",
-    gap: 10,
-    padding: "16px 0 8px 0",
+    gap: theme.spacing(1.25),
   },
-
-  header__form: {
-    flex: 1,
-    height: 47,
-    [theme.breakpoints.down("xs")]: {
-      height: 42,
-    },
-    display: "flex",
-    alignItems: "center",
-    borderRadius: 999,
-    border: "1px solid",
-    borderColor: theme.palette.type === "dark" ? "rgba(225,225,225,0.1)" : "rgba(0,0,0,0.15)",
-    overflow: "hidden",
-    "& > .MuiSvgIcon-root": {
-      marginLeft: 10,
-    },
-    "& > input": {
-      height: "100%",
-      flex: 1,
-      border: 0,
-      outlineWidth: 0,
-      paddingLeft: 10,
-      color: theme.palette.text.primary,
-      fontSize: 14,
-      fontWeight: 600,
-      backgroundColor: "transparent",
-      "&::placeholder": {
-        color: theme.palette.text.secondary,
-      },
-    },
-    "& > select": {
-      height: "100%",
-      border: 0,
-      outlineWidth: 0,
-      padding: "0 10px",
-      backgroundColor: "transparent",
-      color: theme.palette.text.primary,
-      fontSize: 13,
-      fontWeight: 600,
-      borderLeft:
-        theme.palette.type === "dark"
-          ? "1px solid rgba(225,225,225,0.1)"
-          : "1px solid rgba(0,0,0,0.12)",
-      cursor: "pointer",
-      "&:disabled": {
-        cursor: "not-allowed",
-        opacity: 0.7,
-      },
-    },
-    "& > button": {
-      height: "100%",
-      display: "flex",
-      alignItems: "center",
-      padding: "0 15px",
-      border: 0,
-      outlineWidth: 0,
-      backgroundColor: theme.palette.primary.main,
-      color: "white",
-      cursor: "pointer",
-      fontWeight: 600,
-      transition: "background-color 0.2s ease",
-      "&:hover": {
-        backgroundColor: theme.palette.primary.dark,
-      },
-    },
-  },
-
-  headerTextField: {
-    flex: 1,
-    "& .MuiInputBase-root": {
-      height: "100%",
-      color: theme.palette.text.primary,
-    },
-    "& .MuiInputBase-input": {
-      height: "100%",
-      boxSizing: "border-box",
-      padding: "0 10px",
-      color: theme.palette.text.primary,
-      fontSize: 14,
-      fontWeight: 600,
-      backgroundColor: "transparent",
-      "&::placeholder": {
-        color: theme.palette.text.secondary,
-        opacity: 1,
-      },
-    },
-  },
-
-  writeArticleButton: {
-    height: 40,
-    border: 0,
-    outlineWidth: 0,
-    borderRadius: 999,
-    padding: "0 14px",
-    backgroundColor: fade(theme.palette.primary.main, 0.1),
-    color: theme.palette.primary.main,
-    fontWeight: 700,
-    fontSize: 13,
+  avatar: {
+    width: 48,
+    height: 48,
     cursor: "pointer",
-    whiteSpace: "nowrap",
-    transition: "background-color 0.2s ease, color 0.2s ease",
-    "&:hover": {
-      backgroundColor: fade(theme.palette.primary.main, 0.18),
-      color: theme.palette.primary.dark,
-    },
-    [theme.breakpoints.down("xs")]: {
-      height: 36,
-      padding: "0 10px",
-      fontSize: 12,
-    },
   },
-
-  selectedFile: {
-    display: "flex",
-    alignItems: "center",
-    flexWrap: "wrap",
-    gap: 6,
-    paddingBottom: 5,
-  },
-
-  uploading: {
-    display: "flex",
-    alignItems: "center",
-    margin: "5px 0",
-    paddingLeft: 5,
-    "& > p": {
-      fontSize: 12,
-      fontWeight: 600,
-    },
-  },
-
-  pasteURL_Input: {
-    width: "50%",
-    [theme.breakpoints.down("xs")]: {
-      width: "80%",
-    },
-    height: 30,
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    margin: "10px auto",
-    borderBottom:
-      theme.palette.type === "dark"
-        ? "1px dashed rgba(225,225,225,0.1)"
-        : "1px dashed rgba(0,0,0,0.15)",
-
-    "& > input": {
-      flex: 1,
-      height: "100%",
-      outlineWidth: 0,
-      backgroundColor: "transparent",
-      border: 0,
-      overflow: "hidden",
-      padding: "0px 10px",
-      color: theme.palette.text.secondary,
-      fontSize: 13,
-      "&::placeholder": {
-        color: theme.palette.text.secondary,
-      },
-    },
-
-    "& > .MuiSvgIcon-root": {
-      margin: "2px 0px",
-    },
-  },
-
-  pollComposer: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 8,
-    margin: "8px 0 6px",
-    padding: "10px 12px",
-    borderRadius: 10,
-    border:
-      theme.palette.type === "dark"
-        ? "1px solid rgba(225,225,225,0.1)"
-        : "1px solid rgba(0,0,0,0.1)",
-    backgroundColor:
-      theme.palette.type === "dark" ? darkSecondary : fade(theme.palette.primary.main, 0.04),
-  },
-
-  pollLabel: {
-    fontSize: 12,
-    fontWeight: 700,
-    color: theme.palette.type === "dark" ? "rgba(255,255,255,0.9)" : theme.palette.primary.dark,
-    textTransform: "uppercase",
-    letterSpacing: 0.3,
-  },
-
-  pollInput: {
-    width: "100%",
-    border: 0,
-    outlineWidth: 0,
-    borderRadius: 8,
-    padding: "10px 12px",
+  startPostButton: {
+    flex: 1,
+    height: 48,
+    borderRadius: 999,
+    border: `1px solid ${
+      theme.palette.type === "dark" ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.25)"
+    }`,
+    backgroundColor: "transparent",
+    padding: "0 16px",
+    textAlign: "left",
     fontSize: 14,
-    color: theme.palette.text.primary,
-    backgroundColor: theme.palette.type === "dark" ? "rgba(0,0,0,0.25)" : "#fff",
-  },
-
-  pollOptions: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 6,
-  },
-
-  pollOptionRow: {
-    display: "flex",
-    alignItems: "center",
-    gap: 6,
-  },
-
-  pollOptionInput: {
-    flex: 1,
-    border: 0,
-    outlineWidth: 0,
-    borderRadius: 8,
-    padding: "9px 12px",
-    fontSize: 13,
-    color: theme.palette.text.primary,
-    backgroundColor: theme.palette.type === "dark" ? "rgba(0,0,0,0.25)" : "#fff",
-  },
-
-  pollRemoveOption: {
-    width: 32,
-    height: 32,
-    border: 0,
-    borderRadius: 999,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
+    fontWeight: 600,
+    fontFamily: "inherit",
+    color: theme.palette.text.secondary,
     cursor: "pointer",
-    color: theme.palette.type === "dark" ? "#f5b5b5" : "#c62828",
-    backgroundColor: theme.palette.type === "dark" ? "rgba(255,255,255,0.08)" : "rgba(198,40,40,0.08)",
-  },
-
-  pollAddOption: {
-    width: "fit-content",
-    border: 0,
-    outlineWidth: 0,
-    borderRadius: 999,
-    display: "flex",
-    alignItems: "center",
-    gap: 6,
-    padding: "6px 10px",
-    cursor: "pointer",
-    fontWeight: 700,
-    fontSize: 12,
-    color: theme.palette.type === "dark" ? "#a5d6a7" : theme.palette.primary.dark,
-    backgroundColor:
-      theme.palette.type === "dark"
-        ? fade(theme.palette.primary.main, 0.2)
-        : fade(theme.palette.primary.main, 0.15),
-    "&:disabled": {
-      cursor: "not-allowed",
-      opacity: 0.6,
-    },
-  },
-
-  pollHint: {
-    margin: 0,
-    fontSize: 12,
-    color: theme.palette.type === "dark" ? "rgba(255,255,255,0.65)" : "rgba(0,0,0,0.6)",
-  },
-
-  progress: {
-    flex: 1,
-    height: 8,
-    marginRight: 5,
-    borderRadius: 10,
-    backgroundColor: theme.palette.type === "dark" ? theme.palette.action.hover : "#e0e0e0",
-    "& > *": {
-      backgroundColor: theme.palette.type === "dark" ? LinkedInLightBlue : LinkedInBlue,
-    },
-  },
-
-  upload__media: {
-    height: 50,
-    [theme.breakpoints.down("xs")]: {
-      height: 40,
-    },
-    display: "flex",
-    alignItems: "center",
-    padding: "2px 0",
-    opacity: 1,
-  },
-
-  media__options: {
-    flex: 1,
-    height: "100%",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    cursor: "pointer",
-    borderRadius: 8,
-    transition: "background-color 0.2s ease",
+    transition: "background-color 0.15s ease",
     "&:hover": {
       backgroundColor: theme.palette.action.hover,
     },
-    "& > h4": {
+    [theme.breakpoints.down("xs")]: {
+      height: 42,
+      fontSize: 13,
+    },
+  },
+  toolbar: {
+    display: "flex",
+    alignItems: "center",
+    gap: 4,
+  },
+  toolbarButton: {
+    flex: 1,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    height: 48,
+    border: 0,
+    backgroundColor: "transparent",
+    borderRadius: 8,
+    cursor: "pointer",
+    padding: "0 8px",
+    transition: "background-color 0.15s ease",
+    "&:hover": {
+      backgroundColor: theme.palette.action.hover,
+    },
+    "& > span": {
       fontSize: 14,
-      fontWeight: 400,
-      marginLeft: 10,
-      [theme.breakpoints.down("md")]: {
+      fontWeight: 600,
+      color: theme.palette.text.secondary,
+      [theme.breakpoints.down("sm")]: {
         display: "none",
       },
+    },
+    [theme.breakpoints.down("xs")]: {
+      height: 40,
     },
   },
 }));

@@ -1,39 +1,34 @@
-import ThumbUpAltIcon from "@material-ui/icons/ThumbUpAlt";
-import FavoriteIcon from "@material-ui/icons/Favorite";
-import EmojiEventsIcon from "@material-ui/icons/EmojiEvents";
-import EmojiObjectsIcon from "@material-ui/icons/EmojiObjects";
-import SentimentVerySatisfiedIcon from "@material-ui/icons/SentimentVerySatisfied";
-import { green } from "@material-ui/core/colors";
+import { ThumbsUp, Heart, Trophy, Lightbulb, Smile } from "lucide-react";
 
 export const REACTION_ITEMS = [
   {
     key: "like",
     label: "Like",
-    color: green[800],
-    Icon: ThumbUpAltIcon,
+    color: "#2e7d32",
+    Icon: ThumbsUp,
   },
   {
     key: "love",
     label: "Love",
     color: "#d32f2f",
-    Icon: FavoriteIcon,
+    Icon: Heart,
   },
   {
     key: "celebrate",
     label: "Celebrate",
     color: "#ed6c02",
-    Icon: EmojiEventsIcon,
+    Icon: Trophy,
   },
   {
     key: "insightful",
     label: "Insightful",
     color: "#0288d1",
-    Icon: EmojiObjectsIcon,
+    Icon: Lightbulb,
   },
   {
     key: "funny",
     label: "Funny",
     color: "#f9a825",
-    Icon: SentimentVerySatisfiedIcon,
+    Icon: Smile,
   },
 ];

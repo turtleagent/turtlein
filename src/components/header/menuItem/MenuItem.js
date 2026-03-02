@@ -1,5 +1,5 @@
 import React from "react";
-import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
+import { ChevronDown } from "lucide-react";
 import { Hidden } from "@material-ui/core";
 import Style from "./Style";
 
@@ -11,7 +11,7 @@ const MenuItem = ({ Icon, title, arrow, onClick }) => {
       <Hidden mdDown>
         <div className={classes.title}>
           <p>{title}</p>
-          {arrow && <ArrowDropDownIcon />}
+          {arrow && <ChevronDown size={20} strokeWidth={1.75} />}
         </div>
       </Hidden>
     </div>
