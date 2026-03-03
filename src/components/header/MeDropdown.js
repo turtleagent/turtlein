@@ -1,7 +1,17 @@
-import React from "react";
-import { Avatar, Button, ClickAwayListener, Paper, Typography } from "@material-ui/core";
+import React, { useCallback, useState } from "react";
+import {
+  Avatar,
+  Button,
+  ClickAwayListener,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Paper,
+  Typography,
+} from "@material-ui/core";
 import { fade, makeStyles } from "@material-ui/core/styles";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun, Trash2 } from "lucide-react";
 
 const useStyles = makeStyles((theme) => ({
   dropdown: {
@@ -101,86 +111,223 @@ const useStyles = makeStyles((theme) => ({
     color: theme.palette.text.secondary,
     fontWeight: 500,
   },
+  dangerRow: {
+    color: theme.palette.error.main,
+  },
+  dangerIcon: {
+    color: theme.palette.error.main,
+  },
+  deleteButton: {
+    backgroundColor: theme.palette.error.main,
+    color: theme.palette.getContrastText(theme.palette.error.main),
+    "&:hover": {
+      backgroundColor: theme.palette.error.dark,
+    },
+  },
+  dialogBody: {
+    color: theme.palette.text.secondary,
+    fontSize: 14,
+    lineHeight: 1.5,
+  },
+  errorText: {
+    marginTop: 12,
+    color: theme.palette.error.main,
+    fontSize: 13,
+    fontWeight: 500,
+  },
 }));
 
-const MeDropdown = ({ open, user, isDarkMode, onToggleTheme, onViewProfile, onSignOut, onClose }) => {
+const MeDropdown = ({
+  open,
+  user,
+  isDarkMode,
+  onToggleTheme,
+  onViewProfile,
+  onSignOut,
+  onDeleteAccount,
+  onClose,
+}) => {
   const classes = useStyles();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
-  if (!open) {
+  const handleClickAway = useCallback(() => {
+    if (isDeleteDialogOpen) {
+      return;
+    }
+    onClose();
+  }, [isDeleteDialogOpen, onClose]);
+
+  const handleConfirmDelete = useCallback(async () => {
+    if (!onDeleteAccount) {
+      return;
+    }
+
+    setIsDeleting(true);
+    setDeleteError("");
+
+    try {
+      await onDeleteAccount();
+      setIsDeleteDialogOpen(false);
+    } catch (error) {
+      setDeleteError(error?.message || "Failed to delete account. Please try again.");
+    } finally {
+      setIsDeleting(false);
+    }
+  }, [onDeleteAccount]);
+
+  if (!open && !isDeleteDialogOpen) {
     return null;
   }
 
   return (
-    <ClickAwayListener onClickAway={onClose}>
-      <Paper className={classes.dropdown} elevation={3}>
-        <div className={classes.userCard}>
-          <Avatar src={user?.photoURL} alt={user?.displayName} className={classes.avatar} />
-          <div className={classes.userInfo}>
-            <Typography className={classes.userName}>
-              {user?.displayName || "TurtleIn User"}
-            </Typography>
-            <Typography className={classes.userTitle}>
-              {user?.title || "TurtleIn Member"}
-            </Typography>
-          </div>
-        </div>
+    <>
+      {open ? (
+        <ClickAwayListener onClickAway={handleClickAway}>
+          <Paper className={classes.dropdown} elevation={3}>
+            <div className={classes.userCard}>
+              <Avatar src={user?.photoURL} alt={user?.displayName} className={classes.avatar} />
+              <div className={classes.userInfo}>
+                <Typography className={classes.userName}>
+                  {user?.displayName || "TurtleIn User"}
+                </Typography>
+                <Typography className={classes.userTitle}>
+                  {user?.title || "TurtleIn Member"}
+                </Typography>
+              </div>
+            </div>
 
-        <div className={classes.profileButtonRow}>
+            <div className={classes.profileButtonRow}>
+              <Button
+                variant="outlined"
+                fullWidth
+                className={classes.profileButton}
+                onClick={onViewProfile}
+              >
+                View profile
+              </Button>
+            </div>
+
+            <div className={classes.divider} />
+
+            <Typography className={classes.sectionHeader}>Account</Typography>
+
+            <div
+              className={classes.row}
+              onClick={onToggleTheme}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  onToggleTheme();
+                }
+              }}
+            >
+              <div className={classes.rowLabel}>
+                {isDarkMode ? (
+                  <Moon size={18} strokeWidth={1.75} />
+                ) : (
+                  <Sun size={18} strokeWidth={1.75} />
+                )}
+                <span>Appearance</span>
+              </div>
+              <span className={classes.rowValue}>{isDarkMode ? "Dark" : "Light"}</span>
+            </div>
+
+            <div className={classes.divider} />
+
+            <div
+              className={`${classes.row} ${classes.dangerRow}`}
+              onClick={() => {
+                if (!onDeleteAccount || isDeleting) {
+                  return;
+                }
+                setIsDeleteDialogOpen(true);
+              }}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  if (!onDeleteAccount || isDeleting) {
+                    return;
+                  }
+                  setIsDeleteDialogOpen(true);
+                }
+              }}
+            >
+              <div className={classes.rowLabel}>
+                <Trash2 size={18} strokeWidth={1.75} className={classes.dangerIcon} />
+                <span>Delete account</span>
+              </div>
+            </div>
+
+            <div className={classes.divider} />
+
+            <div
+              className={classes.row}
+              onClick={onSignOut}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  onSignOut();
+                }
+              }}
+            >
+              <span>Sign Out</span>
+            </div>
+          </Paper>
+        </ClickAwayListener>
+      ) : null}
+
+      <Dialog
+        open={isDeleteDialogOpen}
+        onClose={() => {
+          if (isDeleting) {
+            return;
+          }
+          setIsDeleteDialogOpen(false);
+          setDeleteError("");
+        }}
+        aria-labelledby="delete-account-dialog-title"
+      >
+        <DialogTitle id="delete-account-dialog-title">Delete your account?</DialogTitle>
+        <DialogContent dividers>
+          <Typography className={classes.dialogBody}>
+            This permanently deletes your TurtleIn profile and data (posts, comments, likes,
+            connections, messages, follows, bookmarks, reports, and more). This action cannot be
+            undone.
+          </Typography>
+          {deleteError ? <div className={classes.errorText}>{deleteError}</div> : null}
+        </DialogContent>
+        <DialogActions>
           <Button
-            variant="outlined"
-            fullWidth
-            className={classes.profileButton}
-            onClick={onViewProfile}
+            onClick={() => {
+              if (isDeleting) {
+                return;
+              }
+              setIsDeleteDialogOpen(false);
+              setDeleteError("");
+            }}
+            disabled={isDeleting}
           >
-            View profile
+            Cancel
           </Button>
-        </div>
-
-        <div className={classes.divider} />
-
-        <Typography className={classes.sectionHeader}>Account</Typography>
-
-        <div
-          className={classes.row}
-          onClick={onToggleTheme}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              onToggleTheme();
-            }
-          }}
-        >
-          <div className={classes.rowLabel}>
-            {isDarkMode ? (
-              <Moon size={18} strokeWidth={1.75} />
-            ) : (
-              <Sun size={18} strokeWidth={1.75} />
-            )}
-            <span>Appearance</span>
-          </div>
-          <span className={classes.rowValue}>{isDarkMode ? "Dark" : "Light"}</span>
-        </div>
-
-        <div className={classes.divider} />
-
-        <div
-          className={classes.row}
-          onClick={onSignOut}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              onSignOut();
-            }
-          }}
-        >
-          <span>Sign Out</span>
-        </div>
-      </Paper>
-    </ClickAwayListener>
+          <Button
+            onClick={handleConfirmDelete}
+            disabled={isDeleting}
+            variant="contained"
+            className={classes.deleteButton}
+          >
+            {isDeleting ? "Deleting..." : "Delete account"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };
 

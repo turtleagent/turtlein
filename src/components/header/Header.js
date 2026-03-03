@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useAuthActions } from "@convex-dev/auth/react";
-import { useConvexAuth, useQuery } from "convex/react";
+import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "@material-ui/core/styles";
 import { ChangeTheme } from "../../store/actions/util";
@@ -81,6 +81,7 @@ const Header = ({
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMeDropdownOpen, setIsMeDropdownOpen] = useState(false);
   const [recentSearches, setRecentSearches] = useState([]);
+  const deleteAccount = useMutation(api.users.deleteAccount);
   const unreadCount = useQuery(
     api.notifications.getUnreadCount,
     isAuthenticated && user?._id ? { userId: user._id } : "skip"
@@ -565,6 +566,16 @@ const Header = ({
             onSignOut={() => {
               signOut();
               setIsMeDropdownOpen(false);
+            }}
+            onDeleteAccount={async () => {
+              await deleteAccount();
+              try {
+                await signOut();
+              } catch {
+                // ignore sign-out errors after account deletion
+              }
+              setIsMeDropdownOpen(false);
+              navigate("/");
             }}
             onClose={() => setIsMeDropdownOpen(false)}
           />
