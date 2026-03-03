@@ -1187,3 +1187,234 @@ export const searchUsers = query({
     );
   },
 });
+
+export const deleteAccount = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new Error("Not authenticated");
+    }
+
+    const user = await ctx.db.get(userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const deleteIds = async <T extends { _id: Id<any> }>(docs: T[]) => {
+      for (const doc of docs) {
+        await ctx.db.delete(doc._id);
+      }
+    };
+
+    const posts = await ctx.db
+      .query("posts")
+      .withIndex("byAuthorId", (q) => q.eq("authorId", userId))
+      .collect();
+
+    const deletedPostIds = new Set<Id<"posts">>(posts.map((post) => post._id));
+
+    for (const post of posts) {
+      if (post.imageStorageIds?.length) {
+        await Promise.all(post.imageStorageIds.map((storageId) => ctx.storage.delete(storageId)));
+      }
+
+      const [postEdits, polls, comments, likes, reactions, hashtags, reports, reposts] =
+        await Promise.all([
+          ctx.db
+            .query("postEdits")
+            .withIndex("byPostId", (q) => q.eq("postId", post._id))
+            .collect(),
+          ctx.db.query("polls").withIndex("byPostId", (q) => q.eq("postId", post._id)).collect(),
+          ctx.db
+            .query("comments")
+            .withIndex("byPostId", (q) => q.eq("postId", post._id))
+            .collect(),
+          ctx.db.query("likes").withIndex("byPostId", (q) => q.eq("postId", post._id)).collect(),
+          ctx.db
+            .query("reactions")
+            .withIndex("byPost", (q) => q.eq("postId", post._id))
+            .collect(),
+          ctx.db
+            .query("hashtags")
+            .withIndex("byPostId", (q) => q.eq("postId", post._id))
+            .collect(),
+          ctx.db
+            .query("reports")
+            .withIndex("byPostId", (q) => q.eq("postId", post._id))
+            .collect(),
+          ctx.db
+            .query("reposts")
+            .withIndex("byOriginalPost", (q) => q.eq("originalPostId", post._id))
+            .collect(),
+        ]);
+
+      await Promise.all([
+        deleteIds(postEdits),
+        deleteIds(comments),
+        deleteIds(likes),
+        deleteIds(reactions),
+        deleteIds(hashtags),
+        deleteIds(reports),
+        deleteIds(reposts),
+      ]);
+
+      for (const poll of polls) {
+        const votes = await ctx.db
+          .query("pollVotes")
+          .withIndex("byPollId", (q) => q.eq("pollId", poll._id))
+          .collect();
+        await deleteIds(votes);
+        await ctx.db.delete(poll._id);
+      }
+
+      await ctx.db.delete(post._id);
+    }
+
+    const [likesByUser, bookmarksByUser, reactionsByUser, repostsByUser, commentsByUser, reportsByUser]
+      = await Promise.all([
+        ctx.db.query("likes").withIndex("byUserId", (q) => q.eq("userId", userId)).collect(),
+        ctx.db.query("bookmarks").withIndex("byUserId", (q) => q.eq("userId", userId)).collect(),
+        ctx.db
+          .query("reactions")
+          .withIndex("byUserAndPost", (q) => q.eq("userId", userId))
+          .collect(),
+        ctx.db.query("reposts").withIndex("byUser", (q) => q.eq("userId", userId)).collect(),
+        ctx.db
+          .query("comments")
+          .withIndex("byAuthorId", (q) => q.eq("authorId", userId))
+          .collect(),
+        ctx.db.query("reports").withIndex("byUserId", (q) => q.eq("userId", userId)).collect(),
+      ]);
+
+    let bookmarksForDeletedPosts: Doc<"bookmarks">[] = [];
+    if (deletedPostIds.size > 0) {
+      const allBookmarks = await ctx.db.query("bookmarks").collect();
+      bookmarksForDeletedPosts = allBookmarks.filter((bookmark) => deletedPostIds.has(bookmark.postId));
+    }
+
+    const bookmarkIds = new Set<Id<"bookmarks">>([
+      ...bookmarksByUser.map((bookmark) => bookmark._id),
+      ...bookmarksForDeletedPosts.map((bookmark) => bookmark._id),
+    ]);
+
+    await Promise.all([
+      deleteIds(likesByUser),
+      deleteIds(reactionsByUser),
+      deleteIds(repostsByUser),
+      deleteIds(commentsByUser),
+      deleteIds(reportsByUser),
+      (async () => {
+        for (const bookmarkId of bookmarkIds) {
+          await ctx.db.delete(bookmarkId);
+        }
+      })(),
+    ]);
+
+    const [connectionsUser1, connectionsUser2, followsByFollower, followsByFollowed, companyFollowers] =
+      await Promise.all([
+        ctx.db
+          .query("connections")
+          .withIndex("byUser1", (q) => q.eq("userId1", userId))
+          .collect(),
+        ctx.db
+          .query("connections")
+          .withIndex("byUser2", (q) => q.eq("userId2", userId))
+          .collect(),
+        ctx.db.query("follows").withIndex("byFollower", (q) => q.eq("followerId", userId)).collect(),
+        ctx.db.query("follows").withIndex("byFollowed", (q) => q.eq("followedId", userId)).collect(),
+        ctx.db
+          .query("companyFollowers")
+          .withIndex("byUser", (q) => q.eq("userId", userId))
+          .collect(),
+      ]);
+
+    await Promise.all([
+      deleteIds(connectionsUser1),
+      deleteIds(connectionsUser2),
+      deleteIds(followsByFollower),
+      deleteIds(followsByFollowed),
+      deleteIds(companyFollowers),
+    ]);
+
+    const allConversations = await ctx.db.query("conversations").collect();
+    const conversationsToDelete = allConversations.filter((conversation) =>
+      conversation.participants.includes(userId),
+    );
+    const conversationIds = new Set<Id<"conversations">>(
+      conversationsToDelete.map((conversation) => conversation._id),
+    );
+
+    const [allMessages, allPollVotes, allNotifications] = await Promise.all([
+      ctx.db.query("messages").collect(),
+      ctx.db.query("pollVotes").collect(),
+      ctx.db.query("notifications").collect(),
+    ]);
+
+    const messageIdsToDelete = allMessages
+      .filter((message) => message.senderId === userId || conversationIds.has(message.conversationId))
+      .map((message) => message._id);
+    const pollVoteIdsToDelete = allPollVotes
+      .filter((vote) => vote.userId === userId)
+      .map((vote) => vote._id);
+    const notificationIdsToDelete = allNotifications
+      .filter((notification) => notification.userId === userId || notification.fromUserId === userId)
+      .map((notification) => notification._id);
+
+    for (const messageId of messageIdsToDelete) {
+      await ctx.db.delete(messageId);
+    }
+    for (const conversationId of conversationIds) {
+      await ctx.db.delete(conversationId);
+    }
+    for (const pollVoteId of pollVoteIdsToDelete) {
+      await ctx.db.delete(pollVoteId);
+    }
+    for (const notificationId of notificationIdsToDelete) {
+      await ctx.db.delete(notificationId);
+    }
+
+    const authSessions = await ctx.db
+      .query("authSessions")
+      .withIndex("userId", (q) => q.eq("userId", userId))
+      .collect();
+    const sessionIds = new Set<Id<"authSessions">>(authSessions.map((session) => session._id));
+
+    for (const session of authSessions) {
+      const refreshTokens = await ctx.db
+        .query("authRefreshTokens")
+        .withIndex("sessionId", (q) => q.eq("sessionId", session._id))
+        .collect();
+      await deleteIds(refreshTokens);
+      await ctx.db.delete(session._id);
+    }
+
+    const authAccounts = await ctx.db
+      .query("authAccounts")
+      .withIndex("userIdAndProvider", (q) => q.eq("userId", userId))
+      .collect();
+    for (const account of authAccounts) {
+      const verificationCodes = await ctx.db
+        .query("authVerificationCodes")
+        .withIndex("accountId", (q) => q.eq("accountId", account._id))
+        .collect();
+      await deleteIds(verificationCodes);
+      await ctx.db.delete(account._id);
+    }
+
+    const authVerifiers = await ctx.db.query("authVerifiers").collect();
+    const verifiersToDelete = authVerifiers.filter(
+      (verifier) => verifier.sessionId && sessionIds.has(verifier.sessionId),
+    );
+    await deleteIds(verifiersToDelete);
+
+    if (user.photoStorageId) {
+      await ctx.storage.delete(user.photoStorageId);
+    }
+    if (user.coverStorageId) {
+      await ctx.storage.delete(user.coverStorageId);
+    }
+
+    await ctx.db.delete(userId);
+  },
+});
