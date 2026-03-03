@@ -1,5 +1,4 @@
 import { fade, makeStyles } from "@material-ui/core/styles";
-import { darkSecondary } from "../../../assets/Colors";
 
 export default makeStyles((theme) => ({
   post: {
@@ -293,6 +292,7 @@ export default makeStyles((theme) => ({
   body__image: {
     width: "100%",
     overflow: "hidden",
+    borderRadius: 8,
     "& > div": {
       height: "auto",
     },
@@ -343,19 +343,48 @@ export default makeStyles((theme) => ({
     width: "100%",
     display: "grid",
     gap: 2,
+    borderRadius: 8,
+    overflow: "hidden",
     backgroundColor: theme.palette.type === "dark" ? "#1f2a30" : "#f3f2ef",
   },
   imageGrid1: {
     gridTemplateColumns: "1fr",
+    "& $imageGridItem": {
+      minHeight: 320,
+      [theme.breakpoints.down("xs")]: {
+        minHeight: 220,
+      },
+    },
   },
   imageGrid2: {
     gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+    [theme.breakpoints.down("xs")]: {
+      gridTemplateColumns: "1fr",
+    },
+    "& $imageGridItem": {
+      minHeight: 220,
+      [theme.breakpoints.down("xs")]: {
+        minHeight: 200,
+      },
+    },
   },
   imageGrid3: {
     gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+    [theme.breakpoints.down("xs")]: {
+      gridTemplateColumns: "1fr",
+    },
+    "& $imageGridItem:first-child": {
+      gridColumn: "1 / span 2",
+      [theme.breakpoints.down("xs")]: {
+        gridColumn: "auto",
+      },
+    },
   },
   imageGrid4: {
     gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+    [theme.breakpoints.down("xs")]: {
+      gridTemplateColumns: "1fr",
+    },
   },
   imageGridItem: {
     width: "100%",

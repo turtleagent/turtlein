@@ -127,9 +127,20 @@ export const setReaction = mutation({
       updatedAt: now,
     });
 
-    await ctx.db.patch(args.postId, {
-      likesCount: post.likesCount + 1,
-    });
+    const existingLike = await ctx.db
+      .query("likes")
+      .withIndex("byUserAndPost", (q) =>
+        q.eq("userId", userId).eq("postId", args.postId),
+      )
+      .first();
+
+    if (existingLike) {
+      await ctx.db.delete(existingLike._id);
+    } else {
+      await ctx.db.patch(args.postId, {
+        likesCount: post.likesCount + 1,
+      });
+    }
 
     if (post.authorId !== userId) {
       await ctx.runMutation(internal.notifications.createNotification, {
@@ -167,11 +178,26 @@ export const removeReaction = mutation({
       )
       .first();
 
-    if (!existingReaction) {
+    if (existingReaction) {
+      await ctx.db.delete(existingReaction._id);
+      await ctx.db.patch(args.postId, {
+        likesCount: Math.max(0, post.likesCount - 1),
+      });
+      return { removed: true };
+    }
+
+    const existingLike = await ctx.db
+      .query("likes")
+      .withIndex("byUserAndPost", (q) =>
+        q.eq("userId", userId).eq("postId", args.postId),
+      )
+      .first();
+
+    if (!existingLike) {
       return { removed: false };
     }
 
-    await ctx.db.delete(existingReaction._id);
+    await ctx.db.delete(existingLike._id);
     await ctx.db.patch(args.postId, {
       likesCount: Math.max(0, post.likesCount - 1),
     });
@@ -301,12 +327,17 @@ export const getReactionCountsByPostIds = query({
         ]);
 
         const counts = buildEmptyReactionCounts();
-        if (reactions.length > 0) {
-          for (const reaction of reactions) {
-            counts[reaction.reactionType] += 1;
+        const reactionUserIds = new Set<string>();
+        for (const reaction of reactions) {
+          counts[reaction.reactionType] += 1;
+          reactionUserIds.add(`${reaction.userId}`);
+        }
+
+        for (const like of likes) {
+          if (reactionUserIds.has(`${like.userId}`)) {
+            continue;
           }
-        } else {
-          counts.like = likes.length;
+          counts.like += 1;
         }
 
         return [`${postId}`, counts] as const;

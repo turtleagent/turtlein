@@ -101,7 +101,7 @@ const PostActions = ({
       return;
     }
 
-    const nextReaction = selectedReaction === "like" ? null : "like";
+    const nextReaction = selectedReaction ? null : "like";
     onReactionChange(nextReaction);
   };
 
@@ -114,6 +114,9 @@ const PostActions = ({
     onReactionChange(nextReaction);
   };
   const isLikeActive = Boolean(selectedReaction);
+
+  const ActiveIcon = selectedReactionItem?.Icon ?? ThumbsUp;
+  const isLikeSelected = selectedReaction === "like";
 
   return (
     <div className={classes.footer__actions}>
@@ -161,12 +164,12 @@ const PostActions = ({
           style={!canInteract ? { opacity: 0.45, cursor: "not-allowed" } : undefined}
         >
           {isLikeActive ? (
-            <ThumbsUp
+            <ActiveIcon
               size={18}
               strokeWidth={2.25}
               fill="currentColor"
               style={{
-                transform: "scaleX(-1)",
+                ...(isLikeSelected ? { transform: "scaleX(-1)" } : null),
                 color: selectedReactionItem?.color ?? theme.palette.primary.main,
               }}
             />
