@@ -22,7 +22,7 @@ import PostActions from "./PostActions";
 import PostComments from "./PostComments";
 import PostHeader from "./PostHeader";
 import RepostCard from "./RepostCard";
-import { getLinkPreviewFromText } from "./post.utils";
+import { getLinkPreviewFromText, getLinkifiedSegmentsFromText } from "./post.utils";
 import Style from "./Style";
 import { REACTION_ITEMS } from "../../../utils/reactions";
 
@@ -59,8 +59,6 @@ const REACTION_ITEM_BY_KEY = REACTION_ITEMS.reduce((accumulator, item) => {
 }, {});
 const HASHTAG_REGEX = /(^|[^a-zA-Z0-9_])(#([a-zA-Z0-9_]+))/g;
 const MENTION_REGEX = /(^|[^a-z0-9-])(@([a-z0-9]+(?:-[a-z0-9]+)*))/gi;
-const URL_INLINE_REGEX = /\b((?:https?:\/\/|www\.)[^\s<>"]+)/gi;
-const TRAILING_PUNCTUATION = /[),.;!?]+$/;
 const ARTICLE_PREVIEW_MAX_LENGTH = 240;
 
 const buildArticlePreview = (body, fallbackDescription) => {
@@ -564,53 +562,33 @@ const Post = forwardRef(
         return value;
       }
 
-      const nodes = [];
-      let lastIndex = 0;
-
-      for (const match of value.matchAll(new RegExp(URL_INLINE_REGEX))) {
-        const matchIndex = match.index ?? -1;
-        const rawUrl = match[1] ?? "";
-
-        if (matchIndex < 0 || !rawUrl) {
-          continue;
-        }
-
-        if (matchIndex > lastIndex) {
-          nodes.push(value.slice(lastIndex, matchIndex));
-        }
-
-        const cleaned = rawUrl.replace(TRAILING_PUNCTUATION, "");
-        const href = cleaned.startsWith("www.") ? `https://${cleaned}` : cleaned;
-        const trailing = rawUrl.slice(cleaned.length);
-
-        nodes.push(
-          <a
-            key={`url-${keyPrefix}-${matchIndex}`}
-            className={classes.link}
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {cleaned}
-          </a>,
-        );
-
-        if (trailing) {
-          nodes.push(trailing);
-        }
-
-        lastIndex = matchIndex + rawUrl.length;
-      }
-
-      if (lastIndex < value.length) {
-        nodes.push(value.slice(lastIndex));
-      }
-
-      if (nodes.length === 0) {
+      const segments = getLinkifiedSegmentsFromText(value);
+      const hasLink = segments.some((segment) => segment.type === "link");
+      if (!hasLink) {
         return value;
       }
 
-      return nodes;
+      return segments.map((segment, index) => {
+        if (segment.type === "link") {
+          return (
+            <a
+              key={`url-${keyPrefix}-${index}`}
+              className={classes.link}
+              href={segment.href}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {segment.value}
+            </a>
+          );
+        }
+
+        return (
+          <React.Fragment key={`url-text-${keyPrefix}-${index}`}>
+            {segment.value}
+          </React.Fragment>
+        );
+      });
     };
 
     const renderTextWithMentions = (value, segmentIndex) => {

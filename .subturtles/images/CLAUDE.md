@@ -1,5 +1,5 @@
 ## Current Task
-All backlog items complete. URL link detection in post text is implemented and build verified.
+All backlog items complete. URL link detection in post + repost text is implemented and tests pass.
 
 ## End Goal with Specs
 - Image upload + multi-image grid is DONE (already committed in 56d442c, 955675f)

@@ -1,6 +1,7 @@
 import React from "react";
 import Avatar from "@material-ui/core/Avatar";
 import ReactTimeago from "react-timeago";
+import { getLinkifiedSegmentsFromText } from "./post.utils";
 
 const RepostCard = ({
   classes,
@@ -12,6 +13,13 @@ const RepostCard = ({
   renderMedia,
   originalPostImages,
 }) => {
+  const originalDescription =
+    typeof originalPost?.description === "string" ? originalPost.description : "";
+  const descriptionSegments = React.useMemo(
+    () => getLinkifiedSegmentsFromText(originalDescription),
+    [originalDescription],
+  );
+
   if (!originalPost) {
     return null;
   }
@@ -39,9 +47,28 @@ const RepostCard = ({
           </p>
         </div>
       </div>
-      {typeof originalPost.description === "string" &&
-        originalPost.description.trim().length > 0 && (
-          <p className={classes.repost__embedDescription}>{originalPost.description}</p>
+      {originalDescription.trim().length > 0 && (
+        <p className={classes.repost__embedDescription}>
+          {descriptionSegments.some((segment) => segment.type === "link")
+            ? descriptionSegments.map((segment, index) =>
+              segment.type === "link" ? (
+                <a
+                  key={`repost-link-${postId}-${index}`}
+                  className={classes.link}
+                  href={segment.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {segment.value}
+                </a>
+              ) : (
+                <React.Fragment key={`repost-text-${postId}-${index}`}>
+                  {segment.value}
+                </React.Fragment>
+              ),
+            )
+            : originalDescription}
+        </p>
       )}
       {renderMedia(
         originalPost.fileType,
