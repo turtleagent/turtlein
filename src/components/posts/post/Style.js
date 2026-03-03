@@ -209,6 +209,19 @@ export default makeStyles((theme) => ({
       borderRadius: 2,
     },
   },
+  link: {
+    color: theme.palette.type === "dark" ? "#90caf9" : "#0a66c2",
+    textDecoration: "none",
+    wordBreak: "break-all",
+    "&:hover": {
+      textDecoration: "underline",
+    },
+    "&:focus": {
+      outline: `2px solid ${theme.palette.type === "dark" ? "#90caf9" : "#0a66c2"}`,
+      outlineOffset: 1,
+      borderRadius: 2,
+    },
+  },
   body__linkPreview: {
     width: "100%",
     padding: "0 10px 10px",

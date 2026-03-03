@@ -59,6 +59,8 @@ const REACTION_ITEM_BY_KEY = REACTION_ITEMS.reduce((accumulator, item) => {
 }, {});
 const HASHTAG_REGEX = /(^|[^a-zA-Z0-9_])(#([a-zA-Z0-9_]+))/g;
 const MENTION_REGEX = /(^|[^a-z0-9-])(@([a-z0-9]+(?:-[a-z0-9]+)*))/gi;
+const URL_INLINE_REGEX = /\b((?:https?:\/\/|www\.)[^\s<>"]+)/gi;
+const TRAILING_PUNCTUATION = /[),.;!?]+$/;
 const ARTICLE_PREVIEW_MAX_LENGTH = 240;
 
 const buildArticlePreview = (body, fallbackDescription) => {
@@ -557,6 +559,60 @@ const Post = forwardRef(
 
       navigate(`/article/${postId}`);
     };
+    const renderTextWithUrls = (value, keyPrefix) => {
+      if (typeof value !== "string" || value.length === 0) {
+        return value;
+      }
+
+      const nodes = [];
+      let lastIndex = 0;
+
+      for (const match of value.matchAll(new RegExp(URL_INLINE_REGEX))) {
+        const matchIndex = match.index ?? -1;
+        const rawUrl = match[1] ?? "";
+
+        if (matchIndex < 0 || !rawUrl) {
+          continue;
+        }
+
+        if (matchIndex > lastIndex) {
+          nodes.push(value.slice(lastIndex, matchIndex));
+        }
+
+        const cleaned = rawUrl.replace(TRAILING_PUNCTUATION, "");
+        const href = cleaned.startsWith("www.") ? `https://${cleaned}` : cleaned;
+        const trailing = rawUrl.slice(cleaned.length);
+
+        nodes.push(
+          <a
+            key={`url-${keyPrefix}-${matchIndex}`}
+            className={classes.link}
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {cleaned}
+          </a>,
+        );
+
+        if (trailing) {
+          nodes.push(trailing);
+        }
+
+        lastIndex = matchIndex + rawUrl.length;
+      }
+
+      if (lastIndex < value.length) {
+        nodes.push(value.slice(lastIndex));
+      }
+
+      if (nodes.length === 0) {
+        return value;
+      }
+
+      return nodes;
+    };
+
     const renderTextWithMentions = (value, segmentIndex) => {
       if (typeof value !== "string" || value.length === 0) {
         return value;
@@ -577,7 +633,7 @@ const Post = forwardRef(
         }
 
         if (matchIndex > lastIndex) {
-          renderedNodes.push(value.slice(lastIndex, matchIndex));
+          renderedNodes.push(renderTextWithUrls(value.slice(lastIndex, matchIndex), `${segmentIndex}-pre-${matchIndex}`));
         }
 
         if (prefix) {
@@ -600,11 +656,11 @@ const Post = forwardRef(
       }
 
       if (lastIndex < value.length) {
-        renderedNodes.push(value.slice(lastIndex));
+        renderedNodes.push(renderTextWithUrls(value.slice(lastIndex), `${segmentIndex}-post-${lastIndex}`));
       }
 
       if (renderedNodes.length === 0) {
-        return value;
+        return renderTextWithUrls(value, `${segmentIndex}-full`);
       }
 
       return renderedNodes.map((node, index) => (
