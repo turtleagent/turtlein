@@ -21,9 +21,12 @@ import SavedPosts from "./components/bookmarks/SavedPosts";
 import Sidebar from "./components/sidebar/Sidebar";
 import Widgets from "./components/widgets/Widgets";
 import Footer from "./components/footer/Footer";
+import PrivacyPolicy from "./components/legal/PrivacyPolicy";
+import TermsOfService from "./components/legal/TermsOfService";
+import CookiePolicy from "./components/legal/CookiePolicy";
 import { api } from "./convex/_generated/api";
 import Styles from "./Style";
-import { LinkedInBgColor, LinkedInBlue, darkPrimary } from "./assets/Colors";
+import { LinkedInBgColor, darkPrimary } from "./assets/Colors";
 import { tokens } from "./assets/designTokens";
 
 const CompanyPage = lazy(() => import("./components/company/CompanyPage"));
@@ -54,6 +57,9 @@ const AppShell = () => {
   const writeArticleRouteMatch = useMatch("/write-article");
   const articleRouteMatch = useMatch("/article/:id");
   const savedRouteMatch = useMatch("/saved");
+  const privacyRouteMatch = useMatch("/privacy");
+  const termsRouteMatch = useMatch("/terms");
+  const cookiesRouteMatch = useMatch("/cookies");
   const companyRouteMatch = useMatch("/company/:slug");
   const createCompanyRouteMatch = useMatch("/create-company");
   const usernameRouteMatch = useMatch("/:username");
@@ -69,12 +75,18 @@ const AppShell = () => {
   const isWriteArticleRouteActive = Boolean(writeArticleRouteMatch);
   const isArticleRouteActive = Boolean(articleRouteMatch?.params?.id);
   const isSavedRouteActive = Boolean(savedRouteMatch);
+  const isPrivacyRouteActive = Boolean(privacyRouteMatch);
+  const isTermsRouteActive = Boolean(termsRouteMatch);
+  const isCookiesRouteActive = Boolean(cookiesRouteMatch);
   const isCompanyRouteActive = Boolean(routeCompanySlug);
   const isCreateCompanyRouteActive = Boolean(createCompanyRouteMatch);
   const routeUsername =
     isWriteArticleRouteActive ||
     isArticleRouteActive ||
     isSavedRouteActive ||
+    isPrivacyRouteActive ||
+    isTermsRouteActive ||
+    isCookiesRouteActive ||
     isCompanyRouteActive ||
     isCreateCompanyRouteActive
     ? null
@@ -88,6 +100,9 @@ const AppShell = () => {
     isWriteArticleRouteActive ||
     isArticleRouteActive ||
     isSavedRouteActive ||
+    isPrivacyRouteActive ||
+    isTermsRouteActive ||
+    isCookiesRouteActive ||
     isCompanyRouteActive ||
     isCreateCompanyRouteActive;
   const { isAuthenticated, isLoading } = useConvexAuth();
@@ -371,12 +386,18 @@ const AppShell = () => {
   const shouldShowWriteArticleView = isWriteArticleRouteActive;
   const shouldShowArticleView = isArticleRouteActive;
   const shouldShowSavedView = isSavedRouteActive;
+  const shouldShowPrivacyView = isPrivacyRouteActive;
+  const shouldShowTermsView = isTermsRouteActive;
+  const shouldShowCookiesView = isCookiesRouteActive;
   const shouldShowCompanyView = isCompanyRouteActive;
   const shouldShowCreateCompanyView = isCreateCompanyRouteActive;
   const shouldShowProfileView =
     !shouldShowCreateCompanyView &&
     !shouldShowCompanyView &&
     !shouldShowSavedView &&
+    !shouldShowCookiesView &&
+    !shouldShowTermsView &&
+    !shouldShowPrivacyView &&
     !shouldShowHashtagView &&
     !shouldShowArticleView &&
     !shouldShowWriteArticleView &&
@@ -388,6 +409,9 @@ const AppShell = () => {
     !shouldShowCreateCompanyView &&
     !shouldShowSavedView &&
     !shouldShowCompanyView &&
+    !shouldShowCookiesView &&
+    !shouldShowTermsView &&
+    !shouldShowPrivacyView &&
     !shouldShowHashtagView &&
     !shouldShowArticleView &&
     !shouldShowWriteArticleView;
@@ -469,6 +493,9 @@ const AppShell = () => {
                   <CreateCompany />
                 </Suspense>
               )}
+              {shouldShowPrivacyView && <PrivacyPolicy />}
+              {shouldShowTermsView && <TermsOfService />}
+              {shouldShowCookiesView && <CookiePolicy />}
 
               {shouldShowMainTabs && activeTab === "home" && (
                 <>
