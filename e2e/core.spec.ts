@@ -620,3 +620,101 @@ test("Reaction flow updates per-type counts", async () => {
     }
   }
 });
+
+test("Legacy likes stay compatible with reactions", async ({ page }) => {
+  test.setTimeout(70_000);
+
+  try {
+    await loginAsGuest(page);
+    await ensureFeedReady(page, false);
+    test.skip(
+      await isFeedBlocked(page),
+      "Skipped: feed is in ErrorBoundary state in live deployment.",
+    );
+  } catch {
+    test.skip(true, "Skipped: guest login was unavailable in live deployment.");
+  }
+
+  const authToken = await page.evaluate(() =>
+    window.localStorage.getItem("__convexAuthJWT"),
+  );
+  test.skip(!authToken, "Skipped: Convex auth token missing in browser storage.");
+
+  const client = new ConvexHttpClient(CONVEX_URL);
+  client.setAuth(authToken!);
+
+  const currentUser = await client.query("users:getCurrentUser", {});
+  test.skip(
+    !currentUser?._id,
+    "Skipped: failed to resolve current authenticated user for reactions test.",
+  );
+
+  const readCounts = async (postId: string) => {
+    const countsByPostId = await client.query("likes:getReactionCountsByPostIds", {
+      postIds: [postId],
+    });
+    return countsByPostId[postId] ?? EMPTY_REACTION_COUNTS;
+  };
+
+  const readUserReaction = async (postId: string) => {
+    const reactionsByPostId = await client.query("likes:getUserReactionsByPostIds", {
+      userId: currentUser._id,
+      postIds: [postId],
+    });
+    return reactionsByPostId[postId] ?? null;
+  };
+
+  const postDescription = `E2E legacy like compatibility ${Date.now()}`;
+  let createdPostId: string | null = null;
+
+  try {
+    createdPostId = await client.mutation("posts:createPost", {
+      authorId: currentUser._id,
+      description: postDescription,
+      visibility: "public",
+    });
+
+    await expect.poll(async () => (await readCounts(createdPostId!)).total).toBe(0);
+    await expect.poll(async () => readUserReaction(createdPostId!)).toBeNull();
+
+    // Insert a legacy like (pre-reactions) and ensure it is treated as 👍.
+    await client.mutation("likes:toggleLike", { postId: createdPostId });
+    await expect.poll(async () => (await readCounts(createdPostId!)).like).toBe(1);
+    await expect.poll(async () => (await readCounts(createdPostId!)).total).toBe(1);
+    await expect.poll(async () => readUserReaction(createdPostId!)).toBe("like");
+
+    // Switching to a reaction should not double-count legacy likes.
+    await client.mutation("likes:setReaction", {
+      userId: currentUser._id,
+      postId: createdPostId,
+      reactionType: "love",
+    });
+    await expect.poll(async () => (await readCounts(createdPostId!)).like).toBe(0);
+    await expect.poll(async () => (await readCounts(createdPostId!)).love).toBe(1);
+    await expect.poll(async () => (await readCounts(createdPostId!)).total).toBe(1);
+    await expect.poll(async () => readUserReaction(createdPostId!)).toBe("love");
+
+    // Changing reactions keeps the total stable.
+    await client.mutation("likes:setReaction", {
+      userId: currentUser._id,
+      postId: createdPostId,
+      reactionType: "celebrate",
+    });
+    await expect.poll(async () => (await readCounts(createdPostId!)).love).toBe(0);
+    await expect.poll(async () => (await readCounts(createdPostId!)).celebrate).toBe(1);
+    await expect.poll(async () => (await readCounts(createdPostId!)).total).toBe(1);
+    await expect.poll(async () => readUserReaction(createdPostId!)).toBe("celebrate");
+
+    // Removing the reaction returns the post to zero reactions.
+    await client.mutation("likes:removeReaction", {
+      userId: currentUser._id,
+      postId: createdPostId!,
+    });
+    await expect.poll(async () => (await readCounts(createdPostId!)).total).toBe(0);
+    await expect.poll(async () => readUserReaction(createdPostId!)).toBeNull();
+  } finally {
+    if (createdPostId) {
+      await client.mutation("posts:deletePost", { postId: createdPostId }).catch(() => {});
+    }
+  }
+});
