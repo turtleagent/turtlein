@@ -64,10 +64,14 @@ const Widgets = () => {
       </Paper>
       <div className={classes.footer}>
         <div className={classes.footerLinks}>
-          <span className={classes.footerLink}>About</span>
-          <span className={classes.footerLink}>Accessibility</span>
-          <span className={classes.footerLink}>Help Center</span>
-          <span className={classes.footerLink}>Privacy & Terms</span>
+          <div className={classes.footerRow}>
+            <span className={classes.footerLink}>About</span>
+            <span className={classes.footerLink}>Accessibility</span>
+          </div>
+          <div className={classes.footerRow}>
+            <span className={classes.footerLink}>Help Center</span>
+            <span className={classes.footerLink}>Privacy & Terms</span>
+          </div>
         </div>
         <p className={classes.footerCopyright}>TurtleIn Corporation &copy; 2026</p>
       </div>

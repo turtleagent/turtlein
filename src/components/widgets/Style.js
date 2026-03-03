@@ -82,12 +82,19 @@ export default makeStyles((theme) => ({
   },
   footer: {
     marginTop: 16,
-    padding: "0 8px",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
   },
   footerLinks: {
     display: "flex",
-    flexWrap: "wrap",
-    gap: "4px 12px",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: 4,
+  },
+  footerRow: {
+    display: "flex",
+    gap: 12,
   },
   footerLink: {
     fontSize: 12,
