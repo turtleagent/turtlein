@@ -253,6 +253,10 @@ const Profile = ({
       ? { followerId: authUser._id, followedId: resolvedUserId }
       : "skip",
   );
+  const followerCount = useQuery(
+    api.follows.getFollowerCount,
+    resolvedUserId ? { userId: resolvedUserId } : "skip",
+  );
   const profileConnections = useQuery(
     api.connections.listConnections,
     showConnections && resolvedUserId ? { userId: resolvedUserId } : "skip",
@@ -1218,6 +1222,11 @@ const Profile = ({
               >
                 {connections} connections
               </Typography>
+              {typeof followerCount === "number" && (
+                <Typography variant="body2" color="textSecondary">
+                  {followerCount} follower{followerCount === 1 ? "" : "s"}
+                </Typography>
+              )}
               {canShowProfileActions && mutualConnectionsCount !== undefined && (
                 <Typography variant="body2" color="textSecondary">
                   {mutualConnectionsCount} mutual connection

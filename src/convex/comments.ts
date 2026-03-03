@@ -32,6 +32,44 @@ export const addComment = mutation({
       fromUserId: args.authorId,
       postId: args.postId,
     });
+
+    // Extract @mentions from comment body and send notifications
+    const mentionedUsernames = new Set<string>();
+    const mentionMatches = args.body.matchAll(
+      /(^|[^a-z0-9-])@([a-z0-9]+(?:-[a-z0-9]+)*)/gi,
+    );
+    for (const match of mentionMatches) {
+      const username = match[2]?.trim().toLowerCase();
+      if (username) {
+        mentionedUsernames.add(username);
+      }
+    }
+
+    if (mentionedUsernames.size > 0) {
+      const mentionedUsers = await Promise.all(
+        Array.from(mentionedUsernames).map((username) =>
+          ctx.db
+            .query("users")
+            .withIndex("username", (q) => q.eq("username", username))
+            .unique(),
+        ),
+      );
+
+      await Promise.all(
+        mentionedUsers
+          .filter((u) => u !== null && u._id !== args.authorId)
+          .map((u) =>
+            ctx.db.insert("notifications", {
+              userId: u!._id,
+              type: "mention",
+              fromUserId: args.authorId,
+              postId: args.postId,
+              read: false,
+              createdAt: Date.now(),
+            }),
+          ),
+      );
+    }
   },
 });
 
