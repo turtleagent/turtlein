@@ -1,5 +1,5 @@
 ## Current Task
-Create Terms of Service page component at `src/components/legal/TermsOfService.js`.
+Create Cookie Policy page component at `src/components/legal/CookiePolicy.js`.
 
 ## End Goal with Specs
 The site must have standard legal compliance for a consumer web app launching in the EU:
@@ -17,8 +17,8 @@ Style: use existing Material-UI + makeStyles pattern. Legal pages should be clea
 ## Backlog
 - [x] Read App.js to understand routing pattern and where to add footer
 - [x] Create Privacy Policy page component at src/components/legal/PrivacyPolicy.js
-- [ ] Create Terms of Service page component at src/components/legal/TermsOfService.js <- current
-- [ ] Create Cookie Policy page component at src/components/legal/CookiePolicy.js
+- [x] Create Terms of Service page component at src/components/legal/TermsOfService.js
+- [ ] Create Cookie Policy page component at src/components/legal/CookiePolicy.js <- current
 - [ ] Create CookieConsent banner component — bottom-fixed bar, localStorage persistence, Accept/Manage buttons
 - [ ] Create Footer component with legal links + copyright, add to App.js layout
 - [ ] Add /privacy, /terms, /cookies routes in App.js
