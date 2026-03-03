@@ -52,9 +52,13 @@ export default makeStyles((theme) => ({
     width: "60%",
     marginLeft: 10,
     position: "relative",
+    transition: "width 0.25s ease",
     [theme.breakpoints.down("xs")]: {
       width: "100%",
     },
+  },
+  search__wrapperExpanded: {
+    width: "100%",
   },
   search: {
     width: "100%",
@@ -161,9 +165,13 @@ export default makeStyles((theme) => ({
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
+    transition: "flex 0.25s ease",
     [theme.breakpoints.down("xs")]: {
       display: "none",
     },
+  },
+  header__navCompact: {
+    flex: 2.5,
   },
   headerNavItem: {
     flex: 1,
@@ -271,5 +279,34 @@ export default makeStyles((theme) => ({
   },
   bottomNavIconActive: {
     color: theme.palette.primary.main,
+  },
+  searchBackdrop: {
+    position: "fixed",
+    top: 52,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.45)",
+    zIndex: 50,
+    [theme.breakpoints.down("xs")]: {
+      display: "none",
+    },
+  },
+  recentSearchItem: {
+    display: "flex",
+    alignItems: "center",
+    gap: 10,
+    padding: "8px 12px",
+    cursor: "pointer",
+    fontSize: 14,
+    color: theme.palette.text.primary,
+    transition: "background-color 0.15s ease",
+    "&:hover": {
+      backgroundColor: theme.palette.action.hover,
+    },
+    "& > svg": {
+      color: theme.palette.text.secondary,
+      flexShrink: 0,
+    },
   },
 }));

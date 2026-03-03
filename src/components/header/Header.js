@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useConvexAuth, useQuery } from "convex/react";
@@ -23,12 +23,41 @@ import {
   Building2,
   BadgeCheck,
   ChevronDown,
+  Clock,
 } from "lucide-react";
 import { api } from "../../convex/_generated/api";
 import useConvexUser from "../../hooks/useConvexUser";
 import MenuItem from "./menuItem/MenuItem";
 import MeDropdown from "./MeDropdown";
 import Style from "./Style";
+
+const RECENT_SEARCHES_KEY = "turtlein_recent_searches";
+const MAX_RECENT_SEARCHES = 5;
+
+const getRecentSearches = () => {
+  try {
+    const stored = localStorage.getItem(RECENT_SEARCHES_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+};
+
+const saveRecentSearch = (term) => {
+  const trimmed = term.trim();
+  if (!trimmed) {
+    return;
+  }
+
+  try {
+    const existing = getRecentSearches();
+    const filtered = existing.filter((item) => item !== trimmed);
+    const updated = [trimmed, ...filtered].slice(0, MAX_RECENT_SEARCHES);
+    localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(updated));
+  } catch {
+    // localStorage unavailable
+  }
+};
 
 const Header = ({
   activeTab,
@@ -48,8 +77,10 @@ const Header = ({
   const photoURL = user?.photoURL;
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedTerm, setDebouncedTerm] = useState("");
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMeDropdownOpen, setIsMeDropdownOpen] = useState(false);
+  const [recentSearches, setRecentSearches] = useState([]);
   const unreadCount = useQuery(
     api.notifications.getUnreadCount,
     isAuthenticated && user?._id ? { userId: user._id } : "skip"
@@ -80,7 +111,8 @@ const Header = ({
   const userResults = users ?? [];
   const postResults = posts ?? [];
   const companyResults = companies ?? [];
-  const showSearchResults = isSearchOpen && searchTerm.trim().length > 0;
+  const hasSearchTerm = searchTerm.trim().length > 0;
+  const showDropdown = isSearchFocused;
   const isSearchLoading =
     Boolean(debouncedTerm) &&
     (users === undefined || posts === undefined || companies === undefined);
@@ -93,9 +125,10 @@ const Header = ({
     return `${description.slice(0, 60)}...`;
   };
 
-  const closeSearch = () => {
+  const closeSearch = useCallback(() => {
+    setIsSearchFocused(false);
     setIsSearchOpen(false);
-  };
+  }, []);
 
   const getFollowerLabel = (count) => {
     if (count === 1) {
@@ -104,11 +137,12 @@ const Header = ({
     return `${count} followers`;
   };
 
-  const clearSearch = () => {
+  const clearSearch = useCallback(() => {
     setSearchTerm("");
     setDebouncedTerm("");
-    closeSearch();
-  };
+    setIsSearchFocused(false);
+    setIsSearchOpen(false);
+  }, []);
 
   const handleSearchChange = (event) => {
     const nextTerm = event.target.value;
@@ -118,6 +152,8 @@ const Header = ({
   };
 
   const handleSearchFocus = () => {
+    setIsSearchFocused(true);
+    setRecentSearches(getRecentSearches());
     if (searchTerm.trim().length > 0) {
       setIsSearchOpen(true);
     }
@@ -131,7 +167,14 @@ const Header = ({
     }
   };
 
+  const handleRecentSearchClick = (term) => {
+    setSearchTerm(term);
+    setDebouncedTerm(term);
+    setIsSearchOpen(true);
+  };
+
   const handleUserResultClick = (resultUser) => {
+    saveRecentSearch(searchTerm);
     onNavigateProfile({
       username: resultUser?.username ?? null,
       userId: resultUser?._id ?? null,
@@ -140,6 +183,7 @@ const Header = ({
   };
 
   const handlePostResultClick = (postId) => {
+    saveRecentSearch(searchTerm);
     if (typeof onNavigateHome === "function") {
       onNavigateHome();
     } else {
@@ -160,6 +204,7 @@ const Header = ({
       return;
     }
 
+    saveRecentSearch(searchTerm);
     navigate(`/company/${encodeURIComponent(slug)}`);
     clearSearch();
   };
@@ -282,7 +327,6 @@ const Header = ({
             }}
             onClick={navigateToHome}
           >
-            <img src="/turtle-mascot.png" alt="TurtleIn" style={{ height: 28 }} />
             <span style={{
               color: theme.palette.primary.main,
               fontSize: 22,
@@ -293,7 +337,11 @@ const Header = ({
             }}>TurtleIn</span>
           </span>
           <ClickAwayListener onClickAway={closeSearch}>
-            <div className={classes.search__wrapper}>
+            <div
+              className={`${classes.search__wrapper} ${
+                isSearchFocused ? classes.search__wrapperExpanded : ""
+              }`}
+            >
               <div className={classes.search}>
                 <Search size={20} strokeWidth={1.75} />
                 <input
@@ -303,129 +351,154 @@ const Header = ({
                   onFocus={handleSearchFocus}
                 />
               </div>
-              {showSearchResults && (
+              {showDropdown && (
                 <Paper className={classes.searchDropdown} elevation={3}>
-                  {isSearchLoading ? (
-                    <Typography className={classes.searchEmptyState}>Searching...</Typography>
-                  ) : (
-                    <>
-                      <Typography className={classes.searchSectionHeader}>Users</Typography>
-                      {userResults.length > 0 ? (
-                        userResults.map((resultUser) => (
-                          <div
-                            key={resultUser._id}
-                            className={classes.searchResultItem}
-                            onClick={() => handleUserResultClick(resultUser)}
-                            onKeyDown={(event) =>
-                              handleResultKeyDown(event, () =>
-                                handleUserResultClick(resultUser)
-                              )
-                            }
-                            role="button"
-                            tabIndex={0}
-                          >
-                            <Avatar
-                              src={resultUser.photoURL}
-                              alt={resultUser.displayName}
-                              className={classes.searchResultAvatar}
-                            />
-                            <div className={classes.searchResultContent}>
-                              <Typography className={classes.searchResultPrimary}>
-                                {resultUser.displayName}
-                              </Typography>
-                              <Typography className={classes.searchResultSecondary}>
-                                {resultUser.title}
-                              </Typography>
-                            </div>
-                          </div>
-                        ))
-                      ) : (
-                        <Typography className={classes.searchEmptyState}>
-                          No users found.
-                        </Typography>
-                      )}
-
-                      <Typography className={classes.searchSectionHeader}>Posts</Typography>
-                      {postResults.length > 0 ? (
-                        postResults.map((post) => (
-                          <div
-                            key={post._id}
-                            className={classes.searchResultItem}
-                            onClick={() => handlePostResultClick(post._id)}
-                            onKeyDown={(event) =>
-                              handleResultKeyDown(event, () =>
-                                handlePostResultClick(post._id)
-                              )
-                            }
-                            role="button"
-                            tabIndex={0}
-                          >
-                            <div className={classes.searchResultContent}>
-                              <Typography className={classes.searchResultPrimary}>
-                                {post.author?.displayName ?? "Unknown user"}
-                              </Typography>
-                              <Typography className={classes.searchResultSecondary}>
-                                {getDescriptionSnippet(post.description)}
-                              </Typography>
-                            </div>
-                          </div>
-                        ))
-                      ) : (
-                        <Typography className={classes.searchEmptyState}>
-                          No posts found.
-                        </Typography>
-                      )}
-
-                      <Typography className={classes.searchSectionHeader}>Companies</Typography>
-                      {companyResults.length > 0 ? (
-                        companyResults.map((company) => (
-                          <div
-                            key={company.slug}
-                            className={classes.searchResultItem}
-                            onClick={() => handleCompanyResultClick(company.slug)}
-                            onKeyDown={(event) =>
-                              handleResultKeyDown(event, () =>
-                                handleCompanyResultClick(company.slug)
-                              )
-                            }
-                            role="button"
-                            tabIndex={0}
-                          >
-                            <Avatar
-                              src={company.logoURL ?? undefined}
-                              alt={company.name}
-                              className={classes.searchResultAvatar}
+                  {hasSearchTerm ? (
+                    isSearchLoading ? (
+                      <Typography className={classes.searchEmptyState}>Searching...</Typography>
+                    ) : (
+                      <>
+                        <Typography className={classes.searchSectionHeader}>Users</Typography>
+                        {userResults.length > 0 ? (
+                          userResults.map((resultUser) => (
+                            <div
+                              key={resultUser._id}
+                              className={classes.searchResultItem}
+                              onClick={() => handleUserResultClick(resultUser)}
+                              onKeyDown={(event) =>
+                                handleResultKeyDown(event, () =>
+                                  handleUserResultClick(resultUser)
+                                )
+                              }
+                              role="button"
+                              tabIndex={0}
                             >
-                              {!company.logoURL ? <Building2 size={16} strokeWidth={1.75} /> : null}
-                            </Avatar>
-                            <div className={classes.searchResultContent}>
-                              <div className={classes.searchResultPrimaryRow}>
+                              <Avatar
+                                src={resultUser.photoURL}
+                                alt={resultUser.displayName}
+                                className={classes.searchResultAvatar}
+                              />
+                              <div className={classes.searchResultContent}>
                                 <Typography className={classes.searchResultPrimary}>
-                                  {company.name}
+                                  {resultUser.displayName}
                                 </Typography>
-                                {company.isVerified ? (
-                                  <BadgeCheck
-                                    className={classes.searchVerifiedIcon}
-                                    size={16}
-                                    strokeWidth={1.75}
-                                    aria-label="Verified company"
-                                  />
-                                ) : null}
+                                <Typography className={classes.searchResultSecondary}>
+                                  {resultUser.title}
+                                </Typography>
                               </div>
-                              <Typography className={classes.searchResultSecondary}>
-                                {`${company.industry || "Unknown industry"} • ${getFollowerLabel(
-                                  company.followerCount
-                                )}`}
-                              </Typography>
                             </div>
-                          </div>
-                        ))
-                      ) : (
-                        <Typography className={classes.searchEmptyState}>
-                          No companies found.
-                        </Typography>
-                      )}
+                          ))
+                        ) : (
+                          <Typography className={classes.searchEmptyState}>
+                            No users found.
+                          </Typography>
+                        )}
+
+                        <Typography className={classes.searchSectionHeader}>Posts</Typography>
+                        {postResults.length > 0 ? (
+                          postResults.map((post) => (
+                            <div
+                              key={post._id}
+                              className={classes.searchResultItem}
+                              onClick={() => handlePostResultClick(post._id)}
+                              onKeyDown={(event) =>
+                                handleResultKeyDown(event, () =>
+                                  handlePostResultClick(post._id)
+                                )
+                              }
+                              role="button"
+                              tabIndex={0}
+                            >
+                              <div className={classes.searchResultContent}>
+                                <Typography className={classes.searchResultPrimary}>
+                                  {post.author?.displayName ?? "Unknown user"}
+                                </Typography>
+                                <Typography className={classes.searchResultSecondary}>
+                                  {getDescriptionSnippet(post.description)}
+                                </Typography>
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <Typography className={classes.searchEmptyState}>
+                            No posts found.
+                          </Typography>
+                        )}
+
+                        <Typography className={classes.searchSectionHeader}>Companies</Typography>
+                        {companyResults.length > 0 ? (
+                          companyResults.map((company) => (
+                            <div
+                              key={company.slug}
+                              className={classes.searchResultItem}
+                              onClick={() => handleCompanyResultClick(company.slug)}
+                              onKeyDown={(event) =>
+                                handleResultKeyDown(event, () =>
+                                  handleCompanyResultClick(company.slug)
+                                )
+                              }
+                              role="button"
+                              tabIndex={0}
+                            >
+                              <Avatar
+                                src={company.logoURL ?? undefined}
+                                alt={company.name}
+                                className={classes.searchResultAvatar}
+                              >
+                                {!company.logoURL ? <Building2 size={16} strokeWidth={1.75} /> : null}
+                              </Avatar>
+                              <div className={classes.searchResultContent}>
+                                <div className={classes.searchResultPrimaryRow}>
+                                  <Typography className={classes.searchResultPrimary}>
+                                    {company.name}
+                                  </Typography>
+                                  {company.isVerified ? (
+                                    <BadgeCheck
+                                      className={classes.searchVerifiedIcon}
+                                      size={16}
+                                      strokeWidth={1.75}
+                                      aria-label="Verified company"
+                                    />
+                                  ) : null}
+                                </div>
+                                <Typography className={classes.searchResultSecondary}>
+                                  {`${company.industry || "Unknown industry"} • ${getFollowerLabel(
+                                    company.followerCount
+                                  )}`}
+                                </Typography>
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <Typography className={classes.searchEmptyState}>
+                            No companies found.
+                          </Typography>
+                        )}
+                      </>
+                    )
+                  ) : recentSearches.length > 0 ? (
+                    <>
+                      <Typography className={classes.searchSectionHeader}>Recent</Typography>
+                      {recentSearches.map((term) => (
+                        <div
+                          key={term}
+                          className={classes.recentSearchItem}
+                          onClick={() => handleRecentSearchClick(term)}
+                          onKeyDown={(event) =>
+                            handleResultKeyDown(event, () => handleRecentSearchClick(term))
+                          }
+                          role="button"
+                          tabIndex={0}
+                        >
+                          <Clock size={16} strokeWidth={1.75} />
+                          <span>{term}</span>
+                        </div>
+                      ))}
                     </>
+                  ) : (
+                    <Typography className={classes.searchEmptyState}>
+                      Try searching for people, posts, or companies.
+                    </Typography>
                   )}
                 </Paper>
               )}
@@ -442,7 +515,11 @@ const Header = ({
             style={{ cursor: "pointer" }}
           />
         </div>
-        <div className={classes.header__nav}>
+        <div
+          className={`${classes.header__nav} ${
+            isSearchFocused ? classes.header__navCompact : ""
+          }`}
+        >
           {items.map(({ key, Icon, title, arrow, onClick, isActive }) => (
             <div
               key={key}
@@ -450,7 +527,13 @@ const Header = ({
                 isActive ? classes.headerNavItemActive : ""
               }`}
             >
-              <MenuItem Icon={Icon} title={title} arrow={arrow} onClick={onClick} />
+              <MenuItem
+                Icon={Icon}
+                title={title}
+                arrow={arrow}
+                onClick={onClick}
+                hideLabels={isSearchFocused}
+              />
             </div>
           ))}
         </div>
@@ -502,6 +585,10 @@ const Header = ({
           ))}
         </Paper>
       </div>
+
+      {isSearchFocused && (
+        <div className={classes.searchBackdrop} onClick={closeSearch} />
+      )}
     </Paper>
   );
 };

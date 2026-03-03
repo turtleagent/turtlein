@@ -6,75 +6,101 @@ export default makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
   },
-  widgets__top: {
-    overflow: "hidden",
+  promotedCard: {
     borderRadius: 12,
+    overflow: "hidden",
+    padding: "12px 16px",
   },
-  heading: {
-    width: "100%",
-    height: 30,
+  promotedHeader: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: "20px 15px",
-    "& > h4": {
-      fontSize: 15,
-      fontWeight: 600,
-    },
-    "& > svg": {
-      width: 16,
-      height: 16,
-      color: theme.palette.text.secondary,
-    },
+    marginBottom: 12,
   },
-  expand: {
-    width: "100%",
-    height: 30,
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    cursor: "pointer",
+  promotedLabel: {
+    fontSize: 12,
     color: theme.palette.text.secondary,
-    transition: "background-color 0.2s ease",
-    "& > h4": {
-      fontSize: 13,
-      fontWeight: 600,
-    },
-    "&:hover": {
-      backgroundColor: theme.palette.action.hover,
-    },
   },
-  widgets__bottom: {
-    position: "sticky",
-    top: "8vh",
-    marginTop: 10,
+  promotedMore: {
+    color: theme.palette.text.secondary,
+    cursor: "pointer",
   },
-  widgets__suggestions: {
-    marginTop: 10,
+  companyBody: {
+    display: "flex",
+    alignItems: "flex-start",
+    gap: 10,
+    marginBottom: 8,
   },
-  addBanner: {
-    width: "100%",
+  companyLogo: {
+    width: 48,
+    height: 48,
+    borderRadius: 4,
+    flexShrink: 0,
+  },
+  companyInfo: {
     display: "flex",
     flexDirection: "column",
-    padding: "12px 14px",
-    borderRadius: 12,
-    overflow: "hidden",
-    border: `1px solid ${theme.palette.divider}`,
-    background:
-      theme.palette.type === "dark"
-        ? `linear-gradient(120deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`
-        : "linear-gradient(120deg, #e8f5e9 0%, #c8e6c9 100%)",
-    "& > h4": {
-      margin: 0,
-      fontSize: 17,
-      fontWeight: 700,
-      color: theme.palette.type === "dark" ? "#e8f5e9" : theme.palette.primary.dark,
+    minWidth: 0,
+  },
+  companyName: {
+    fontSize: 14,
+    fontWeight: 600,
+    color: theme.palette.text.primary,
+    lineHeight: 1.3,
+  },
+  personalizedMessage: {
+    fontSize: 12,
+    color: theme.palette.text.secondary,
+    lineHeight: 1.4,
+    marginTop: 2,
+  },
+  updateNote: {
+    fontSize: 12,
+    color: theme.palette.text.secondary,
+    margin: "4px 0 8px",
+  },
+  followButton: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 4,
+    padding: "6px 16px",
+    fontSize: 14,
+    fontWeight: 600,
+    color: theme.palette.primary.main,
+    backgroundColor: "transparent",
+    border: `1.5px solid ${theme.palette.primary.main}`,
+    borderRadius: 20,
+    cursor: "pointer",
+    transition: "background-color 0.2s ease, border-color 0.2s ease",
+    "&:hover": {
+      backgroundColor:
+        theme.palette.type === "dark"
+          ? "rgba(255,255,255,0.06)"
+          : "rgba(0,0,0,0.04)",
+      borderColor: theme.palette.primary.dark,
     },
-    "& > p": {
-      margin: "8px 0 0 0",
-      fontSize: 13,
-      lineHeight: 1.4,
-      color: theme.palette.type === "dark" ? "#c8e6c9" : theme.palette.primary.main,
+  },
+  footer: {
+    marginTop: 16,
+    padding: "0 8px",
+  },
+  footerLinks: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "4px 12px",
+  },
+  footerLink: {
+    fontSize: 12,
+    color: theme.palette.text.secondary,
+    cursor: "pointer",
+    "&:hover": {
+      color: theme.palette.primary.main,
+      textDecoration: "underline",
     },
+  },
+  footerCopyright: {
+    fontSize: 12,
+    color: theme.palette.text.secondary,
+    marginTop: 8,
   },
 }));

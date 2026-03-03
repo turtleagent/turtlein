@@ -1,42 +1,53 @@
 import { makeStyles } from "@material-ui/core/styles";
 
 export default makeStyles((theme) => ({
-  sidebar: {
-    width: "100%",
+  wrapper: {
     display: "flex",
     flexDirection: "column",
-    alignItems: "center",
+    gap: 8,
+  },
+  profileCard: {
     borderRadius: 12,
     overflow: "hidden",
-    "& > .MuiAvatar-root": {
-      width: "30%",
-      height: "auto",
-      marginTop: -40,
-    },
-    "& > h4": {
-      margin: "10px 0",
-    },
-  },
-  subtitle: {
-    margin: "-6px 0 8px",
-    fontSize: 12,
-    color: theme.palette.text.secondary,
+    paddingBottom: 12,
   },
   cover: {
     width: "100%",
-    height: "60px",
+    height: 60,
     opacity: 0.75,
   },
-  stats: {
-    width: "100%",
-    "& > *": { marginTop: 5 },
+  profileBody: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    padding: "0 12px",
+  },
+  avatar: {
+    width: 72,
+    height: 72,
+    marginTop: -36,
+    border: `3px solid ${theme.palette.background.paper}`,
+  },
+  displayName: {
+    margin: "8px 0 0",
+    fontSize: 16,
+    fontWeight: 600,
+  },
+  subtitle: {
+    margin: "2px 0 0",
+    fontSize: 12,
+    color: theme.palette.text.secondary,
+  },
+  statsCard: {
+    borderRadius: 12,
+    overflow: "hidden",
   },
   stat: {
     width: "100%",
     display: "flex",
     justifyContent: "space-between",
     color: theme.palette.text.secondary,
-    padding: "5px 10px",
+    padding: "10px 12px",
     cursor: "pointer",
     transition: "background-color 0.2s ease",
     "& > h4": {
@@ -53,13 +64,17 @@ export default makeStyles((theme) => ({
       backgroundColor: theme.palette.action.hover,
     },
   },
-  myItems: {
+  actionsCard: {
+    borderRadius: 12,
+    overflow: "hidden",
+  },
+  actionItem: {
     width: "100%",
-    height: 50,
+    height: 46,
     display: "flex",
     alignItems: "center",
     cursor: "pointer",
-    paddingLeft: 10,
+    paddingLeft: 12,
     color: theme.palette.text.primary,
     transition: "background-color 0.2s ease",
     "& > h4": {
@@ -75,7 +90,7 @@ export default makeStyles((theme) => ({
       backgroundColor: theme.palette.action.hover,
     },
   },
-  savedPostsLink: {
+  actionLink: {
     width: "100%",
     textDecoration: "none",
     color: "inherit",

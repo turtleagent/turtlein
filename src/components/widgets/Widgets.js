@@ -1,78 +1,78 @@
-import React, { useState } from "react";
-import { Paper } from "@material-ui/core";
-import { Circle, Info, ChevronDown } from "lucide-react";
-import HeaderInfo from "../../components/util/HeadLine";
-import { LinkedInLightBlue } from "../../assets/Colors";
-import CompanySuggestions from "../company/CompanySuggestions";
+import React from "react";
+import { useQuery, useMutation } from "convex/react";
+import { Paper, Avatar } from "@material-ui/core";
+import { MoreHorizontal, Plus } from "lucide-react";
+import { api } from "../../convex/_generated/api";
+import useConvexUser from "../../hooks/useConvexUser";
 import Style from "./Style";
+
+const SUPERTURTLE_SLUG = "superturtle";
+const FALLBACK_NAME = "SuperTurtle";
+const FALLBACK_LOGO = "/turtle-mascot.png";
+const FALLBACK_TAGLINE = "Slow and steady wins the race.";
 
 const Widgets = () => {
   const classes = Style();
-  const [expand, setExpand] = useState(false);
+  const user = useConvexUser();
+
+  const company = useQuery(api.companies.getCompanyBySlug, {
+    slug: SUPERTURTLE_SLUG,
+  });
+  const followerCount = useQuery(
+    api.companies.getFollowerCount,
+    company?._id ? { companyId: company._id } : "skip",
+  );
+  const followCompany = useMutation(api.companies.followCompany);
+
+  const name = company?.name ?? FALLBACK_NAME;
+  const logo = company?.logoUrl ?? FALLBACK_LOGO;
+  const tagline = company?.tagline ?? FALLBACK_TAGLINE;
+  const followers = followerCount ?? 0;
+
+  const handleFollow = async () => {
+    if (!user?._id || !company?._id) return;
+    try {
+      await followCompany({ companyId: company._id });
+    } catch (err) {
+      // silently ignore
+    }
+  };
 
   return (
     <div className={classes.widgets}>
-      <Paper className={classes.widgets__top}>
-        <div className={classes.heading}>
-          <h4>TurtleIn News</h4>
-          <Info size={16} strokeWidth={1.75} />
+      <Paper className={classes.promotedCard}>
+        <div className={classes.promotedHeader}>
+          <span className={classes.promotedLabel}>Promoted</span>
+          <MoreHorizontal size={16} strokeWidth={1.75} className={classes.promotedMore} />
         </div>
-        {top_1.map((title, i) => (
-          <HeaderInfo
-            key={`widgets-top_1_${i}`}
-            Icon={
-              <Circle
-                size={12}
-                fill={LinkedInLightBlue}
-                strokeWidth={0}
-              />
-            }
-            title={title}
-            time={true}
-            count={true}
-          />
-        ))}
-        {expand &&
-          top_2.map((title, i) => (
-            <HeaderInfo
-              key={`widgets-top_2_${i}`}
-              Icon={<Circle size={12} fill={LinkedInLightBlue} strokeWidth={0} />}
-              title={title}
-              time={true}
-              count={true}
-            />
-          ))}
-        <div className={classes.expand} onClick={() => setExpand(!expand)}>
-          <h4>{expand ? "Show less" : "Show more"}</h4>
-          <ChevronDown size={20} strokeWidth={1.75} style={{ transform: expand ? "rotate(180deg)" : "", transition: "transform 0.2s ease" }} />
+        <div className={classes.companyBody}>
+          <Avatar src={logo} variant="square" className={classes.companyLogo} />
+          <div className={classes.companyInfo}>
+            <span className={classes.companyName}>{name}</span>
+            <span className={classes.personalizedMessage}>{tagline}</span>
+          </div>
         </div>
+        {followers > 0 && (
+          <p className={classes.updateNote}>
+            {followers.toLocaleString()} follower{followers !== 1 ? "s" : ""}
+          </p>
+        )}
+        <button className={classes.followButton} onClick={handleFollow}>
+          <Plus size={16} strokeWidth={2} />
+          Follow
+        </button>
       </Paper>
-      <div className={classes.widgets__suggestions}>
-        <CompanySuggestions />
-      </div>
-      <div className={classes.widgets__bottom}>
-        <Paper className={classes.addBanner}>
-          <h4>🐢 TurtleIn Premium</h4>
-          <p>Unlock priority visibility and premium networking insights.</p>
-        </Paper>
+      <div className={classes.footer}>
+        <div className={classes.footerLinks}>
+          <span className={classes.footerLink}>About</span>
+          <span className={classes.footerLink}>Accessibility</span>
+          <span className={classes.footerLink}>Help Center</span>
+          <span className={classes.footerLink}>Privacy & Terms</span>
+        </div>
+        <p className={classes.footerCopyright}>TurtleIn Corporation &copy; 2026</p>
       </div>
     </div>
   );
 };
-
-const top_1 = [
-  "TurtleIn reaches 1000 users",
-  "React 19 brings new hooks",
-  "Convex raises Series B",
-  "Remote work is here to stay",
-  "AI pair programming goes mainstream",
-];
-
-const top_2 = [
-  "Green tech startups surge in 2026",
-  "Open source funding hits record high",
-  "TypeScript adoption crosses 80%",
-  "Serverless backends: the new default",
-];
 
 export default Widgets;

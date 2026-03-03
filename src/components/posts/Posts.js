@@ -3,9 +3,10 @@ import { useQuery } from "convex/react";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
-import Tabs from "@material-ui/core/Tabs";
-import Tab from "@material-ui/core/Tab";
+import Paper from "@material-ui/core/Paper";
+import ClickAwayListener from "@material-ui/core/ClickAwayListener";
 import FlipMove from "react-flip-move";
+import { ChevronDown } from "lucide-react";
 import Post from "./post/Post";
 import { DEFAULT_PHOTO } from "../../constants";
 import { api } from "../../convex/_generated/api";
@@ -15,9 +16,16 @@ import LoadingGate from "../LoadingGate";
 
 const PAGE_SIZE = 10;
 
+const SORT_OPTIONS = [
+  { value: "top", label: "Most relevant first" },
+  { value: "recent", label: "Most recent first" },
+  { value: "following", label: "Following" },
+];
+
 const Posts = ({ onNavigateProfile }) => {
   const classes = Style();
-  const [sortBy, setSortBy] = React.useState("recent");
+  const [sortBy, setSortBy] = React.useState("top");
+  const [isSortOpen, setIsSortOpen] = React.useState(false);
   const [page, setPage] = React.useState(0);
   const [pagedPosts, setPagedPosts] = React.useState({});
   const offset = page * PAGE_SIZE;
@@ -86,29 +94,76 @@ const Posts = ({ onNavigateProfile }) => {
     return photoURL;
   };
 
+  const activeLabel = SORT_OPTIONS.find((opt) => opt.value === sortBy)?.label ?? "Most relevant first";
+
+  const handleSortSelect = (value) => {
+    if (value !== sortBy) {
+      setSortBy(value);
+      setPage(0);
+      setPagedPosts({});
+    }
+    setIsSortOpen(false);
+  };
+
   return (
     <div className={classes.posts}>
-      <div className={classes.feedSort}>
-        <Tabs
-          value={sortBy}
-          onChange={(_, nextSortBy) => {
-            if (nextSortBy === sortBy) {
-              return;
-            }
-
-            setSortBy(nextSortBy);
-            setPage(0);
-            setPagedPosts({});
-          }}
-          indicatorColor="primary"
-          textColor="primary"
-          variant="fullWidth"
-          aria-label="Feed sort"
-        >
-          <Tab value="recent" label="Recent" className={classes.sortTab} />
-          <Tab value="top" label="Top" className={classes.sortTab} />
-          <Tab value="following" label="Following" className={classes.sortTab} />
-        </Tabs>
+      <div className={classes.sortRow}>
+        <div className={classes.sortDivider} />
+        <div className={classes.sortTriggerWrapper}>
+          <div
+            className={classes.sortTrigger}
+            onClick={() => setIsSortOpen((prev) => !prev)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                setIsSortOpen((prev) => !prev);
+              }
+            }}
+          >
+            <span>Select feed view:</span>
+            <span className={classes.sortTriggerValue}>
+              {activeLabel}
+              <ChevronDown
+                size={16}
+                strokeWidth={1.75}
+                style={{
+                  transform: isSortOpen ? "rotate(180deg)" : "",
+                  transition: "transform 0.2s ease",
+                }}
+              />
+            </span>
+          </div>
+          {isSortOpen && (
+            <ClickAwayListener onClickAway={() => setIsSortOpen(false)}>
+              <Paper className={classes.sortDropdown} elevation={3}>
+                {SORT_OPTIONS.map((option) => (
+                  <div
+                    key={option.value}
+                    className={`${classes.sortOption} ${
+                      option.value === sortBy ? classes.sortOptionActive : ""
+                    }`}
+                    onClick={() => handleSortSelect(option.value)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        handleSortSelect(option.value);
+                      }
+                    }}
+                  >
+                    {option.label}
+                  </div>
+                ))}
+                <p className={classes.sortNote}>
+                  This selection only affects your current feed view on this device.
+                </p>
+              </Paper>
+            </ClickAwayListener>
+          )}
+        </div>
       </div>
       <LoadingGate isLoading={isLoading}>
         {posts.length === 0 ? (
@@ -172,18 +227,72 @@ const Style = makeStyles((theme) => ({
     flexDirection: "column",
     alignItems: "center",
   },
-  feedSort: {
+  sortRow: {
     width: "100%",
-    borderRadius: 10,
-    marginBottom: 10,
-    background: theme.palette.background.paper,
-    border: `1px solid ${theme.palette.divider}`,
-    overflow: "hidden",
+    display: "flex",
+    alignItems: "center",
+    gap: 8,
+    margin: "8px 0 2px",
   },
-  sortTab: {
-    minHeight: 44,
+  sortDivider: {
+    flex: 1,
+    height: 0,
+    borderTop: `1px solid ${theme.palette.divider}`,
+  },
+  sortTriggerWrapper: {
+    position: "relative",
+    flexShrink: 0,
+  },
+  sortTrigger: {
+    display: "flex",
+    alignItems: "center",
+    gap: 4,
+    cursor: "pointer",
+    fontSize: 12,
+    lineHeight: 1,
+    color: theme.palette.text.secondary,
+    whiteSpace: "nowrap",
+    userSelect: "none",
+  },
+  sortTriggerValue: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 2,
     fontWeight: 600,
-    textTransform: "none",
+    color: theme.palette.text.primary,
+  },
+  sortDropdown: {
+    position: "absolute",
+    top: "calc(100% + 8px)",
+    right: 0,
+    width: 260,
+    zIndex: 1000,
+    borderRadius: 8,
+    padding: "4px 0",
+    backgroundColor: theme.palette.background.paper,
+  },
+  sortOption: {
+    padding: "10px 16px",
+    fontSize: 14,
+    color: theme.palette.text.primary,
+    cursor: "pointer",
+    transition: "background-color 0.15s ease",
+    "&:hover": {
+      backgroundColor: theme.palette.action.hover,
+    },
+  },
+  sortOptionActive: {
+    fontWeight: 600,
+    color: theme.palette.primary.main,
+  },
+  sortNote: {
+    padding: "8px 16px 12px",
+    margin: 0,
+    fontSize: 12,
+    lineHeight: 1.4,
+    color: theme.palette.text.secondary,
+    borderTop: `1px solid ${theme.palette.divider}`,
+    marginTop: 4,
   },
   loadMoreContainer: {
     marginTop: 12,

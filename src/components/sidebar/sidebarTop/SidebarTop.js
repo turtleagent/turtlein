@@ -1,6 +1,6 @@
 import React from "react";
 import { useQuery } from "convex/react";
-import { Paper, Avatar, Divider } from "@material-ui/core";
+import { Paper, Avatar } from "@material-ui/core";
 import { useTheme } from "@material-ui/core/styles";
 import { Tag, Bookmark, Building2 } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -19,41 +19,47 @@ const SidebarTop = () => {
   const connections = connectionCount ?? 0;
 
   return (
-    <Paper className={classes.sidebar}>
-      <div
-        className={classes.cover}
-        style={{
-          backgroundImage: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
-        }}
-      ></div>
-      <Avatar src={user?.photoURL} />
-      <h4>{user?.displayName ?? "Guest User"}</h4>
-      <p className={classes.subtitle}>{user?.title ?? "TurtleIn member"}</p>
-      <div className={classes.stats}>
-        <Divider />
+    <div className={classes.wrapper}>
+      <Paper className={classes.profileCard}>
+        <div
+          className={classes.cover}
+          style={{
+            backgroundImage: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+          }}
+        />
+        <div className={classes.profileBody}>
+          <Avatar src={user?.photoURL} className={classes.avatar} />
+          <h4 className={classes.displayName}>{user?.displayName ?? "Guest User"}</h4>
+          <p className={classes.subtitle}>{user?.title ?? "TurtleIn member"}</p>
+        </div>
+      </Paper>
+
+      <Paper className={classes.statsCard}>
         <div className={classes.stat}>
           <h4>Connections</h4>
           <p>{connections}</p>
         </div>
-        <Divider />
-      </div>
-      <div className={classes.myItems}>
-        <Tag size={20} strokeWidth={1.75} style={{ transform: "rotate(-90deg)" }} />
-        <h4>My Items</h4>
-      </div>
-      <Link to="/saved" className={classes.savedPostsLink}>
-        <div className={classes.myItems}>
-          <Bookmark size={20} strokeWidth={1.75} />
-          <h4>Saved posts</h4>
+      </Paper>
+
+      <Paper className={classes.actionsCard}>
+        <div className={classes.actionItem}>
+          <Tag size={20} strokeWidth={1.75} style={{ transform: "rotate(-90deg)" }} />
+          <h4>My Items</h4>
         </div>
-      </Link>
-      <Link to="/create-company" className={classes.savedPostsLink}>
-        <div className={classes.myItems}>
-          <Building2 size={20} strokeWidth={1.75} />
-          <h4>Create company</h4>
-        </div>
-      </Link>
-    </Paper>
+        <Link to="/saved" className={classes.actionLink}>
+          <div className={classes.actionItem}>
+            <Bookmark size={20} strokeWidth={1.75} />
+            <h4>Saved posts</h4>
+          </div>
+        </Link>
+        <Link to="/create-company" className={classes.actionLink}>
+          <div className={classes.actionItem}>
+            <Building2 size={20} strokeWidth={1.75} />
+            <h4>Create company</h4>
+          </div>
+        </Link>
+      </Paper>
+    </div>
   );
 };
 
