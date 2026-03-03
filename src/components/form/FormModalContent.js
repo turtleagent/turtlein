@@ -80,6 +80,8 @@ const FormModalContent = ({
 
   const visibilityLabel = postVisibility === "public" ? "Post to Anyone" : "Connections Only";
   const VisibilityIcon = postVisibility === "public" ? Earth : Users;
+  const selectedImageFiles = files.filter((file) => file.type === "image" && Boolean(file.data));
+  const selectedVideoFiles = files.filter((file) => file.type === "video");
 
   return (
     <>
@@ -117,21 +119,65 @@ const FormModalContent = ({
           onClose={onCloseMentions}
         />
 
-        {!isUrlOpen && files.length > 0 && (
+        {!isUrlOpen && selectedImageFiles.length > 0 && (
+          <div className={classes.imagePreviewSection}>
+            <div className={classes.imagePreviewLabel}>
+              {selectedImageFiles.length}{" "}
+              {selectedImageFiles.length === 1 ? "photo selected" : "photos selected"}
+            </div>
+            <div
+              className={`${classes.imagePreviewGrid} ${
+                selectedImageFiles.length <= 1
+                  ? classes.imagePreviewGrid1
+                  : selectedImageFiles.length === 2
+                    ? classes.imagePreviewGrid2
+                    : selectedImageFiles.length === 3
+                      ? classes.imagePreviewGrid3
+                      : classes.imagePreviewGrid4
+              }`}
+            >
+              {selectedImageFiles.map((file, imageIndex) => {
+                const fileIndex = files.findIndex((candidate) => candidate === file);
+
+                return (
+                  <div
+                    key={`${file.name}-${imageIndex}`}
+                    className={classes.imagePreviewItem}
+                    style={
+                      selectedImageFiles.length === 3 && imageIndex === 0
+                        ? { gridColumn: "1 / span 2" }
+                        : undefined
+                    }
+                  >
+                    <img
+                      src={file.data}
+                      alt={file.name || `Selected photo ${imageIndex + 1}`}
+                      loading="lazy"
+                    />
+                    <button
+                      type="button"
+                      className={classes.imagePreviewRemove}
+                      onClick={() => onRemoveFile(fileIndex)}
+                      aria-label={`Remove ${file.name || "photo"}`}
+                    >
+                      <X size={14} strokeWidth={2.25} />
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {!isUrlOpen && selectedVideoFiles.length > 0 && (
           <div className={classes.fileChips}>
-            {files.map((file, fileIndex) => (
+            {selectedVideoFiles.map((file, fileIndex) => (
               <Chip
                 key={`${file.name}-${fileIndex}`}
                 color="primary"
                 size="small"
-                onDelete={() => onRemoveFile(fileIndex)}
-                icon={
-                  file.type === "image" ? (
-                    <ImageIcon size={18} strokeWidth={1.75} />
-                  ) : (
-                    <Video size={18} strokeWidth={1.75} />
-                  )
-                }
+                onDelete={() => onRemoveFile(files.findIndex((candidate) => candidate === file))}
+                icon={<Video size={18} strokeWidth={1.75} />}
                 label={file.name}
               />
             ))}

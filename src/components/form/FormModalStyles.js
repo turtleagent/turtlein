@@ -87,6 +87,69 @@ export default makeStyles((theme) => ({
     gap: 6,
   },
 
+  imagePreviewSection: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 8,
+  },
+  imagePreviewLabel: {
+    fontSize: 12,
+    fontWeight: 700,
+    color: theme.palette.text.secondary,
+  },
+  imagePreviewGrid: {
+    width: "100%",
+    display: "grid",
+    gap: 8,
+  },
+  imagePreviewGrid1: {
+    gridTemplateColumns: "1fr",
+  },
+  imagePreviewGrid2: {
+    gridTemplateColumns: "repeat(2, 1fr)",
+  },
+  imagePreviewGrid3: {
+    gridTemplateColumns: "repeat(2, 1fr)",
+  },
+  imagePreviewGrid4: {
+    gridTemplateColumns: "repeat(2, 1fr)",
+  },
+  imagePreviewItem: {
+    position: "relative",
+    overflow: "hidden",
+    borderRadius: 12,
+    backgroundColor:
+      theme.palette.type === "dark" ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)",
+    aspectRatio: "1 / 1",
+    "& > img": {
+      width: "100%",
+      height: "100%",
+      objectFit: "cover",
+      display: "block",
+    },
+  },
+  imagePreviewRemove: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    width: 28,
+    height: 28,
+    borderRadius: 999,
+    border: 0,
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    color: "#fff",
+    backgroundColor: "rgba(0,0,0,0.55)",
+    backdropFilter: "blur(8px)",
+    WebkitBackdropFilter: "blur(8px)",
+    transition: "background-color 0.15s ease",
+    "&:hover": {
+      backgroundColor: "rgba(0,0,0,0.7)",
+    },
+  },
+
   urlInput: {
     width: "100%",
     display: "flex",
