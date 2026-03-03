@@ -669,11 +669,6 @@ const Post = forwardRef(
                 <div
                   key={`${keyPrefix}-image-${index}`}
                   className={classes.imageGridItem}
-                  style={
-                    mediaImages.length === 3 && index === 0
-                      ? { gridColumn: "1 / span 2" }
-                      : undefined
-                  }
                 >
                   <img src={imageUrl} alt={`post media ${index + 1}`} loading="lazy" />
                 </div>

@@ -1,5 +1,5 @@
 ## Current Task
-Display images in Post.js with responsive grid layout (1/2/3/4 image layouts).
+Detect URLs in post description text and render as styled clickable links.
 
 ## End Goal with Specs
 - Item 16: Image upload in posts — file picker in Form.js, store via Convex storage (generateUploadUrl), display in feed
@@ -12,8 +12,8 @@ Posts schema already has `imageStorageIds: v.optional(v.array(v.id("_storage")))
 - [x] Read Form.js, Posts.js, Post.js, and PostActions.js to understand current image handling
 - [x] Ensure file picker allows selecting 1-4 images, shows previews before posting
 - [x] Upload all selected images to Convex storage, save IDs in imageStorageIds array
-- [ ] Display images in Post.js with responsive grid layout (1/2/3/4 image layouts) <- current
-- [ ] Detect URLs in post description text and render as styled clickable links
+- [x] Display images in Post.js with responsive grid layout (1/2/3/4 image layouts)
+- [ ] Detect URLs in post description text and render as styled clickable links <- current
 - [ ] Test: create post with 1 image, 2 images, 4 images, and post with URL text
 - [ ] Commit
 
