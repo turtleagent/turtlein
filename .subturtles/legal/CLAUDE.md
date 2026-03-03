@@ -1,5 +1,5 @@
 ## Current Task
-Create Footer component with legal links + copyright, add to App.js layout.
+Add `/privacy`, `/terms`, `/cookies` routes in `src/App.js`.
 
 ## End Goal with Specs
 The site must have standard legal compliance for a consumer web app launching in the EU:
@@ -20,8 +20,8 @@ Style: use existing Material-UI + makeStyles pattern. Legal pages should be clea
 - [x] Create Terms of Service page component at src/components/legal/TermsOfService.js
 - [x] Create Cookie Policy page component at src/components/legal/CookiePolicy.js
 - [x] Create CookieConsent banner component — bottom-fixed bar, localStorage persistence, Accept/Manage buttons
-- [ ] Create Footer component with legal links + copyright, add to App.js layout <- current
-- [ ] Add /privacy, /terms, /cookies routes in App.js
+- [x] Create Footer component with legal links + copyright, add to App.js layout
+- [ ] Add /privacy, /terms, /cookies routes in App.js <- current
 - [ ] Add "Delete Account" button with confirmation dialog — Convex mutation to delete all user data
 - [ ] Create deleteAccount mutation in src/convex/users.ts — cascade delete posts, comments, likes, connections, messages, follows, bookmarks, reports
 - [ ] Verify all pages render, dark mode works, footer shows everywhere

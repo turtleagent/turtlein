@@ -20,6 +20,7 @@ import Profile from "./components/profile/Profile";
 import SavedPosts from "./components/bookmarks/SavedPosts";
 import Sidebar from "./components/sidebar/Sidebar";
 import Widgets from "./components/widgets/Widgets";
+import Footer from "./components/footer/Footer";
 import { api } from "./convex/_generated/api";
 import Styles from "./Style";
 import { LinkedInBgColor, LinkedInBlue, darkPrimary } from "./assets/Colors";
@@ -502,6 +503,9 @@ const AppShell = () => {
               <Widgets />
             </Grid>
           </Hidden>
+        </Grid>
+        <Grid item xs={12}>
+          <Footer />
         </Grid>
       </Grid>
     </ThemeProvider>
