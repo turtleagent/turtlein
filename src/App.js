@@ -24,6 +24,7 @@ import Footer from "./components/footer/Footer";
 import PrivacyPolicy from "./components/legal/PrivacyPolicy";
 import TermsOfService from "./components/legal/TermsOfService";
 import CookiePolicy from "./components/legal/CookiePolicy";
+import CookieConsent from "./components/legal/CookieConsent";
 import { api } from "./convex/_generated/api";
 import Styles from "./Style";
 import { LinkedInBgColor, darkPrimary } from "./assets/Colors";
@@ -80,6 +81,8 @@ const AppShell = () => {
   const isCookiesRouteActive = Boolean(cookiesRouteMatch);
   const isCompanyRouteActive = Boolean(routeCompanySlug);
   const isCreateCompanyRouteActive = Boolean(createCompanyRouteMatch);
+  const isLegalRouteActive =
+    isPrivacyRouteActive || isTermsRouteActive || isCookiesRouteActive;
   const routeUsername =
     isWriteArticleRouteActive ||
     isArticleRouteActive ||
@@ -322,7 +325,44 @@ const AppShell = () => {
   const isCurrentUserLoading = isAuthenticated && currentUser === undefined;
   const shouldShowOnboarding = Boolean(isAuthenticated && currentUser && !currentUser.username);
 
+  const renderPublicLegalPage = () => {
+    const content = isPrivacyRouteActive ? (
+      <PrivacyPolicy />
+    ) : isTermsRouteActive ? (
+      <TermsOfService />
+    ) : (
+      <CookiePolicy />
+    );
+
+    return (
+      <ThemeProvider theme={muiTheme}>
+        <Grid
+          container
+          className={`${classes.app} fade-in`}
+          style={{
+            backgroundColor: mode ? darkPrimary : LinkedInBgColor,
+            minHeight: "100vh",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <Grid item xs={12} style={{ flexGrow: 1, padding: "16px 0 48px" }}>
+            {content}
+          </Grid>
+          <Grid item xs={12}>
+            <Footer />
+          </Grid>
+          <CookieConsent />
+        </Grid>
+      </ThemeProvider>
+    );
+  };
+
   if (isLoading || isCurrentUserLoading) {
+    if (isLegalRouteActive) {
+      return renderPublicLegalPage();
+    }
+
     return (
       <ThemeProvider theme={muiTheme}>
         <Grid
@@ -350,6 +390,10 @@ const AppShell = () => {
   }
 
   if (!isAuthenticated) {
+    if (isLegalRouteActive) {
+      return renderPublicLegalPage();
+    }
+
     return (
       <ThemeProvider theme={muiTheme}>
         <Grid
@@ -369,6 +413,10 @@ const AppShell = () => {
   }
 
   if (shouldShowOnboarding) {
+    if (isLegalRouteActive) {
+      return renderPublicLegalPage();
+    }
+
     return (
       <ThemeProvider theme={muiTheme}>
         <Grid
@@ -535,6 +583,7 @@ const AppShell = () => {
           <Footer />
         </Grid>
       </Grid>
+      <CookieConsent />
     </ThemeProvider>
   );
 };

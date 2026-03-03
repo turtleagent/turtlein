@@ -1,5 +1,5 @@
 ## Current Task
-Verify all legal pages render, dark mode works, footer shows, cookie banner appears on first visit.
+All backlog items complete.
 
 ## End Goal with Specs
 Finish the remaining legal/compliance items:
@@ -12,8 +12,8 @@ Already shipped (committed): Privacy Policy, Terms of Service, Cookie Policy pag
 ## Backlog
 - [x] Create deleteAccount mutation in src/convex/users.ts — cascade delete all user data from every table
 - [x] Add "Delete Account" button with confirmation dialog in MeDropdown (src/components/header/MeDropdown.js)
-- [ ] Verify all legal pages render, dark mode works, footer shows, cookie banner appears on first visit <- current
-- [ ] Commit
+- [x] Verify all legal pages render, dark mode works, footer shows, cookie banner appears on first visit
+- [x] Commit
 
 ## Notes
 - Tables to cascade delete from: users, posts, comments, likes, reactions, connections, follows, bookmarks, reports, reposts, messages, conversations, polls, pollVotes, postEdits, hashtags
@@ -22,3 +22,6 @@ Already shipped (committed): Privacy Policy, Terms of Service, Cookie Policy pag
 - Use Convex ctx.db.delete() for each record; query by userId indexes
 - Confirmation dialog: "Are you sure? This will permanently delete your account and all your data."
 - deleteAccount mutation completed: cascade deletes posts+related content, user activity, connections, follows, conversations, messages, notifications, poll votes, auth data, storage, and user record
+
+## Loop Control
+STOP
