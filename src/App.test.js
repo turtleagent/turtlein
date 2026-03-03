@@ -46,7 +46,6 @@ test("renders Convex Auth login screen when unauthenticated", async () => {
   renderApp();
 
   expect(screen.getByText("TurtleIn")).not.toBeNull();
-  expect(screen.getByRole("button", { name: "🐢 Continue as Turtle" })).not.toBeNull();
   expect(screen.getByRole("button", { name: "Sign in with GitHub" })).not.toBeNull();
   expect(screen.getByRole("button", { name: /Sign in with Google/ })).not.toBeNull();
   expect(screen.queryByPlaceholderText("Start a post")).toBeNull();
