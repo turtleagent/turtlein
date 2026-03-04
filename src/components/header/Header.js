@@ -78,7 +78,7 @@ const Header = ({
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedTerm, setDebouncedTerm] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [/* isSearchOpen */, setIsSearchOpen] = useState(false);
   const [isMeDropdownOpen, setIsMeDropdownOpen] = useState(false);
   const [recentSearches, setRecentSearches] = useState([]);
   const deleteAccount = useMutation(api.users.deleteAccount);
@@ -585,7 +585,7 @@ const Header = ({
           {tabItems.map(({ key, icon: Icon, onClick, isActive }) => (
             <Icon
               key={key}
-              size={28}
+              size={26}
               strokeWidth={isActive ? 2.25 : 1.75}
               onClick={onClick}
               aria-label={key}

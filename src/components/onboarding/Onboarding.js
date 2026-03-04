@@ -110,7 +110,7 @@ const Onboarding = ({ currentUser }) => {
     setIsSkipping(true);
     setSaveError("");
 
-    const fallbackName = (currentUser?.displayName ?? currentUser?.email ?? "user").trim();
+    const fallbackName = (currentUser?.displayName ?? "").trim();
     const autoUsername = slugifyUsername(fallbackName) || `user-${Date.now().toString(36)}`;
 
     try {

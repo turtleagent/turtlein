@@ -3,6 +3,7 @@ import { v } from "convex/values";
 import { mutation } from "./_generated/server";
 
 const USERNAME_REGEX = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const normalizeUsername = (value: string) => value.trim().toLowerCase();
 
@@ -47,9 +48,14 @@ export const completeOnboarding = mutation({
       throw new Error("Username is already taken");
     }
 
+    const normalizedDisplayName = normalizeRequiredField(args.displayName, "Display name");
+    if (EMAIL_REGEX.test(normalizedDisplayName)) {
+      throw new Error("Display name cannot be an email address");
+    }
+
     await ctx.db.patch(userId, {
       username: normalizedUsername,
-      displayName: normalizeRequiredField(args.displayName, "Display name"),
+      displayName: normalizedDisplayName,
       title: args.title.trim(),
       location: args.location.trim(),
     });

@@ -55,6 +55,25 @@ const formatTimeAgo = (timestamp) => {
   return new Date(timestamp).toLocaleDateString();
 };
 
+const AVATAR_COLORS = [
+  "#057642", "#0a66c2", "#7c3aed", "#c026d3", "#dc2626",
+  "#ea580c", "#0891b2", "#4f46e5", "#be185d", "#15803d",
+];
+
+const getInitialColor = (name = "") => {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
+};
+
+const getInitials = (name = "") => {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+  return (parts[0]?.[0] ?? "?").toUpperCase();
+};
+
 const Messaging = () => {
   const classes = useStyles();
   const user = useConvexUser();
@@ -228,7 +247,14 @@ const Messaging = () => {
                       onClick={() => setSelectedConversationId(conversation._id)}
                       disableRipple
                     >
-                      <Avatar src={photoURL} alt={displayName} />
+                      <Avatar
+                        src={photoURL}
+                        alt={displayName}
+                        className={classes.avatar}
+                        style={!photoURL ? { backgroundColor: getInitialColor(displayName) } : undefined}
+                      >
+                        {!photoURL && getInitials(displayName)}
+                      </Avatar>
                       <div className={classes.conversationMain}>
                         <div className={classes.conversationTopRow}>
                           <p className={classes.conversationName}>{displayName}</p>
