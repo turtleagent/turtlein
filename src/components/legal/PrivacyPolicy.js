@@ -64,7 +64,7 @@ const PrivacyPolicy = () => {
           Privacy Policy
         </Typography>
         <Typography variant="body2" className={classes.subtitle}>
-          Effective date: March 3, 2026
+          Effective date: March 8, 2026
         </Typography>
         <Typography variant="body2" className={classes.finePrint}>
           TurtleIn is a demo LinkedIn-style social networking app. This Privacy Policy is provided for
@@ -88,12 +88,14 @@ const PrivacyPolicy = () => {
         </Typography>
         <ul className={classes.bulletList}>
           <li className={classes.bulletItem}>
-            <strong>Account data (Google OAuth):</strong> name, email address, and profile photo (as
-            provided by Google).
+            <strong>Account data (Google or GitHub sign-in):</strong> name, email address, profile
+            photo, the sign-in provider you use, account/session records created to keep you signed
+            in, and basic verification metadata such as email-verification timestamps.
           </li>
           <li className={classes.bulletItem}>
-            <strong>Profile data:</strong> headline, about/summary, experience, education, skills,
-            location, and other fields you choose to add.
+            <strong>Profile data:</strong> username, display name, title, headline, about/summary,
+            experience, education, skills, location, profile and cover images, featured posts,
+            connection/follower counts, and other fields you choose to add.
           </li>
           <li className={classes.bulletItem}>
             <strong>Content and activity:</strong> posts, comments, reactions/likes, reposts, saved
@@ -104,7 +106,15 @@ const PrivacyPolicy = () => {
             following/followers, and related metadata.
           </li>
           <li className={classes.bulletItem}>
-            <strong>Messaging:</strong> messages and conversation metadata you send and receive.
+            <strong>Messaging:</strong> conversation participants, timestamps, message bodies,
+            preview snippets, an encrypted/plaintext flag, and an optional conversation encryption
+            key. When optional browser-side encryption is used, we store the encrypted message body
+            and the conversation key in backend systems.
+          </li>
+          <li className={classes.bulletItem}>
+            <strong>Notifications:</strong> notification records about likes, comments, follows,
+            company follows, connection requests or acceptances, mentions, and messages, including
+            related sender/reference IDs, read status, and timestamps.
           </li>
           <li className={classes.bulletItem}>
             <strong>Technical data:</strong> basic log data such as timestamps and diagnostic
@@ -120,8 +130,8 @@ const PrivacyPolicy = () => {
         </Typography>
         <ul className={classes.bulletList}>
           <li className={classes.bulletItem}>
-            <strong>Provide the service</strong> (create accounts, show profiles, publish posts,
-            deliver messages).
+            <strong>Provide the service</strong> (create accounts, show profiles in search and
+            discovery, publish posts, deliver messages, and generate notifications).
           </li>
           <li className={classes.bulletItem}>
             <strong>Maintain safety and integrity</strong> (prevent abuse, investigate reports).
@@ -130,6 +140,11 @@ const PrivacyPolicy = () => {
             <strong>Operate and improve</strong> (performance, debugging, feature development).
           </li>
         </ul>
+        <Typography variant="body1" className={classes.paragraph}>
+          We also use profile and network data to support username lookup, search, recommendations,
+          and similar discovery features. Messaging and notification data are used to render
+          conversation previews, unread counts, and in-app alerts.
+        </Typography>
         <Typography variant="body1" className={classes.paragraph}>
           Depending on your location, our legal bases may include performance of a contract (providing
           the service), legitimate interests (security and improvement), and consent (where required).
@@ -149,7 +164,8 @@ const PrivacyPolicy = () => {
             <strong>Vercel</strong> for hosting and delivering the web application.
           </li>
           <li className={classes.bulletItem}>
-            <strong>Google</strong> for authentication via Google OAuth.
+            <strong>Google and GitHub</strong> for authentication when you choose those sign-in
+            options.
           </li>
         </ul>
 
@@ -210,4 +226,3 @@ const PrivacyPolicy = () => {
 };
 
 export default PrivacyPolicy;
-

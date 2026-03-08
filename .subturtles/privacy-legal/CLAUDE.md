@@ -1,5 +1,5 @@
 # Current task
-Verify disclosure of auth/profile/message/notification processing against the code-to-policy map in `docs/legal-data-flow-map.md`.
+Verify deletion/retention statements against `deleteAccount` behavior.
 
 # End goal with specs
 - Verify policy coverage for all user-data categories in the app.
@@ -19,8 +19,8 @@ Verify disclosure of auth/profile/message/notification processing against the co
 
 # Backlog
 - [x] Map real data flows from Convex schema/functions to legal docs
-- [ ] Verify disclosure of auth/profile/message/notification processing <- current
-- [ ] Verify deletion/retention statements against `deleteAccount` behavior
+- [x] Verify disclosure of auth/profile/message/notification processing
+- [ ] Verify deletion/retention statements against `deleteAccount` behavior <- current
 - [ ] Verify cookie/localStorage disclosures vs frontend implementation
 - [ ] Draft/patch legal text for identified gaps
 - [ ] Produce sign-off checklist for pre-launch legal review
