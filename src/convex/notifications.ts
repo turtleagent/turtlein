@@ -1,6 +1,22 @@
+import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
-import { internalMutation, mutation, query } from "./_generated/server";
+import {
+  internalMutation,
+  mutation,
+  query,
+  type MutationCtx,
+  type QueryCtx,
+} from "./_generated/server";
 import { buildAuthorSummary } from "./helpers";
+
+const requireAuthenticatedUserId = async (ctx: QueryCtx | MutationCtx) => {
+  const userId = await getAuthUserId(ctx);
+  if (!userId) {
+    throw new Error("Not authenticated");
+  }
+
+  return userId;
+};
 
 export const createNotification = internalMutation({
   args: {
@@ -28,13 +44,12 @@ export const createNotification = internalMutation({
 });
 
 export const listNotifications = query({
-  args: {
-    userId: v.id("users"),
-  },
-  handler: async (ctx, args) => {
+  args: {},
+  handler: async (ctx) => {
+    const userId = await requireAuthenticatedUserId(ctx);
     const notifications = await ctx.db
       .query("notifications")
-      .filter((q) => q.eq(q.field("userId"), args.userId))
+      .filter((q) => q.eq(q.field("userId"), userId))
       .collect();
 
     const sortedNotifications = [...notifications]
@@ -67,15 +82,14 @@ export const listNotifications = query({
 });
 
 export const getUnreadCount = query({
-  args: {
-    userId: v.id("users"),
-  },
-  handler: async (ctx, args) => {
+  args: {},
+  handler: async (ctx) => {
+    const userId = await requireAuthenticatedUserId(ctx);
     const unreadNotifications = await ctx.db
       .query("notifications")
       .filter((q) =>
         q.and(
-          q.eq(q.field("userId"), args.userId),
+          q.eq(q.field("userId"), userId),
           q.eq(q.field("read"), false),
         ),
       )
@@ -90,8 +104,17 @@ export const markAsRead = mutation({
     notificationId: v.id("notifications"),
   },
   handler: async (ctx, args) => {
+    const userId = await requireAuthenticatedUserId(ctx);
     const notification = await ctx.db.get(args.notificationId);
-    if (!notification || notification.read) {
+    if (!notification) {
+      return;
+    }
+
+    if (notification.userId !== userId) {
+      throw new Error("Not authorized to update this notification");
+    }
+
+    if (notification.read) {
       return;
     }
 
@@ -100,15 +123,14 @@ export const markAsRead = mutation({
 });
 
 export const markAllAsRead = mutation({
-  args: {
-    userId: v.id("users"),
-  },
-  handler: async (ctx, args) => {
+  args: {},
+  handler: async (ctx) => {
+    const userId = await requireAuthenticatedUserId(ctx);
     const unreadNotifications = await ctx.db
       .query("notifications")
       .filter((q) =>
         q.and(
-          q.eq(q.field("userId"), args.userId),
+          q.eq(q.field("userId"), userId),
           q.eq(q.field("read"), false),
         ),
       )

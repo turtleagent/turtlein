@@ -50,7 +50,7 @@ const Notifications = ({ onViewPost, onNavigateProfile, onNavigateMessaging }) =
 
   const notifications = useQuery(
     api.notifications.listNotifications,
-    user?._id ? { userId: user._id } : "skip"
+    user?._id ? {} : "skip"
   );
 
   const unreadCount = useMemo(() => {
@@ -119,7 +119,7 @@ const Notifications = ({ onViewPost, onNavigateProfile, onNavigateMessaging }) =
     }
 
     try {
-      await markAllAsRead({ userId: user._id });
+      await markAllAsRead({});
     } catch (error) {
       console.error("Failed to mark all notifications as read:", error);
       showError("Failed to update notifications. Please try again.");

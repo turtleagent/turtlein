@@ -1,5 +1,5 @@
 # Current task
-Harden `src/convex/notifications.ts` ownership checks.
+Harden `src/convex/comments.ts` actor identity + delete authorization.
 
 # End goal with specs
 - Bind all sensitive mutations/queries to authenticated identity (`getAuthUserId`).
@@ -19,8 +19,8 @@ Harden `src/convex/notifications.ts` ownership checks.
 
 # Backlog
 - [x] Harden `src/convex/messaging.ts` auth and participant checks
-- [ ] Harden `src/convex/notifications.ts` ownership checks <- current
-- [ ] Harden `src/convex/comments.ts` actor identity + delete authorization
+- [x] Harden `src/convex/notifications.ts` ownership checks
+- [ ] Harden `src/convex/comments.ts` actor identity + delete authorization <- current
 - [ ] Harden `src/convex/follows.ts` and `src/convex/connections.ts` actor binding
 - [ ] Enforce visibility in `posts/hashtags/comments` read APIs
 - [ ] Sanitize user-return payloads to avoid exposing private fields

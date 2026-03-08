@@ -84,7 +84,7 @@ const Header = ({
   const deleteAccount = useMutation(api.users.deleteAccount);
   const unreadCount = useQuery(
     api.notifications.getUnreadCount,
-    isAuthenticated && user?._id ? { userId: user._id } : "skip"
+    isAuthenticated ? {} : "skip"
   );
   const users = useQuery(
     api.users.searchUsers,
