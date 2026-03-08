@@ -3,6 +3,7 @@ import { v } from "convex/values";
 import type { Id } from "./_generated/dataModel";
 import {
   action,
+  type ActionCtx,
   internalMutation,
   internalQuery,
   mutation,
@@ -25,7 +26,9 @@ const sameParticipants = (a: Id<"users">[], b: Id<"users">[]) => {
   return a.every((id, index) => id === b[index]);
 };
 
-const requireAuthenticatedUserId = async (ctx: QueryCtx | MutationCtx) => {
+const requireAuthenticatedUserId = async (
+  ctx: QueryCtx | MutationCtx | ActionCtx,
+) => {
   const userId = await getAuthUserId(ctx);
   if (!userId) {
     throw new Error("Not authenticated");
@@ -293,6 +296,7 @@ export const listAllConversations = internalQuery({
 export const backfillEncryptionKeys = action({
   args: {},
   handler: async (ctx): Promise<{ patched: number; total: number }> => {
+    await requireAuthenticatedUserId(ctx);
     const conversations = await ctx.runQuery(internal.messaging.listAllConversations);
     let patched = 0;
 

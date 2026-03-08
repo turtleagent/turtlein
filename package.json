@@ -32,6 +32,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "test:security:authz": "node --experimental-transform-types --test tests/security-authz.test.mjs",
     "test:e2e": "npx playwright test",
     "eject": "react-scripts eject"
   },
