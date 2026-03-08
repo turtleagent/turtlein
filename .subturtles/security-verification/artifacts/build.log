@@ -1,0 +1,34 @@
+
+> turtlein@0.1.0 build
+> react-scripts build
+
+Creating an optimized production build...
+Browserslist: caniuse-lite is outdated. Please run:
+  npx browserslist@latest --update-db
+  Why you should do it regularly: https://github.com/browserslist/browserslist#browsers-data-updating
+Browserslist: caniuse-lite is outdated. Please run:
+  npx browserslist@latest --update-db
+  Why you should do it regularly: https://github.com/browserslist/browserslist#browsers-data-updating
+Compiled successfully.
+
+File sizes after gzip:
+
+  301.22 kB  build/static/js/main.d5956115.js
+  4.31 kB    build/static/js/207.577ca3b2.chunk.js
+  3.06 kB    build/static/js/643.1294cdb1.chunk.js
+  2 kB       build/static/js/437.18b47bfd.chunk.js
+  308 B      build/static/css/main.d06b6b7e.css
+
+The project was built assuming it is hosted at /.
+You can control this with the homepage field in your package.json.
+
+The build folder is ready to be deployed.
+You may serve it with a static server:
+
+  npm install -g serve
+  serve -s build
+
+Find out more about deployment here:
+
+  https://cra.link/deployment
+

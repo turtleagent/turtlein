@@ -1,5 +1,5 @@
 # Current task
-Execute tests and collect evidence artifacts.
+Produce release sign-off report with blockers/non-blockers.
 
 # End goal with specs
 - Build a function-level permission matrix for all Convex public APIs.
@@ -22,5 +22,8 @@ Execute tests and collect evidence artifacts.
 - [x] Add negative tests for messaging/notifications authz bypass
 - [x] Add negative tests for follows/connections/comments identity spoofing
 - [x] Add visibility leakage tests for posts/hashtags/search/comments
-- [ ] Execute tests and collect evidence artifacts <- current
-- [ ] Produce release sign-off report with blockers/non-blockers
+- [x] Execute tests and collect evidence artifacts
+- [ ] Produce release sign-off report with blockers/non-blockers <- current
+
+## Notes
+- 2026-03-08: Captured raw verification artifacts in `.subturtles/security-verification/artifacts/` and indexed them in `.subturtles/security-verification/test-evidence.md`.

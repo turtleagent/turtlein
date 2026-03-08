@@ -1,0 +1,74 @@
+
+> turtlein@0.1.0 test
+> react-scripts test --watchAll=false
+
+  console.error
+    Warning: ReactDOM.render is no longer supported in React 18. Use createRoot instead. Until you switch to the new API, your app will behave as if it's running React 17. Learn more: https://reactjs.org/link/switch-to-createroot
+
+      27 |   const store = createStore(reducers, applyMiddleware(thunk));
+      28 |
+    > 29 |   render(
+         |   ^
+      30 |     <Provider store={store}>
+      31 |       <App />
+      32 |     </Provider>
+
+      at printWarning (node_modules/react-dom/cjs/react-dom.development.js:86:30)
+      at error (node_modules/react-dom/cjs/react-dom.development.js:60:7)
+      at Object.render (node_modules/react-dom/cjs/react-dom.development.js:29670:5)
+      at node_modules/@testing-library/react/dist/pure.js:99:25
+      at act (node_modules/react/cjs/react.development.js:2512:16)
+      at render (node_modules/@testing-library/react/dist/pure.js:95:26)
+      at renderApp (src/App.test.js:29:3)
+
+  console.error
+    Material-UI: the createMuiTheme function was renamed to createTheme.
+    
+    You should use `import { createTheme } from '@material-ui/core/styles'`
+
+      116 |   const muiTheme = useMemo(
+      117 |     () =>
+    > 118 |       createMuiTheme({
+          |       ^
+      119 |         palette: {
+      120 |           type: mode ? "dark" : "light",
+      121 |           primary: {
+
+      at createMuiTheme (node_modules/@material-ui/core/styles/createTheme.js:114:15)
+      at src/App.js:118:7
+      at mountMemo (node_modules/react-dom/cjs/react-dom.development.js:17225:19)
+      at Object.useMemo (node_modules/react-dom/cjs/react-dom.development.js:17670:16)
+      at useMemo (node_modules/react/cjs/react.development.js:1650:21)
+      at AppShell (src/App.js:116:20)
+      at renderWithHooks (node_modules/react-dom/cjs/react-dom.development.js:16305:18)
+
+  console.warn
+    ⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+
+      at warnOnce (node_modules/react-router/lib/deprecations.ts:9:13)
+      at logDeprecation (node_modules/react-router/lib/deprecations.ts:14:3)
+      at Object.logV6DeprecationWarnings [as UNSAFE_logV6DeprecationWarnings] (node_modules/react-router/lib/deprecations.ts:26:5)
+      at node_modules/react-router-dom/index.tsx:816:25
+      at commitHookEffectListMount (node_modules/react-dom/cjs/react-dom.development.js:23150:26)
+      at commitPassiveMountOnFiber (node_modules/react-dom/cjs/react-dom.development.js:24931:11)
+      at commitPassiveMountEffects_complete (node_modules/react-dom/cjs/react-dom.development.js:24891:9)
+
+  console.warn
+    ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+      at warnOnce (node_modules/react-router/lib/deprecations.ts:9:13)
+      at logDeprecation (node_modules/react-router/lib/deprecations.ts:14:3)
+      at Object.logV6DeprecationWarnings [as UNSAFE_logV6DeprecationWarnings] (node_modules/react-router/lib/deprecations.ts:37:5)
+      at node_modules/react-router-dom/index.tsx:816:25
+      at commitHookEffectListMount (node_modules/react-dom/cjs/react-dom.development.js:23150:26)
+      at commitPassiveMountOnFiber (node_modules/react-dom/cjs/react-dom.development.js:24931:11)
+      at commitPassiveMountEffects_complete (node_modules/react-dom/cjs/react-dom.development.js:24891:9)
+
+PASS src/App.test.js
+  ✓ renders Convex Auth login screen when unauthenticated (139 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       1 passed, 1 total
+Snapshots:   0 total
+Time:        1.752 s, estimated 2 s
+Ran all test suites.

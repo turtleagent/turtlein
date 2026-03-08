@@ -1,0 +1,25 @@
+
+> turtlein@0.1.0 test:security:authz
+> node --experimental-transform-types --test tests/security-authz.test.mjs
+
+(node:96097) ExperimentalWarning: Transform Types is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:96097) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/Richard.Mladek/Documents/projects/turtlein/src/convex/notifications.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /Users/Richard.Mladek/Documents/projects/turtlein/package.json.
+✔ notifications deny guests and block cross-user state changes (7.117042ms)
+✔ messaging denies guests, non-participants, and guest maintenance calls (0.351583ms)
+✔ follows bind writes to the session user instead of spoofed args (0.416583ms)
+✔ connections reject spoofed actors and unauthorized state changes (0.468584ms)
+✔ comments bind writes to the session user and reject spoofed deletes (0.462166ms)
+✔ comments hide connections-only threads from guests and strangers (3.289459ms)
+✔ post discovery queries filter connections-only posts for unauthorized viewers (1.036375ms)
+✔ user profile queries and mutations omit private auth fields (0.271959ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 390.085291
