@@ -1,5 +1,5 @@
 # Current task
-Finish freezing the release candidate commit by clearing the remaining tracked non-release churn from the worktree, then record the final SHA in `.subturtles/prod-release/release-checklist.md`.
+Finish preflight checks on frozen release candidate `e8192fc4184d6533fd21dc77e7a2b389b483c5c9` by resolving or explicitly accepting the remaining `npm audit --omit=dev` security-gate findings.
 
 # End goal with specs
 - Stage deployment completes with smoke checks passing.
@@ -18,13 +18,14 @@ Finish freezing the release candidate commit by clearing the remaining tracked n
 - Document release outcome and rollback readiness.
 
 # Backlog
-- [ ] Define and freeze release candidate commit + checklist <- current
-- [ ] Run preflight checks (build/tests/security gate outputs)
+- [x] Define and freeze release candidate commit + checklist
+- [ ] Run preflight checks (build/tests/security gate outputs) <- current
 - [ ] Execute staging smoke run for key paths (auth/feed/profile/messaging)
 - [ ] Deploy Convex backend and validate function health
 - [ ] Deploy Vercel frontend and validate production smoke tests
 - [ ] Publish post-release notes and rollback instructions
 
 ## Notes
-- 2026-03-08: Baseline SHA `cee1bd65c2d8da464f5e48de7753e26404def476` captured in `.subturtles/prod-release/release-checklist.md`; freeze remains blocked until the worktree is reduced to the approved release changes.
-- 2026-03-08: Approved release payload was verified locally with `npm run build` and `npm test -- --watch=false`; freeze still cannot be finalized while tracked changes outside that approved payload remain in the worktree.
+- 2026-03-08: Release candidate frozen at `e8192fc4184d6533fd21dc77e7a2b389b483c5c9` (`Harden comment mutation auth binding`) after clearing tracked runtime/task churn and confirming `git status --short` was clean at `HEAD`.
+- 2026-03-08: Isolated preflight on `e8192fc4184d6533fd21dc77e7a2b389b483c5c9` succeeded for `npm ci --legacy-peer-deps`, `npm run build`, and `CI=true npm test -- --watch=false`.
+- 2026-03-08: `npm audit --omit=dev --json` on the frozen candidate reported `63` vulnerabilities (`4 critical`, `27 high`, `17 moderate`, `15 low`); `react-scripts` remains a direct `high` finding, so preflight is not yet green.

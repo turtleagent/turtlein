@@ -3,34 +3,38 @@
 ## Baseline
 - Captured on: 2026-03-08
 - Branch: `main`
-- Baseline SHA under evaluation: `cee1bd65c2d8da464f5e48de7753e26404def476`
-- Baseline commit: `Fix email leak in onboarding + mobile UI fixes`
-- Freeze status: `blocked`
+- Frozen release candidate SHA: `e8192fc4184d6533fd21dc77e7a2b389b483c5c9`
+- Frozen release candidate commit: `Harden comment mutation auth binding`
+- Freeze status: `frozen`
 
 ## Approved Release Payload
 - Repo hygiene and release docs: `.gitignore`, `README.md`, `package.json`, `package-lock.json`
 - Mobile layout/header fixes: `src/Style.js`, `src/components/header/Header.js`, `src/components/header/Style.js`
-- Local verification completed on this payload:
+- Privacy disclosure alignment: `docs/legal-data-flow-map.md`, `src/components/legal/PrivacyPolicy.js`
+- Comment auth hardening: `src/convex/comments.ts`, `src/components/posts/post/PostComments.js`
+- Local verification completed before the freeze on the earlier approved payload:
   - `npm run build`
   - `npm test -- --watch=false`
 
 ## Current Blockers
-- The worktree is not clean, so `HEAD` cannot be treated as the approved release candidate yet.
-- Tracked changes outside the approved payload are still present in the worktree, including agent/runtime state churn and unrelated app/task files, which need to be resolved before the candidate SHA can be frozen from a clean worktree.
+- Freeze blockers cleared. `git status --short` was clean at `HEAD` when `e8192fc4184d6533fd21dc77e7a2b389b483c5c9` was captured.
+- Preflight build/test passed in an isolated worktree at the frozen SHA after `npm ci --legacy-peer-deps`.
+- The production dependency gate is still blocking release: `npm audit --omit=dev --json` reported `63` vulnerabilities (`4 critical`, `27 high`, `17 moderate`, `15 low`), with `react-scripts` still flagged as a direct `high` dependency on the frozen candidate.
+- Fresh installs of the frozen candidate require `--legacy-peer-deps` because the repo still combines React 18 with Material-UI v4 peer ranges.
 
 ## Freeze Checklist
-1. Resolve the remaining tracked non-release changes so `git status --short` is clean at `HEAD`.
-2. Re-run `git rev-parse HEAD` and replace the baseline SHA above with the final release candidate SHA.
-3. Confirm the release candidate commit matches the approved payload listed above and is the exact commit used for preflight, staging smoke, and production deploy.
-4. Capture command results from the frozen candidate SHA for:
+1. [x] Resolve the remaining tracked non-release changes so `git status --short` is clean at `HEAD`.
+2. [x] Re-run `git rev-parse HEAD` and replace the baseline SHA above with the final release candidate SHA.
+3. [x] Confirm the release candidate commit matches the approved payload listed above and is the exact commit to carry into preflight, staging smoke, and production deploy.
+4. [x] Capture command results from the frozen candidate SHA for:
    - `npm run build`
    - `npm test -- --watch=false`
-5. Record staging smoke coverage for auth, feed, profile, and messaging before deploy.
-6. Proceed to `npx convex deploy` and `npx vercel --prod` only after the candidate SHA is frozen and preflight passes.
+5. [ ] Record staging smoke coverage for auth, feed, profile, and messaging before deploy.
+6. [ ] Proceed to `npx convex deploy` and `npx vercel --prod` only after the candidate SHA is frozen and preflight passes.
 
 ## Release Log Fields
-- Final release candidate SHA: `PENDING`
-- Preflight result links/notes: `Local build/test passed on the approved payload; rerun after freeze is still pending.`
+- Final release candidate SHA: `e8192fc4184d6533fd21dc77e7a2b389b483c5c9`
+- Preflight result links/notes: `2026-03-08 isolated worktree preflight on e8192fc: npm ci --legacy-peer-deps succeeded; npm run build passed; CI=true npm test -- --watch=false passed (1 suite / 1 test); npm audit --omit=dev reported 63 vulnerabilities (4 critical, 27 high, 17 moderate, 15 low) with react-scripts:high still direct.`
 - Staging smoke notes: `PENDING`
 - Production deploy timestamps: `PENDING`
 - Rollback target/version: `PENDING`
