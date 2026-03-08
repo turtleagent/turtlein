@@ -1,0 +1,26 @@
+# Current task
+Verify disclosure of auth/profile/message/notification processing against the code-to-policy map in `docs/legal-data-flow-map.md`.
+
+# End goal with specs
+- Verify policy coverage for all user-data categories in the app.
+- Ensure account deletion and messaging behaviors are accurately disclosed.
+- Ensure cookie/local storage usage disclosures match implementation.
+- Deliver updated legal copy and a compliance gap checklist.
+
+# Roadmap (Completed)
+- Initial docs inventory captured (`PrivacyPolicy`, `TermsOfService`, `CookiePolicy`).
+- Core data domains identified (profiles, posts, messages, notifications, auth data).
+
+# Roadmap (Upcoming)
+- Map each data flow from code to legal text.
+- Identify missing/incorrect disclosures and retention statements.
+- Patch legal pages and confirm internal consistency.
+- Produce final compliance readiness summary.
+
+# Backlog
+- [x] Map real data flows from Convex schema/functions to legal docs
+- [ ] Verify disclosure of auth/profile/message/notification processing <- current
+- [ ] Verify deletion/retention statements against `deleteAccount` behavior
+- [ ] Verify cookie/localStorage disclosures vs frontend implementation
+- [ ] Draft/patch legal text for identified gaps
+- [ ] Produce sign-off checklist for pre-launch legal review
