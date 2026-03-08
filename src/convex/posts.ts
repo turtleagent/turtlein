@@ -3,6 +3,11 @@ import { mutation, query, type QueryCtx } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import type { Doc, Id } from "./_generated/dataModel";
 import { buildAuthorSummary, type AuthorSummary } from "./helpers";
+import {
+  filterVisiblePosts,
+  getConnectedUserIds,
+  isPostVisibleToViewer,
+} from "./postVisibility";
 
 const MAX_POST_IMAGES = 4;
 const HASHTAG_REGEX = /(^|[^a-zA-Z0-9_])#([a-zA-Z0-9_]+)/g;
@@ -114,59 +119,26 @@ export const listPosts = query({
     const offset = rawOffset < 0 ? 0 : rawOffset;
     const limit = Math.min(Math.max(rawLimit, 1), 50);
     const viewerId = await getAuthUserId(ctx);
-    const [posts, allReposts] = await Promise.all([
+    const [posts, allReposts, connectedAuthorIds, follows] = await Promise.all([
       ctx.db.query("posts").collect(),
       ctx.db.query("reposts").collect(),
+      viewerId ? getConnectedUserIds(ctx, viewerId) : Promise.resolve(new Set<Id<"users">>()),
+      viewerId && sortBy === "following"
+        ? ctx.db
+            .query("follows")
+            .withIndex("byFollower", (q) => q.eq("followerId", viewerId))
+            .collect()
+        : Promise.resolve([]),
     ]);
-    const connectedAuthorIds = new Set<Id<"users">>();
     const followedAuthorIds = new Set<Id<"users">>();
 
-    if (viewerId) {
-      const [requestedConnections, receivedConnections, follows] = await Promise.all([
-        ctx.db
-          .query("connections")
-          .withIndex("byUser1", (q) => q.eq("userId1", viewerId).eq("status", "accepted"))
-          .collect(),
-        ctx.db
-          .query("connections")
-          .withIndex("byUser2", (q) => q.eq("userId2", viewerId).eq("status", "accepted"))
-          .collect(),
-        sortBy === "following"
-          ? ctx.db
-              .query("follows")
-              .withIndex("byFollower", (q) => q.eq("followerId", viewerId))
-              .collect()
-          : Promise.resolve([]),
-      ]);
-
-      for (const connection of requestedConnections) {
-        connectedAuthorIds.add(connection.userId2);
-      }
-
-      for (const connection of receivedConnections) {
-        connectedAuthorIds.add(connection.userId1);
-      }
-
-      for (const follow of follows) {
-        followedAuthorIds.add(follow.followedId);
-      }
+    for (const follow of follows) {
+      followedAuthorIds.add(follow.followedId);
     }
 
-    const visiblePosts = posts.filter((post) => {
-      if (post.visibility !== "connections") {
-        return true;
-      }
-
-      if (!viewerId) {
-        return false;
-      }
-
-      if (post.authorId === viewerId) {
-        return true;
-      }
-
-      return connectedAuthorIds.has(post.authorId);
-    });
+    const visiblePosts = posts.filter((post) =>
+      isPostVisibleToViewer(post, viewerId, connectedAuthorIds),
+    );
 
     const visiblePostById = new Map(visiblePosts.map((post) => [`${post._id}`, post]));
     const repostCountByPostId = new Map<string, number>();
@@ -350,11 +322,13 @@ export const listPostsByUser = query({
     authorId: v.id("users"),
   },
   handler: async (ctx, args) => {
+    const viewerId = await getAuthUserId(ctx);
     const posts = await ctx.db
       .query("posts")
       .withIndex("byAuthorId", (q) => q.eq("authorId", args.authorId))
       .collect();
-    const sortedPosts = [...posts].sort((a, b) => b.createdAt - a.createdAt);
+    const visiblePosts = await filterVisiblePosts(ctx, posts, viewerId);
+    const sortedPosts = [...visiblePosts].sort((a, b) => b.createdAt - a.createdAt);
 
     const repostCounts = await Promise.all(
       sortedPosts.map(async (post) => {
@@ -382,11 +356,13 @@ export const getCompanyPosts = query({
     companyId: v.id("companies"),
   },
   handler: async (ctx, args) => {
+    const viewerId = await getAuthUserId(ctx);
     const posts = await ctx.db
       .query("posts")
       .withIndex("byCompanyId", (q) => q.eq("companyId", args.companyId))
       .collect();
-    const sortedPosts = [...posts].sort((a, b) => b.createdAt - a.createdAt);
+    const visiblePosts = await filterVisiblePosts(ctx, posts, viewerId);
+    const sortedPosts = [...visiblePosts].sort((a, b) => b.createdAt - a.createdAt);
 
     const repostCounts = await Promise.all(
       sortedPosts.map(async (post) => {
@@ -414,21 +390,23 @@ export const searchPosts = query({
     query: v.string(),
   },
   handler: async (ctx, args) => {
+    const viewerId = await getAuthUserId(ctx);
     const normalizedQuery = args.query.trim().toLowerCase();
     if (!normalizedQuery) {
       return [];
     }
 
     const posts = await ctx.db.query("posts").order("desc").take(300);
-    const matchingPosts = [...posts]
-      .filter((post) =>
-        post.description.toLowerCase().includes(normalizedQuery),
-      )
+    const matchingPosts = posts.filter((post) =>
+      post.description.toLowerCase().includes(normalizedQuery),
+    );
+    const visiblePosts = await filterVisiblePosts(ctx, matchingPosts, viewerId);
+    const limitedPosts = [...visiblePosts]
       .sort((a, b) => b.createdAt - a.createdAt)
       .slice(0, 10);
 
     return await Promise.all(
-      matchingPosts.map(async (post) => {
+      limitedPosts.map(async (post) => {
         const author = await ctx.db.get(post.authorId);
         const imageUrls = await resolvePostImageUrls(ctx, post);
         const resolvedFileData =

@@ -3,6 +3,7 @@ import { v } from "convex/values";
 import { mutation, query, type MutationCtx } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { buildAuthorSummary } from "./helpers";
+import { canViewerAccessPost } from "./postVisibility";
 
 const requireAuthenticatedUserId = async (ctx: MutationCtx) => {
   const userId = await getAuthUserId(ctx);
@@ -118,6 +119,17 @@ export const listComments = query({
     postId: v.id("posts"),
   },
   handler: async (ctx, args) => {
+    const viewerId = await getAuthUserId(ctx);
+    const post = await ctx.db.get(args.postId);
+    if (!post) {
+      return [];
+    }
+
+    const canViewPost = await canViewerAccessPost(ctx, post, viewerId);
+    if (!canViewPost) {
+      return [];
+    }
+
     const comments = await ctx.db
       .query("comments")
       .withIndex("byPostId", (q) => q.eq("postId", args.postId))

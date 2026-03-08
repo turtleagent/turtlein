@@ -1,7 +1,9 @@
 import { v } from "convex/values";
+import { getAuthUserId } from "@convex-dev/auth/server";
 import { query } from "./_generated/server";
 import type { Doc, Id } from "./_generated/dataModel";
 import { buildAuthorSummary } from "./helpers";
+import { filterVisiblePosts } from "./postVisibility";
 
 const normalizeHashtag = (value: string) =>
   value
@@ -33,6 +35,7 @@ export const getPostsByHashtag = query({
     tag: v.string(),
   },
   handler: async (ctx, args) => {
+    const viewerId = await getAuthUserId(ctx);
     const normalizedTag = normalizeHashtag(args.tag);
     if (!normalizedTag) {
       return [];
@@ -49,12 +52,12 @@ export const getPostsByHashtag = query({
 
     const uniquePostIds = Array.from(new Set(hashtagEntries.map((entry) => entry.postId)));
     const posts = await Promise.all(uniquePostIds.map((postId) => ctx.db.get(postId)));
-    const existingPosts = posts
-      .filter((post): post is Doc<"posts"> => post !== null)
-      .sort((a, b) => b.createdAt - a.createdAt);
+    const existingPosts = posts.filter((post): post is Doc<"posts"> => post !== null);
+    const visiblePosts = await filterVisiblePosts(ctx, existingPosts, viewerId);
+    const sortedPosts = [...visiblePosts].sort((a, b) => b.createdAt - a.createdAt);
 
     return await Promise.all(
-      existingPosts.map(async (post) => {
+      sortedPosts.map(async (post) => {
         const author = await ctx.db.get(post.authorId);
         const imageUrls = await resolvePostImageUrls(ctx, post);
         const resolvedFileData =
