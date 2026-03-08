@@ -43,17 +43,38 @@ It is an internal review artifact for legal copy updates. It is not user-facing 
 | Notifications | `notifications` stores `userId`, `type`, `fromUserId`, optional `postId`, optional `companyId`, optional `conversationId`, `read`, and `createdAt`. Notifications are created from likes, comments, follows, company follows, connection requests/acceptance, mentions, and messages. | Header unread count, notifications list, and mark-read flows use this data. | Privacy Policy sections 2-3 now explicitly list notification records, event types, related IDs, read status, timestamps, unread counts, and in-app alert use. | Core disclosure is now aligned for notification storage and use. Deletion/retention remains a separate validation item. |
 | Safety, abuse, and moderation reports | `reports` stores reporting user, target post, reason, optional free-form details, and timestamp. | Report dialogs write this data; duplicate-report checks and account deletion logic read it. Terms section 4 also sets conduct rules that reports are meant to enforce. | Privacy Policy section 2 mentions reports. Privacy Policy section 3 mentions safety and integrity. | The policy should be more explicit that free-form report details may contain personal data and are processed for trust-and-safety review. |
 | Companies, admins, and company analytics | `companies` stores company identity, descriptive fields, optional logo/cover storage IDs, `createdBy`, `admins`, and `createdAt`. Company follower analytics derive from `companyFollowers` and `posts`. | Company pages, search, suggestions, and admin analytics use this data. | Current legal copy does not specifically call out company records or admin relationships. | Because company records include creator/admin user IDs and company follower analytics, the policies should disclose this admin/business profile processing. |
-| Deletion and retention dependencies | `users.deleteAccount` cascades through posts, media, comments, likes, reactions, reposts, bookmarks, reports, connections, follows, company follows, conversations, messages, notifications, auth sessions/accounts, verification records, and stored images. | Account deletion is triggered from the header dropdown and acts as the main retention/deletion implementation. | Privacy Policy section 5 and Terms section 6 discuss deletion and retention only at a high level. | Retention and deletion statements need a dedicated validation pass against actual cascade behavior. This is already a separate backlog item. |
+| Deletion and retention dependencies | `users.deleteAccount` hard-deletes the user record, auth records, profile media, authored posts, related post metadata, social graph records, conversations, messages, notifications, and several related records from other users that are attached to the deleted user's posts or conversations. It does not clean up `companies.createdBy` or `companies.admins` references. | Account deletion is triggered from the header dropdown and acts as the main retention/deletion implementation. | Privacy Policy section 5 and Terms section 6 discuss deletion and retention only at a high level. | Validation shows the current copy is too generic: it does not explain the full cascade, it suggests anonymization/retention paths that are not visible in code, and it overstates completeness because company references can survive deletion. |
+
+## Deletion/Retention Validation
+
+Reviewed against `src/convex/users.ts` (`deleteAccount`) and the user-linked tables in `src/convex/schema.ts`.
+
+| Data category | What `deleteAccount` does now | Disclosure impact |
+| --- | --- | --- |
+| Account, auth, and profile media | Deletes the `users` row, auth sessions, refresh tokens, auth accounts, verification codes, auth verifiers linked to deleted sessions, and the user's profile/cover storage objects. | The current policy text implies deletion or anonymization with possible retention. In the reviewed application code, this path is immediate deletion; no anonymization branch or application-level retention carve-out is implemented here. |
+| User-authored posts and attached metadata | Deletes all posts authored by the user, including company posts and article-style posts, plus attached storage images, post edits, polls, poll votes on those polls, comments, likes, reactions, hashtags, reports, and reposts tied to those posts. | Legal copy should make clear that deleting an account removes authored content and also removes engagement/report records attached to that content. |
+| User activity on other content | Deletes the user's own likes, bookmarks, reactions, reposts, comments, reports, and poll votes on other records. It also removes bookmarks that point to the deleted user's posts. | This generally fits "associated data," but the current language does not spell out that saved items and vote history are also removed. |
+| Messaging and conversations | Deletes every conversation that includes the user and deletes every message in those conversations, including messages sent by other participants. | Current retention/termination wording understates the impact. Account deletion removes entire threads, not just the deleting user's access or copy of messages. |
+| Notifications and relationship records | Deletes connections where the user is either side, follows where the user is either side, company follows by the user, and notifications where the user is either the recipient or actor (`fromUserId`). | The current terms should acknowledge that account deletion removes in-app activity history tied to that user, including notifications delivered to other users. |
+| Company/admin references | Does not delete companies created by the user and does not remove the user ID from `companies.createdBy` or `companies.admins`. Those records can remain with dangling references after the user row is deleted. | Privacy/terms copy should not promise complete deletion of all app references until this is fixed in code or handled operationally. |
+
+### Validation Outcome
+
+1. Privacy Policy section 5 is not yet precise enough for the implementation. It should describe deletion as a broad hard-delete cascade in the app, not as a generic "delete or anonymize" flow.
+2. Terms section 6 understates the practical effect of deletion because the current code removes entire conversations and other related records, not just the deleting user's access.
+3. No application-level timed retention or exception path was found in the reviewed code. If the product relies on backups, logs, provider records, or manual legal holds, that needs separate operational confirmation before the policies mention it.
+4. The highest-priority product gap is company ownership/admin cleanup: company records can outlive the user while still referencing the deleted account ID.
 
 ## High-Signal Findings
 
 1. Auth, profile, messaging, and notification disclosures have been brought into line with the current implementation in `PrivacyPolicy.js`.
 2. Messaging still uses browser-side encryption helpers while backend storage retains conversation metadata and the conversation encryption key, so future privacy edits should preserve that nuance.
-3. Company/admin data is materially processed in the app but is still absent from the current legal copy.
-4. Deletion/retention language and cookie/local storage disclosures remain the next highest-risk review areas.
+3. Account deletion is a hard-delete cascade in application code and also removes some counterparty records tied to the deleted user's posts, conversations, and notifications.
+4. Company/admin data is materially processed in the app, and company records can retain dangling `createdBy`/`admins` references after account deletion.
+5. Cookie/local storage disclosures are now the next highest-risk review area.
 
 ## Suggested Next Review Order
 
-1. Validate deletion and retention language against `users.deleteAccount`.
-2. Validate cookie and local storage disclosures separately from this Convex-focused map.
+1. Validate cookie and local storage disclosures separately from this Convex-focused map.
+2. Patch the deletion/retention copy so it reflects the hard-delete cascade and the current company-reference limitation.
 3. Patch the remaining company/admin and content-metadata legal gaps after those validation passes.

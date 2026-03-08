@@ -1,5 +1,5 @@
 # Current task
-Verify deletion/retention statements against `deleteAccount` behavior.
+Verify cookie/localStorage disclosures vs frontend implementation.
 
 # End goal with specs
 - Verify policy coverage for all user-data categories in the app.
@@ -20,7 +20,7 @@ Verify deletion/retention statements against `deleteAccount` behavior.
 # Backlog
 - [x] Map real data flows from Convex schema/functions to legal docs
 - [x] Verify disclosure of auth/profile/message/notification processing
-- [ ] Verify deletion/retention statements against `deleteAccount` behavior <- current
-- [ ] Verify cookie/localStorage disclosures vs frontend implementation
+- [x] Verify deletion/retention statements against `deleteAccount` behavior
+- [ ] Verify cookie/localStorage disclosures vs frontend implementation <- current
 - [ ] Draft/patch legal text for identified gaps
 - [ ] Produce sign-off checklist for pre-launch legal review
