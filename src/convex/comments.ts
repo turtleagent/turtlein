@@ -1,41 +1,56 @@
+import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { mutation, query, type MutationCtx } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { buildAuthorSummary } from "./helpers";
+
+const requireAuthenticatedUserId = async (ctx: MutationCtx) => {
+  const userId = await getAuthUserId(ctx);
+  if (!userId) {
+    throw new Error("Not authenticated");
+  }
+
+  return userId;
+};
 
 export const addComment = mutation({
   args: {
     postId: v.id("posts"),
-    authorId: v.id("users"),
     body: v.string(),
   },
   handler: async (ctx, args) => {
+    const userId = await requireAuthenticatedUserId(ctx);
     const post = await ctx.db.get(args.postId);
     if (!post) {
       throw new Error("Post not found");
     }
 
+    const body = args.body.trim();
+    if (!body) {
+      throw new Error("Comment body is required");
+    }
+
     await ctx.db.insert("comments", {
       postId: args.postId,
-      authorId: args.authorId,
-      body: args.body,
+      authorId: userId,
+      body,
       createdAt: Date.now(),
     });
 
     await ctx.db.patch(args.postId, {
-      commentsCount: post.commentsCount + 1,
+      commentsCount: (post.commentsCount ?? 0) + 1,
     });
 
     await ctx.runMutation(internal.notifications.createNotification, {
       userId: post.authorId,
       type: "comment",
-      fromUserId: args.authorId,
+      fromUserId: userId,
       postId: args.postId,
     });
 
     // Extract @mentions from comment body and send notifications
     const mentionedUsernames = new Set<string>();
-    const mentionMatches = args.body.matchAll(
+    const mentionMatches = body.matchAll(
       /(^|[^a-z0-9-])@([a-z0-9]+(?:-[a-z0-9]+)*)/gi,
     );
     for (const match of mentionMatches) {
@@ -57,12 +72,12 @@ export const addComment = mutation({
 
       await Promise.all(
         mentionedUsers
-          .filter((u) => u !== null && u._id !== args.authorId)
+          .filter((u) => u !== null && u._id !== userId)
           .map((u) =>
             ctx.db.insert("notifications", {
               userId: u!._id,
               type: "mention",
-              fromUserId: args.authorId,
+              fromUserId: userId,
               postId: args.postId,
               read: false,
               createdAt: Date.now(),
@@ -76,14 +91,14 @@ export const addComment = mutation({
 export const deleteComment = mutation({
   args: {
     commentId: v.id("comments"),
-    userId: v.id("users"),
   },
   handler: async (ctx, args) => {
+    const userId = await requireAuthenticatedUserId(ctx);
     const comment = await ctx.db.get(args.commentId);
     if (!comment) {
       throw new Error("Comment not found");
     }
-    if (comment.authorId !== args.userId) {
+    if (comment.authorId !== userId) {
       throw new Error("Not authorized to delete this comment");
     }
 

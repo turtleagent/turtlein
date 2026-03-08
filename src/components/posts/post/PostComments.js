@@ -91,7 +91,7 @@ const PostComments = ({
     }
 
     try {
-      await addComment({ postId, authorId: currentUserId, body });
+      await addComment({ postId, body });
       setCommentText("");
       closeMention();
     } catch (error) {
@@ -105,7 +105,7 @@ const PostComments = ({
       return;
     }
 
-    await deleteComment({ commentId, userId: currentUserId });
+    await deleteComment({ commentId });
   };
 
   return (
