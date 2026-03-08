@@ -1,6 +1,7 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 import { mutation } from "./_generated/server";
+import { buildSafeUserProfile } from "./helpers";
 
 const USERNAME_REGEX = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -60,6 +61,6 @@ export const completeOnboarding = mutation({
       location: args.location.trim(),
     });
 
-    return await ctx.db.get(userId);
+    return await buildSafeUserProfile(ctx, await ctx.db.get(userId));
   },
 });

@@ -1,5 +1,5 @@
 # Current task
-Sanitize user-return payloads to avoid exposing private fields.
+All security-hardening backlog items are complete.
 
 # End goal with specs
 - Bind all sensitive mutations/queries to authenticated identity (`getAuthUserId`).
@@ -23,4 +23,7 @@ Sanitize user-return payloads to avoid exposing private fields.
 - [x] Harden `src/convex/comments.ts` actor identity + delete authorization
 - [x] Harden `src/convex/follows.ts` and `src/convex/connections.ts` actor binding
 - [x] Enforce visibility in `posts/hashtags/comments` read APIs
-- [ ] Sanitize user-return payloads to avoid exposing private fields <- current
+- [x] Sanitize user-return payloads to avoid exposing private fields
+
+## Loop Control
+STOP

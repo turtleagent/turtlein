@@ -11,13 +11,10 @@ const useConvexUser = () => {
   }
 
   if (currentUser) {
-    const storageBackedPhotoURL =
-      currentUser.photoStorageId && currentUser.photoURL ? currentUser.photoURL : null;
-
     return {
       ...currentUser,
       displayName: currentUser.displayName ?? "TurtleIn User",
-      photoURL: storageBackedPhotoURL ?? currentUser.photoURL ?? DEFAULT_PHOTO,
+      photoURL: currentUser.photoURL ?? DEFAULT_PHOTO,
     };
   }
 

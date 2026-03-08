@@ -26,6 +26,7 @@ registerHooks({
 
 const notificationsModulePromise = import("../src/convex/notifications.ts");
 const messagingModulePromise = import("../src/convex/messaging.ts");
+const usersModulePromise = import("../src/convex/users.ts");
 
 function createAuth(userId = null) {
   return {
@@ -94,6 +95,12 @@ function createDb(seed = {}) {
       patchCalls.push({ id, patch: { ...patchValue } });
     },
     query: (table) => createQuery(tables[table] ?? []),
+  };
+}
+
+function createStorage(urls = {}) {
+  return {
+    getUrl: async (storageId) => urls[storageId] ?? null,
   };
 }
 
@@ -221,4 +228,87 @@ test("messaging denies guests, non-participants, and guest maintenance calls", a
       ),
     /Not authenticated/,
   );
+});
+
+test("user profile queries and mutations omit private auth fields", async () => {
+  const {
+    getCurrentUser,
+    getUser,
+    updateCurrentUserProfile,
+  } = await usersModulePromise;
+
+  const privateUser = {
+    _id: "user-a",
+    _creationTime: 1,
+    name: "Private Auth Name",
+    email: "private@example.com",
+    image: "https://auth.example/avatar.png",
+    emailVerificationTime: 123456789,
+    isAnonymous: false,
+    displayName: "Public Name",
+    username: "public-name",
+    title: "Software Engineer",
+    headline: "Building secure products",
+    location: "Prague",
+    about: "About text",
+    skills: ["TypeScript"],
+    experienceEntries: [],
+    educationEntries: [],
+    featuredPostIds: ["post-1"],
+    connections: 12,
+    followers: 4,
+    photoURL: "https://images.example/fallback-photo.png",
+    photoStorageId: "storage-photo",
+    coverStorageId: "storage-cover",
+  };
+  const db = createDb({
+    users: [privateUser],
+  });
+  const storage = createStorage({
+    "storage-photo": "https://cdn.example/photo.png",
+    "storage-cover": "https://cdn.example/cover.png",
+  });
+
+  const publicProfile = await getUser._handler(
+    {
+      db,
+      storage,
+    },
+    { id: "user-a" },
+  );
+  const currentUserProfile = await getCurrentUser._handler(
+    {
+      auth: createAuth("user-a"),
+      db,
+      storage,
+    },
+    {},
+  );
+  const updatedProfile = await updateCurrentUserProfile._handler(
+    {
+      auth: createAuth("user-a"),
+      db,
+      storage,
+    },
+    {
+      displayName: "  Updated Name  ",
+      title: "  Staff Engineer  ",
+    },
+  );
+
+  for (const profile of [publicProfile, currentUserProfile, updatedProfile]) {
+    assert.equal("name" in profile, false);
+    assert.equal("email" in profile, false);
+    assert.equal("image" in profile, false);
+    assert.equal("emailVerificationTime" in profile, false);
+    assert.equal("isAnonymous" in profile, false);
+    assert.equal("photoStorageId" in profile, false);
+    assert.equal("coverStorageId" in profile, false);
+  }
+
+  assert.equal(publicProfile.photoURL, "https://cdn.example/photo.png");
+  assert.equal(publicProfile.coverURL, "https://cdn.example/cover.png");
+  assert.equal(currentUserProfile.displayName, "Public Name");
+  assert.equal(updatedProfile.displayName, "Updated Name");
+  assert.equal(updatedProfile.title, "Staff Engineer");
 });

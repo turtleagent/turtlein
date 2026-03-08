@@ -2,7 +2,7 @@ import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import type { Doc, Id } from "./_generated/dataModel";
-import { resolveUserPhotoURL } from "./helpers";
+import { buildSafeUserProfile, resolveUserPhotoURL } from "./helpers";
 
 const USERNAME_REGEX = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
@@ -17,18 +17,6 @@ const slugifyUsername = (value: string) => {
 
 const normalizeUsername = (value: string) => value.trim().toLowerCase();
 const buildPrefixUpperBound = (value: string) => `${value}\uffff`;
-
-const resolveUserCoverURL = async (
-  ctx: { storage: { getUrl: (storageId: Id<"_storage">) => Promise<string | null> } },
-  user: Doc<"users">,
-) => {
-  if (!user.coverStorageId) {
-    return "";
-  }
-
-  const storageCoverURL = await ctx.storage.getUrl(user.coverStorageId);
-  return storageCoverURL ?? "";
-};
 
 const normalizeOptionalField = (value?: string) => {
   if (typeof value !== "string") {
@@ -140,15 +128,7 @@ export const getUser = query({
   args: { id: v.id("users") },
   handler: async (ctx, args) => {
     const user = await ctx.db.get(args.id);
-    if (!user) {
-      return null;
-    }
-
-    return {
-      ...user,
-      photoURL: await resolveUserPhotoURL(ctx, user),
-      coverURL: await resolveUserCoverURL(ctx, user),
-    };
+    return await buildSafeUserProfile(ctx, user);
   },
 });
 
@@ -162,11 +142,7 @@ export const getFeaturedUser = query({
       return null;
     }
 
-    return {
-      ...featuredUser,
-      photoURL: await resolveUserPhotoURL(ctx, featuredUser),
-      coverURL: await resolveUserCoverURL(ctx, featuredUser),
-    };
+    return await buildSafeUserProfile(ctx, featuredUser);
   },
 });
 
@@ -183,11 +159,7 @@ export const getCurrentUser = query({
       return null;
     }
 
-    return {
-      ...user,
-      photoURL: await resolveUserPhotoURL(ctx, user),
-      coverURL: await resolveUserCoverURL(ctx, user),
-    };
+    return await buildSafeUserProfile(ctx, user);
   },
 });
 
@@ -210,11 +182,7 @@ export const getUserByUsername = query({
       return null;
     }
 
-    return {
-      ...user,
-      photoURL: await resolveUserPhotoURL(ctx, user),
-      coverURL: await resolveUserCoverURL(ctx, user),
-    };
+    return await buildSafeUserProfile(ctx, user);
   },
 });
 
@@ -427,11 +395,11 @@ export const updateCurrentUserProfile = mutation({
     }
 
     if (Object.keys(patch).length === 0) {
-      return user;
+      return await buildSafeUserProfile(ctx, user);
     }
 
     await ctx.db.patch(userId, patch);
-    return await ctx.db.get(userId);
+    return await buildSafeUserProfile(ctx, await ctx.db.get(userId));
   },
 });
 
@@ -514,7 +482,7 @@ export const updateCurrentUserAbout = mutation({
     const about = args.about.trim();
     await ctx.db.patch(userId, { about });
 
-    return { ...user, about };
+    return await buildSafeUserProfile(ctx, { ...user, about });
   },
 });
 
