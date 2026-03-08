@@ -19,7 +19,7 @@
 ## Current Blockers
 - Freeze blockers cleared. `git status --short` was clean at `HEAD` when `e8192fc4184d6533fd21dc77e7a2b389b483c5c9` was captured.
 - Preflight build/test passed in an isolated worktree at the frozen SHA after `npm ci --legacy-peer-deps`.
-- The production dependency gate is still blocking release: `npm audit --omit=dev --json` reported `63` vulnerabilities (`4 critical`, `27 high`, `17 moderate`, `15 low`), with `react-scripts` still flagged as a direct `high` dependency on the frozen candidate.
+- Post-freeze dependency remediation cleared the production dependency gate by moving `@testing-library/*` to `devDependencies`, removing unused `parse-connection-url`, and overriding `@babel/runtime` to `7.28.6`; capture the remediation commit as the next release candidate SHA before staging smoke.
 - Fresh installs of the frozen candidate require `--legacy-peer-deps` because the repo still combines React 18 with Material-UI v4 peer ranges.
 
 ## Freeze Checklist
@@ -33,8 +33,8 @@
 6. [ ] Proceed to `npx convex deploy` and `npx vercel --prod` only after the candidate SHA is frozen and preflight passes.
 
 ## Release Log Fields
-- Final release candidate SHA: `e8192fc4184d6533fd21dc77e7a2b389b483c5c9`
-- Preflight result links/notes: `2026-03-08 isolated worktree preflight on e8192fc: npm ci --legacy-peer-deps succeeded; npm run build passed; CI=true npm test -- --watch=false passed (1 suite / 1 test); npm audit --omit=dev reported 63 vulnerabilities (4 critical, 27 high, 17 moderate, 15 low) with react-scripts:high still direct.`
+- Final release candidate SHA: `PENDING POST-REMEDIATION COMMIT`
+- Preflight result links/notes: `2026-03-08 post-freeze remediation: npm audit --omit=dev reported 0 vulnerabilities; npm run build passed; CI=true npm test -- --watch=false passed (1 suite / 1 test); npm run test:security:authz passed (2 tests). Capture the resulting commit SHA before staging smoke.`
 - Staging smoke notes: `PENDING`
 - Production deploy timestamps: `PENDING`
 - Rollback target/version: `PENDING`
