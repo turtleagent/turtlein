@@ -1,4 +1,0 @@
-timestamp_utc=2026-03-08T19:07:06Z
-commit=581ec1d478b52601e567d577f9326d2a44ab9e6c
-node=v25.2.1
-npm=11.6.2

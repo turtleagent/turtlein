@@ -10,7 +10,7 @@ A full-featured LinkedIn clone built with React + Convex + Vercel. Originally "L
 - **Styling:** Plus Jakarta Sans, CSS-in-JS via makeStyles, design tokens
 
 ## Current Task
-Fix visual regressions from overnight run — feed sort tabs, left sidebar, right sidebar styling.
+Finalize production rollout wiring: move from dev Convex backend to prod Convex backend, set production env vars, and add custom domain.
 
 ## End Goal with Specs
 Full LinkedIn-like professional networking platform with profiles, posts, connections, messaging, companies, notifications, and polished UI/UX.
@@ -72,9 +72,26 @@ Full LinkedIn-like professional networking platform with profiles, posts, connec
 - Content moderation tools
 
 ## Backlog
-- [ ] Fix visual regressions: feed sort tabs styling, left sidebar card, right sidebar company card <- current
-- [ ] Deploy Phase 2 to production (`npx convex deploy` + `npx vercel --prod`)
-- [ ] Begin Phase 3 planning
+- [ ] Create/configure Convex production deployment and verify auth providers/callbacks <- current
+- [ ] Set Vercel Production env vars to Convex prod (`REACT_APP_CONVEX_URL`, `REACT_APP_CONVEX_SITE_URL`)
+- [ ] Redeploy frontend (`npx vercel --prod`) and validate login/auth redirects
+- [ ] Map custom domain in Vercel and update DNS records
+- [ ] Re-run smoke tests on custom domain (auth, feed, profile, messaging)
+- [ ] Document final dev vs prod environment matrix in README/docs
+
+## Dev/Prod Status
+- Current frontend: Vercel production deployments exist.
+- Current backend: Convex is configured to `dev` deployment (`tough-mosquito-145`).
+- Current auth callback host: Convex site URL from env (`*.convex.site`), which users may see during auth flow.
+- Current custom domain: not configured for TurtleIn.
+
+## Next Steps (Prod Rollout)
+1. Create/select Convex production deployment for project `turtlein`.
+2. Set `REACT_APP_CONVEX_URL` and `REACT_APP_CONVEX_SITE_URL` in Vercel Production to prod values.
+3. Run `npx convex deploy` against prod and verify schema/functions.
+4. Run `npx vercel --prod` and verify app uses prod Convex URLs.
+5. Attach custom domain in Vercel and point DNS.
+6. Verify complete auth flow and user journeys on custom domain.
 
 ## Architecture Notes
 - All Convex functions in `src/convex/` (schema.ts, posts.ts, users.ts, likes.ts, follows.ts, etc.)
