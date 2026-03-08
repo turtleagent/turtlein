@@ -1,5 +1,5 @@
 # Current task
-Draft/patch legal text for the identified cookie/localStorage and deletion-retention gaps.
+Produce sign-off checklist for pre-launch legal review.
 
 # End goal with specs
 - Verify policy coverage for all user-data categories in the app.
@@ -22,5 +22,5 @@ Draft/patch legal text for the identified cookie/localStorage and deletion-reten
 - [x] Verify disclosure of auth/profile/message/notification processing
 - [x] Verify deletion/retention statements against `deleteAccount` behavior
 - [x] Verify cookie/localStorage disclosures vs frontend implementation
-- [ ] Draft/patch legal text for identified gaps <- current
-- [ ] Produce sign-off checklist for pre-launch legal review
+- [x] Draft/patch legal text for identified gaps
+- [ ] Produce sign-off checklist for pre-launch legal review <- current

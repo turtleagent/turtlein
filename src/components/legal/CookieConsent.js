@@ -147,8 +147,8 @@ const CookieConsent = () => {
   }, []);
 
   const handleAccept = () => {
-    saveConsent("accepted");
-    savePreferences({ functional: true, analytics: true });
+    saveConsent("acknowledged");
+    savePreferences({ functional: true, analytics: false });
     setIsVisible(false);
     setIsManageOpen(false);
   };
@@ -179,11 +179,12 @@ const CookieConsent = () => {
           <div className={classes.row}>
             <div>
               <Typography variant="subtitle1" className={classes.title}>
-                We use cookies
+                Cookies and browser storage
               </Typography>
               <Typography variant="body2" className={classes.body}>
-                TurtleIn uses essential cookies to keep you signed in and to remember preferences.
-                You can accept optional cookies or manage your choices.{" "}
+                TurtleIn uses essential cookies and local storage for sign-in and security, stores
+                recent searches on this device, and remembers whether you dismissed this notice. We
+                do not currently use analytics or advertising cookies.{" "}
                 <MuiLink component={Link} to="/cookies" className={classes.manageLink}>
                   Learn more
                 </MuiLink>
@@ -196,7 +197,7 @@ const CookieConsent = () => {
                 Manage
               </Button>
               <Button variant="contained" color="primary" onClick={handleAccept}>
-                Accept
+                Acknowledge
               </Button>
             </div>
           </div>
@@ -204,21 +205,26 @@ const CookieConsent = () => {
       </div>
 
       <Dialog open={isManageOpen} onClose={handleCloseManage} fullWidth maxWidth="sm">
-        <DialogTitle>Cookie preferences</DialogTitle>
+        <DialogTitle>Cookies and browser storage</DialogTitle>
         <DialogContent dividers>
           <Typography variant="body2" className={classes.dialogText}>
-            TurtleIn is a demo app. We use essential cookies for authentication and security. Optional
-            cookies are off by default.
+            TurtleIn currently uses essential browser storage for authentication, sign-in security
+            checks, recent searches, and remembering this notice. We do not currently place
+            analytics or advertising cookies.
           </Typography>
 
           <Typography variant="subtitle2" className={classes.sectionTitle}>
-            Categories
+            Current categories
           </Typography>
           <Box mt={1}>
             <FormControlLabel
               control={<Switch checked disabled color="primary" />}
-              label="Essential (required)"
+              label="Essential sign-in and security storage (required)"
             />
+            <Typography variant="caption" color="textSecondary">
+              Includes auth tokens in localStorage and short-lived Google/GitHub OAuth security
+              cookies.
+            </Typography>
           </Box>
           <Divider />
           <Box mt={1}>
@@ -235,20 +241,21 @@ const CookieConsent = () => {
                   color="primary"
                 />
               }
-              label="Analytics (optional)"
+              label="Future analytics preference (not active today)"
             />
             <Typography variant="caption" color="textSecondary">
-              Helps us understand feature usage. Not required to use TurtleIn.
+              Toggling this stores only your preference locally. TurtleIn does not currently place
+              analytics cookies or enable analytics tracking based on this setting.
             </Typography>
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseManage}>Cancel</Button>
+          <Button onClick={handleCloseManage}>Close</Button>
           <Button onClick={handleSavePreferences} color="primary" variant="contained">
-            Save choices
+            Save preference
           </Button>
           <Button onClick={handleAccept} color="primary" variant="outlined">
-            Accept all
+            Acknowledge
           </Button>
         </DialogActions>
       </Dialog>
@@ -257,4 +264,3 @@ const CookieConsent = () => {
 };
 
 export default CookieConsent;
-

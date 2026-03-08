@@ -64,7 +64,7 @@ const CookiePolicy = () => {
           Cookie Policy
         </Typography>
         <Typography variant="body2" className={classes.subtitle}>
-          Effective date: March 3, 2026
+          Effective date: March 8, 2026
         </Typography>
         <Typography variant="body2" className={classes.finePrint}>
           TurtleIn is a demo LinkedIn-style social networking app. This Cookie Policy is provided for
@@ -75,36 +75,45 @@ const CookiePolicy = () => {
           1. Overview
         </Typography>
         <Typography variant="body1" className={classes.paragraph}>
-          This Cookie Policy explains how TurtleIn ("we", "us") uses cookies and similar technologies
-          to operate the service, remember preferences, and keep you signed in.
+          This Cookie Policy explains how TurtleIn ("we", "us") uses cookies and similar browser
+          storage to run sign-in and security flows, store limited on-device convenience data, and
+          remember your cookie-notice response.
         </Typography>
 
         <Typography variant="h6" className={classes.sectionTitle}>
           2. What are cookies?
         </Typography>
         <Typography variant="body1" className={classes.paragraph}>
-          Cookies are small text files stored on your device by your browser. We may also use similar
-          storage technologies (like localStorage) to remember preferences.
+          Cookies are small text files stored on your device by your browser. We also use browser
+          storage technologies such as localStorage to keep a small amount of app data on your
+          device.
         </Typography>
 
         <Typography variant="h6" className={classes.sectionTitle}>
           3. Cookies and storage we use
         </Typography>
         <Typography variant="body1" className={classes.paragraph}>
-          TurtleIn currently uses limited cookies/storage for core functionality:
+          TurtleIn currently uses the following cookies and storage:
         </Typography>
         <ul className={classes.bulletList}>
           <li className={classes.bulletItem}>
-            <strong>Authentication/session:</strong> to keep you signed in and to secure access to
-            your account.
+            <strong>Authentication tokens in localStorage:</strong> Convex Auth stores browser
+            access/refresh tokens in localStorage so your session can persist between page loads.
           </li>
           <li className={classes.bulletItem}>
-            <strong>Preferences:</strong> to remember settings such as theme (e.g., dark mode) and
-            other UI preferences.
+            <strong>OAuth security cookies:</strong> short-lived cookies are set during Google or
+            GitHub sign-in to store PKCE/state/nonce values and protect the login flow from
+            tampering.
           </li>
           <li className={classes.bulletItem}>
-            <strong>Cookie consent preference:</strong> if you interact with a cookie notice, we may
-            store your choice locally (for example via localStorage) so we don’t show it repeatedly.
+            <strong>Recent searches:</strong> we store up to five recent search terms in
+            localStorage so the header search box can show your recent history on that device.
+          </li>
+          <li className={classes.bulletItem}>
+            <strong>Cookie notice state:</strong> we store whether you acknowledged the cookie
+            notice and, if you open the manage dialog, the preference you choose about future
+            optional analytics tools. Today that preference does not turn on analytics cookies
+            because TurtleIn does not currently deploy analytics or advertising cookies.
           </li>
         </ul>
 
@@ -112,13 +121,16 @@ const CookiePolicy = () => {
           4. Essential vs. non-essential cookies
         </Typography>
         <Typography variant="body1" className={classes.paragraph}>
-          <strong>Essential cookies</strong> are necessary for TurtleIn to function (for example,
-          sign-in and security). Without them, key features may not work.
+          The browser storage used for sign-in and security, including localStorage-backed auth
+          tokens and short-lived OAuth security cookies, is required for key account features to
+          work correctly.
         </Typography>
         <Typography variant="body1" className={classes.paragraph}>
-          <strong>Non-essential cookies</strong> (such as analytics or advertising cookies) are not
-          currently used for this demo by default. If we add optional cookies in the future, we will
-          update this policy and (where required) ask for your consent.
+          TurtleIn does not currently deploy analytics, advertising, or cross-site tracking cookies
+          in the live app. The cookie notice may let you record a future preference about optional
+          analytics tools, but that preference is stored locally only and does not enable tracking
+          today. If we add optional cookies in the future, we will update this policy and, where
+          required, ask for your consent before enabling them.
         </Typography>
 
         <Typography variant="h6" className={classes.sectionTitle}>
@@ -126,9 +138,9 @@ const CookiePolicy = () => {
         </Typography>
         <Typography variant="body1" className={classes.paragraph}>
           You can control cookies through your browser settings (for example, blocking or deleting
-          cookies). You can also clear site data (including localStorage) for TurtleIn in your
-          browser. Please note that disabling cookies may sign you out or prevent the service from
-          working correctly.
+          cookies) and clear site data (including localStorage) for TurtleIn in your browser. Doing
+          so may sign you out, remove recent searches stored on that device, reset your cookie-notice
+          response, or interrupt Google/GitHub sign-in flows.
         </Typography>
 
         <Typography variant="h6" className={classes.sectionTitle}>
@@ -144,4 +156,3 @@ const CookiePolicy = () => {
 };
 
 export default CookiePolicy;
-

@@ -173,10 +173,18 @@ const PrivacyPolicy = () => {
           5. How long we keep your data
         </Typography>
         <Typography variant="body1" className={classes.paragraph}>
-          We retain personal data for as long as necessary to provide the service. In practice, we
-          generally keep your account data and content while your account is active. If you delete your
-          account, we will delete or anonymize associated data, subject to limited retention for
-          security, fraud prevention, and legal compliance where applicable.
+          We retain personal data for as long as necessary to provide the service while your account
+          remains active. If you use the current in-app account deletion flow, the live application
+          is designed to immediately delete your user record, authentication/session records, profile
+          media, authored posts and articles, comments, reactions, bookmarks, follows/connections,
+          conversations, messages, notifications, and most related activity records rather than
+          anonymizing them.
+        </Typography>
+        <Typography variant="body1" className={classes.paragraph}>
+          Because this deletion runs as a broad cascade, it can also remove entire message threads
+          and engagement or report records attached to content you created. Some company-page
+          creator or admin references may remain until additional cleanup tooling is added, so we do
+          not promise that every historical internal reference disappears immediately.
         </Typography>
 
         <Typography variant="h6" className={classes.sectionTitle}>
@@ -200,9 +208,11 @@ const PrivacyPolicy = () => {
           7. Cookies and similar technologies
         </Typography>
         <Typography variant="body1" className={classes.paragraph}>
-          TurtleIn uses essential cookies or local storage to keep you signed in and remember certain
-          preferences (for example, theme/dark mode). Where required, we will request consent for
-          non-essential cookies.
+          TurtleIn uses cookies and browser storage for a limited set of purposes: localStorage-backed
+          sign-in/session state, short-lived Google or GitHub OAuth security cookies, recent-search
+          history saved on your device, and remembering that you acknowledged the cookie notice or
+          stored a future analytics preference. We do not currently use analytics or advertising
+          cookies in the live app.
         </Typography>
 
         <Typography variant="h6" className={classes.sectionTitle}>

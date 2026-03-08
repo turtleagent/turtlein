@@ -64,7 +64,7 @@ const TermsOfService = () => {
           Terms of Service
         </Typography>
         <Typography variant="body2" className={classes.subtitle}>
-          Effective date: March 3, 2026
+          Effective date: March 8, 2026
         </Typography>
         <Typography variant="body2" className={classes.finePrint}>
           TurtleIn is a demo LinkedIn-style social networking app. These Terms are provided for
@@ -144,9 +144,16 @@ const TermsOfService = () => {
         <Typography variant="body1" className={classes.paragraph}>
           You may stop using TurtleIn at any time. We may suspend or terminate your access if we
           reasonably believe you have violated these Terms, created risk for us or other users, or
-          where required by law. Termination may result in loss of access to User Content; however,
-          we may retain certain data for security, fraud prevention, and legal compliance where
-          applicable.
+          where required by law. You may also delete your account through the app. In the current
+          product, that deletion flow is designed to remove your account, sign-in/session records,
+          profile media, authored content, relationship records, notifications, and
+          conversations/messages from the live app database.
+        </Typography>
+        <Typography variant="body1" className={classes.paragraph}>
+          Because conversations are deleted at the thread level, deleting your account can also
+          remove entire message threads for other participants. Company pages that referenced you as
+          a creator or admin may temporarily retain those internal references until additional
+          cleanup is performed.
         </Typography>
 
         <Typography variant="h6" className={classes.sectionTitle}>
@@ -188,4 +195,3 @@ const TermsOfService = () => {
 };
 
 export default TermsOfService;
-
