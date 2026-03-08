@@ -30,6 +30,7 @@
     "test": "react-scripts test",
     "test:security:authz": "node --experimental-transform-types --test tests/security-authz.test.mjs",
     "test:e2e": "npx playwright test",
+    "test:e2e:staging-smoke": "npx playwright test --grep @staging-smoke",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {

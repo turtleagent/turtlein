@@ -196,7 +196,9 @@ test.describe("Social e2e", () => {
     await loginAsGuest(page);
   });
 
-  test("Profile navigation opens user profile and returns to feed", async ({ page }) => {
+  test("Profile navigation opens user profile and returns to feed @staging-smoke", async ({
+    page,
+  }) => {
     const authorName = await openProfileFromFirstPost(page);
 
     await expect(page.getByRole("button", { name: "Back to feed", exact: true })).toBeVisible();
@@ -308,7 +310,9 @@ test.describe("Social e2e", () => {
     await expect(pendingButton).toBeDisabled();
   });
 
-  test("Messaging tab shows empty state or conversation list", async ({ page }) => {
+  test("Messaging tab shows empty state or conversation list @staging-smoke", async ({
+    page,
+  }) => {
     await openMessagingTab(page);
 
     const emptyState = page.getByText("No conversations yet.");
@@ -330,7 +334,7 @@ test.describe("Social e2e", () => {
     expect(hasVisibleConversation).toBeTruthy();
   });
 
-  test("Message button on profile opens messaging view", async ({ page }) => {
+  test("Message button on profile opens messaging view @staging-smoke", async ({ page }) => {
     await openProfileFromFirstPost(page);
     await expect(page.getByRole("button", { name: "Message", exact: true })).toBeVisible();
 

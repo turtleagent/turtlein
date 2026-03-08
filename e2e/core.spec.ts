@@ -252,7 +252,7 @@ async function discoverMentionCandidates(
   return candidates;
 }
 
-test("Guest login", async ({ page }) => {
+test("Guest login @staging-smoke", async ({ page }) => {
   await page.goto("/");
 
   const guestLoginButton = page.getByRole("button", {
@@ -277,7 +277,7 @@ test.describe("Feed", () => {
     }
   });
 
-  test("Feed loads posts", async ({ page }) => {
+  test("Feed loads posts @staging-smoke", async ({ page }) => {
     await waitForFeedPosts(page);
 
     const posts = page.locator('[id^="post-"]');

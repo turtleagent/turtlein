@@ -1,5 +1,5 @@
 # Current task
-Execute staging smoke run for key paths (auth/feed/profile/messaging) on the post-remediation release candidate.
+Execute staging smoke run for key paths (auth/feed/profile/messaging) on the post-remediation release candidate once a live staging URL is available; the current Playwright target returns Vercel `DEPLOYMENT_NOT_FOUND`.
 
 # End goal with specs
 - Stage deployment completes with smoke checks passing.
@@ -30,3 +30,5 @@ Execute staging smoke run for key paths (auth/feed/profile/messaging) on the pos
 - 2026-03-08: Isolated preflight on `e8192fc4184d6533fd21dc77e7a2b389b483c5c9` succeeded for `npm ci --legacy-peer-deps`, `npm run build`, and `CI=true npm test -- --watch=false`.
 - 2026-03-08: `npm audit --omit=dev --json` on the frozen candidate reported `63` vulnerabilities (`4 critical`, `27 high`, `17 moderate`, `15 low`); `react-scripts` remains a direct `high` finding, so preflight is not yet green.
 - 2026-03-08: Post-freeze dependency remediation moved `@testing-library/*` to `devDependencies`, removed unused `parse-connection-url`, and overrode `@babel/runtime` to `7.28.6`; `npm audit --omit=dev` now reports `0` vulnerabilities, `npm run build` passed, `CI=true npm test -- --watch=false` passed, and `npm run test:security:authz` passed. Capture the remediation commit as the next release candidate before staging smoke.
+- 2026-03-08: Added `npm run test:e2e:staging-smoke` to target 5 Playwright auth/feed/profile/messaging checks plus `PLAYWRIGHT_BASE_URL` override support in `playwright.config.ts` for staging reruns.
+- 2026-03-08: `npm run test:e2e:staging-smoke` against the default `https://linkedin-demo-iota.vercel.app` target failed before app bootstrap (`4 failed`, `1 skipped`); Playwright snapshots and `curl -I -L` both show Vercel HTTP `404` with `DEPLOYMENT_NOT_FOUND`, so this backlog item remains blocked pending a fresh staging deployment URL.
