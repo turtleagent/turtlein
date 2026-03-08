@@ -1,5 +1,5 @@
 # Current task
-Execute staging smoke run for key paths (auth/feed/profile/messaging) on the post-remediation release candidate once a live staging URL is available; the current Playwright target returns Vercel `DEPLOYMENT_NOT_FOUND`.
+Execute staging smoke run for key paths (auth/feed/profile/messaging) on a deployment that exposes guest access or equivalent smoke credentials; the default Playwright target now resolves to `https://turtlein.vercel.app`, but that live auth surface is OAuth-only.
 
 # End goal with specs
 - Stage deployment completes with smoke checks passing.
@@ -32,3 +32,5 @@ Execute staging smoke run for key paths (auth/feed/profile/messaging) on the pos
 - 2026-03-08: Post-freeze dependency remediation moved `@testing-library/*` to `devDependencies`, removed unused `parse-connection-url`, and overrode `@babel/runtime` to `7.28.6`; `npm audit --omit=dev` now reports `0` vulnerabilities, `npm run build` passed, `CI=true npm test -- --watch=false` passed, and `npm run test:security:authz` passed. Capture the remediation commit as the next release candidate before staging smoke.
 - 2026-03-08: Added `npm run test:e2e:staging-smoke` to target 5 Playwright auth/feed/profile/messaging checks plus `PLAYWRIGHT_BASE_URL` override support in `playwright.config.ts` for staging reruns.
 - 2026-03-08: `npm run test:e2e:staging-smoke` against the default `https://linkedin-demo-iota.vercel.app` target failed before app bootstrap (`4 failed`, `1 skipped`); Playwright snapshots and `curl -I -L` both show Vercel HTTP `404` with `DEPLOYMENT_NOT_FOUND`, so this backlog item remains blocked pending a fresh staging deployment URL.
+- 2026-03-08: Vercel CLI shows a live production alias at `https://turtlein.vercel.app`, so Playwright now defaults there instead of the dead `linkedin-demo-iota.vercel.app` host.
+- 2026-03-08: `npm run test:e2e:staging-smoke` now reaches `https://turtlein.vercel.app` and exits with `1 failed`, `4 skipped` in under five seconds; the remaining auth smoke failure is explicit (`GuestLoginUnavailableError: ... only OAuth sign-in is exposed`), so this backlog item remains current until guest access or alternate smoke credentials exist.

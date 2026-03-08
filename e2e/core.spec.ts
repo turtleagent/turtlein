@@ -1,6 +1,6 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { ConvexHttpClient } from "convex/browser";
-import { loginAsGuest } from "./helpers";
+import { isGuestLoginUnavailableError, loginAsGuest } from "./helpers";
 
 const FEED_RECOVERY_ATTEMPTS = 4;
 const DEFAULT_CONVEX_URL = "https://tough-mosquito-145.convex.cloud";
@@ -253,14 +253,7 @@ async function discoverMentionCandidates(
 }
 
 test("Guest login @staging-smoke", async ({ page }) => {
-  await page.goto("/");
-
-  const guestLoginButton = page.getByRole("button", {
-    name: /Continue as (Guest|Turtle)/i,
-  });
-  await expect(guestLoginButton).toBeVisible();
-  await guestLoginButton.click();
-
+  await loginAsGuest(page);
   await expect(page.getByPlaceholder("Start a post")).toBeVisible();
   await expect(page.getByRole("button", { name: "Post" })).toBeVisible();
   await waitForFeedPosts(page);
@@ -273,6 +266,9 @@ test.describe("Feed", () => {
     try {
       await loginAsGuest(page);
     } catch (error) {
+      if (!isGuestLoginUnavailableError(error)) {
+        throw error;
+      }
       test.skip(true, "Skipped: guest login was unavailable in live deployment.");
     }
   });

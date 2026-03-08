@@ -1,7 +1,7 @@
 import { defineConfig } from "@playwright/test";
 
 const BASE_URL =
-  process.env.PLAYWRIGHT_BASE_URL ?? "https://linkedin-demo-iota.vercel.app";
+  process.env.PLAYWRIGHT_BASE_URL ?? "https://turtlein.vercel.app";
 
 export default defineConfig({
   testDir: "./e2e",
