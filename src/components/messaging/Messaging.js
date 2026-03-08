@@ -85,7 +85,7 @@ const Messaging = () => {
 
   const conversations = useQuery(
     api.messaging.listConversations,
-    user?._id ? { userId: user._id } : "skip"
+    user?._id ? {} : "skip"
   );
 
   const selectedConversation = useMemo(
@@ -183,14 +183,12 @@ const Messaging = () => {
         const ciphertext = await encryptMessage(trimmedBody, encryptionKey);
         await sendMessage({
           conversationId: selectedConversationId,
-          senderId: user._id,
           body: ciphertext,
           encrypted: true,
         });
       } else {
         await sendMessage({
           conversationId: selectedConversationId,
-          senderId: user._id,
           body: trimmedBody,
         });
       }

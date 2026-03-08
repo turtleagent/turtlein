@@ -470,8 +470,7 @@ const Profile = ({
       if (authUser._id !== resolvedUserId) {
         const encryptionKey = await generateConversationKey();
         await getOrCreateConversation({
-          userId1: authUser._id,
-          userId2: resolvedUserId,
+          participantId: resolvedUserId,
           encryptionKey,
         });
       }

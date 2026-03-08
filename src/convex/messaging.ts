@@ -1,18 +1,54 @@
+import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
-import { action, internalMutation, internalQuery, mutation, query } from "./_generated/server";
+import type { Id } from "./_generated/dataModel";
+import {
+  action,
+  internalMutation,
+  internalQuery,
+  mutation,
+  query,
+  type MutationCtx,
+  type QueryCtx,
+} from "./_generated/server";
 import { internal } from "./_generated/api";
 import { buildAuthorSummary } from "./helpers";
 
-const normalizeParticipants = (participantIds: string[]) => {
+const normalizeParticipants = (participantIds: Id<"users">[]) => {
   return [...new Set(participantIds)].sort();
 };
 
-const sameParticipants = (a: string[], b: string[]) => {
+const sameParticipants = (a: Id<"users">[], b: Id<"users">[]) => {
   if (a.length !== b.length) {
     return false;
   }
 
   return a.every((id, index) => id === b[index]);
+};
+
+const requireAuthenticatedUserId = async (ctx: QueryCtx | MutationCtx) => {
+  const userId = await getAuthUserId(ctx);
+  if (!userId) {
+    throw new Error("Not authenticated");
+  }
+
+  return userId;
+};
+
+const requireConversationParticipant = async (
+  ctx: QueryCtx | MutationCtx,
+  conversationId: Id<"conversations">,
+  userId: Id<"users">,
+) => {
+  const conversation = await ctx.db.get(conversationId);
+  if (!conversation) {
+    throw new Error("Conversation not found");
+  }
+
+  if (!conversation.participants.includes(userId)) {
+    throw new Error("Not authorized to access this conversation");
+  }
+
+  return conversation;
 };
 
 export const createConversation = mutation({
@@ -21,16 +57,15 @@ export const createConversation = mutation({
     encryptionKey: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const normalizedArgs = normalizeParticipants(args.participantIds.map(String));
+    const userId = await requireAuthenticatedUserId(ctx);
+    const normalizedArgs = normalizeParticipants([userId, ...args.participantIds]);
     if (normalizedArgs.length < 2) {
       throw new Error("A conversation must include at least two participants");
     }
 
     const conversations = await ctx.db.query("conversations").collect();
     const existingConversation = conversations.find((conversation) => {
-      const normalizedConversation = normalizeParticipants(
-        conversation.participants.map(String),
-      );
+      const normalizedConversation = normalizeParticipants(conversation.participants);
       return sameParticipants(normalizedConversation, normalizedArgs);
     });
 
@@ -43,7 +78,7 @@ export const createConversation = mutation({
       createdAt: number;
       encryptionKey?: string;
     } = {
-      participants: args.participantIds,
+      participants: normalizedArgs,
       createdAt: Date.now(),
     };
 
@@ -57,24 +92,19 @@ export const createConversation = mutation({
 
 export const getOrCreateConversation = mutation({
   args: {
-    userId1: v.id("users"),
-    userId2: v.id("users"),
+    participantId: v.id("users"),
     encryptionKey: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    if (args.userId1 === args.userId2) {
+    const userId = await requireAuthenticatedUserId(ctx);
+    if (args.participantId === userId) {
       throw new Error("A conversation must include two different users");
     }
 
-    const normalizedArgs = normalizeParticipants([
-      String(args.userId1),
-      String(args.userId2),
-    ]);
+    const normalizedArgs = normalizeParticipants([userId, args.participantId]);
     const conversations = await ctx.db.query("conversations").collect();
     const existingConversation = conversations.find((conversation) => {
-      const normalizedConversation = normalizeParticipants(
-        conversation.participants.map(String),
-      );
+      const normalizedConversation = normalizeParticipants(conversation.participants);
       return sameParticipants(normalizedConversation, normalizedArgs);
     });
 
@@ -83,11 +113,11 @@ export const getOrCreateConversation = mutation({
     }
 
     const record: {
-      participants: [typeof args.userId1, typeof args.userId2];
+      participants: Id<"users">[];
       createdAt: number;
       encryptionKey?: string;
     } = {
-      participants: [args.userId1, args.userId2],
+      participants: normalizedArgs,
       createdAt: Date.now(),
     };
 
@@ -102,30 +132,31 @@ export const getOrCreateConversation = mutation({
 export const sendMessage = mutation({
   args: {
     conversationId: v.id("conversations"),
-    senderId: v.id("users"),
     body: v.string(),
     encrypted: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
+    const userId = await requireAuthenticatedUserId(ctx);
     const body = args.body.trim();
     if (!body) {
       throw new Error("Message body is required");
     }
 
-    const conversation = await ctx.db.get(args.conversationId);
-    if (!conversation) {
-      throw new Error("Conversation not found");
-    }
+    const conversation = await requireConversationParticipant(
+      ctx,
+      args.conversationId,
+      userId,
+    );
 
     const messageRecord: {
       conversationId: typeof args.conversationId;
-      senderId: typeof args.senderId;
+      senderId: Id<"users">;
       body: string;
       createdAt: number;
       encrypted?: boolean;
     } = {
       conversationId: args.conversationId,
-      senderId: args.senderId,
+      senderId: userId,
       body,
       createdAt: Date.now(),
     };
@@ -137,7 +168,7 @@ export const sendMessage = mutation({
     const messageId = await ctx.db.insert("messages", messageRecord);
 
     const recipients = conversation.participants.filter(
-      (participantId) => participantId !== args.senderId,
+      (participantId) => participantId !== userId,
     );
 
     await Promise.all(
@@ -145,7 +176,7 @@ export const sendMessage = mutation({
         ctx.runMutation(internal.notifications.createNotification, {
           userId: recipientId,
           type: "message",
-          fromUserId: args.senderId,
+          fromUserId: userId,
           conversationId: args.conversationId,
         }),
       ),
@@ -156,19 +187,18 @@ export const sendMessage = mutation({
 });
 
 export const listConversations = query({
-  args: {
-    userId: v.id("users"),
-  },
-  handler: async (ctx, args) => {
+  args: {},
+  handler: async (ctx) => {
+    const userId = await requireAuthenticatedUserId(ctx);
     const conversations = await ctx.db.query("conversations").collect();
     const relevantConversations = conversations.filter((conversation) =>
-      conversation.participants.includes(args.userId),
+      conversation.participants.includes(userId),
     );
 
     const conversationsWithDetails = await Promise.all(
       relevantConversations.map(async (conversation) => {
         const otherParticipantId = conversation.participants.find(
-          (participantId) => participantId !== args.userId,
+          (participantId) => participantId !== userId,
         );
 
         const otherParticipant = otherParticipantId
@@ -206,6 +236,9 @@ export const listMessages = query({
     conversationId: v.id("conversations"),
   },
   handler: async (ctx, args) => {
+    const userId = await requireAuthenticatedUserId(ctx);
+    await requireConversationParticipant(ctx, args.conversationId, userId);
+
     const messages = await ctx.db
       .query("messages")
       .filter((q) => q.eq(q.field("conversationId"), args.conversationId))
