@@ -1,5 +1,5 @@
 # Current task
-Verify cookie/localStorage disclosures vs frontend implementation.
+Draft/patch legal text for the identified cookie/localStorage and deletion-retention gaps.
 
 # End goal with specs
 - Verify policy coverage for all user-data categories in the app.
@@ -21,6 +21,6 @@ Verify cookie/localStorage disclosures vs frontend implementation.
 - [x] Map real data flows from Convex schema/functions to legal docs
 - [x] Verify disclosure of auth/profile/message/notification processing
 - [x] Verify deletion/retention statements against `deleteAccount` behavior
-- [ ] Verify cookie/localStorage disclosures vs frontend implementation <- current
-- [ ] Draft/patch legal text for identified gaps
+- [x] Verify cookie/localStorage disclosures vs frontend implementation
+- [ ] Draft/patch legal text for identified gaps <- current
 - [ ] Produce sign-off checklist for pre-launch legal review

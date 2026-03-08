@@ -71,10 +71,12 @@ Reviewed against `src/convex/users.ts` (`deleteAccount`) and the user-linked tab
 2. Messaging still uses browser-side encryption helpers while backend storage retains conversation metadata and the conversation encryption key, so future privacy edits should preserve that nuance.
 3. Account deletion is a hard-delete cascade in application code and also removes some counterparty records tied to the deleted user's posts, conversations, and notifications.
 4. Company/admin data is materially processed in the app, and company records can retain dangling `createdBy`/`admins` references after account deletion.
-5. Cookie/local storage disclosures are now the next highest-risk review area.
+5. Cookie/local storage disclosures have now been validated separately in
+   `docs/legal-cookie-storage-audit.md`; the next policy pass should use that audit to patch the
+   auth, recent-search, and consent-copy gaps.
 
 ## Suggested Next Review Order
 
-1. Validate cookie and local storage disclosures separately from this Convex-focused map.
-2. Patch the deletion/retention copy so it reflects the hard-delete cascade and the current company-reference limitation.
+1. Patch the deletion/retention copy so it reflects the hard-delete cascade and the current company-reference limitation.
+2. Patch the cookie/storage copy using `docs/legal-cookie-storage-audit.md`, including auth token storage, recent searches, and the current consent-banner wording.
 3. Patch the remaining company/admin and content-metadata legal gaps after those validation passes.
