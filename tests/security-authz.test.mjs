@@ -26,6 +26,9 @@ registerHooks({
 
 const notificationsModulePromise = import("../src/convex/notifications.ts");
 const messagingModulePromise = import("../src/convex/messaging.ts");
+const followsModulePromise = import("../src/convex/follows.ts");
+const connectionsModulePromise = import("../src/convex/connections.ts");
+const commentsModulePromise = import("../src/convex/comments.ts");
 const usersModulePromise = import("../src/convex/users.ts");
 
 function createAuth(userId = null) {
@@ -56,25 +59,74 @@ function createQuery(docs) {
 
       return createQuery(docs.filter(buildPredicate(q)));
     },
+    withIndex(_indexName, buildRange) {
+      const range = {
+        conditions: [],
+        eq(fieldName, value) {
+          this.conditions.push({ fieldName, value });
+          return this;
+        },
+      };
+
+      buildRange(range);
+
+      return createQuery(
+        docs.filter((doc) =>
+          range.conditions.every(
+            ({ fieldName, value }) => doc[fieldName] === value,
+          ),
+        ),
+      );
+    },
     collect: async () => docs.map((doc) => ({ ...doc })),
+    first: async () => (docs[0] ? { ...docs[0] } : null),
+    unique: async () => {
+      if (docs.length === 0) {
+        return null;
+      }
+
+      if (docs.length === 1) {
+        return { ...docs[0] };
+      }
+
+      throw new Error("Expected unique result");
+    },
   };
 }
 
 function createDb(seed = {}) {
-  const tables = {
-    conversations: (seed.conversations ?? []).map((doc) => ({ ...doc })),
-    messages: (seed.messages ?? []).map((doc) => ({ ...doc })),
-    notifications: (seed.notifications ?? []).map((doc) => ({ ...doc })),
-    users: (seed.users ?? []).map((doc) => ({ ...doc })),
-  };
+  const defaultTables = [
+    "comments",
+    "connections",
+    "conversations",
+    "follows",
+    "messages",
+    "notifications",
+    "posts",
+    "users",
+  ];
+  const tables = Object.fromEntries(
+    [...new Set([...defaultTables, ...Object.keys(seed)])].map((table) => [
+      table,
+      (seed[table] ?? []).map((doc) => ({ ...doc })),
+    ]),
+  );
 
   const patchCalls = [];
+  const insertCalls = [];
+  const deleteCalls = [];
+  const nextIds = Object.create(null);
 
-  const findDocument = (id) => {
-    for (const docs of Object.values(tables)) {
-      const document = docs.find((candidate) => candidate._id === id);
-      if (document) {
-        return document;
+  const findDocumentLocation = (id) => {
+    for (const [table, docs] of Object.entries(tables)) {
+      const index = docs.findIndex((candidate) => candidate._id === id);
+      if (index !== -1) {
+        return {
+          table,
+          docs,
+          index,
+          document: docs[index],
+        };
       }
     }
 
@@ -82,17 +134,39 @@ function createDb(seed = {}) {
   };
 
   return {
+    deleteCalls,
+    insertCalls,
     patchCalls,
     tables,
-    get: async (id) => findDocument(id),
+    get: async (id) => findDocumentLocation(id)?.document ?? null,
+    insert: async (table, value) => {
+      tables[table] ??= [];
+      nextIds[table] = (nextIds[table] ?? 0) + 1;
+      const document = {
+        _id: value._id ?? `${table}-${nextIds[table]}`,
+        ...value,
+      };
+      tables[table].push(document);
+      insertCalls.push({ table, document: { ...document } });
+      return document._id;
+    },
     patch: async (id, patchValue) => {
-      const document = findDocument(id);
-      if (!document) {
+      const location = findDocumentLocation(id);
+      if (!location) {
         throw new Error(`Document not found: ${id}`);
       }
 
-      Object.assign(document, patchValue);
+      Object.assign(location.document, patchValue);
       patchCalls.push({ id, patch: { ...patchValue } });
+    },
+    delete: async (id) => {
+      const location = findDocumentLocation(id);
+      if (!location) {
+        throw new Error(`Document not found: ${id}`);
+      }
+
+      location.docs.splice(location.index, 1);
+      deleteCalls.push(id);
     },
     query: (table) => createQuery(tables[table] ?? []),
   };
@@ -228,6 +302,224 @@ test("messaging denies guests, non-participants, and guest maintenance calls", a
       ),
     /Not authenticated/,
   );
+});
+
+test("follows bind writes to the session user instead of spoofed args", async () => {
+  const { followUser, unfollowUser } = await followsModulePromise;
+
+  const db = createDb({
+    users: [{ _id: "user-a" }, { _id: "user-b" }, { _id: "user-c" }],
+  });
+  const runMutationCalls = [];
+
+  await followUser._handler(
+    {
+      auth: createAuth("user-a"),
+      db,
+      runMutation: async (reference, args) => {
+        runMutationCalls.push({ reference, args });
+        return null;
+      },
+    },
+    {
+      followerId: "user-c",
+      followedId: "user-b",
+    },
+  );
+
+  assert.equal(db.tables.follows.length, 1);
+  assert.equal(db.tables.follows[0].followerId, "user-a");
+  assert.equal(db.tables.follows[0].followedId, "user-b");
+  assert.equal(runMutationCalls.length, 1);
+  assert.equal(runMutationCalls[0].args.fromUserId, "user-a");
+
+  const result = await unfollowUser._handler(
+    {
+      auth: createAuth("user-a"),
+      db,
+    },
+    {
+      followerId: "user-c",
+      followedId: "user-b",
+    },
+  );
+
+  assert.deepEqual(result, { unfollowed: true });
+  assert.equal(db.tables.follows.length, 0);
+  assert.deepEqual(db.deleteCalls, ["follows-1"]);
+});
+
+test("connections reject spoofed actors and unauthorized state changes", async () => {
+  const {
+    acceptConnection,
+    rejectConnection,
+    removeConnection,
+    sendConnectionRequest,
+  } = await connectionsModulePromise;
+
+  const requestDb = createDb({
+    users: [{ _id: "user-a" }, { _id: "user-b" }, { _id: "user-c" }],
+  });
+
+  await sendConnectionRequest._handler(
+    {
+      auth: createAuth("user-a"),
+      db: requestDb,
+    },
+    {
+      fromUserId: "user-c",
+      toUserId: "user-b",
+    },
+  );
+
+  assert.equal(requestDb.tables.connections[0].userId1, "user-a");
+  assert.equal(requestDb.tables.connections[0].requestedBy, "user-a");
+  assert.equal(requestDb.tables.notifications[0].fromUserId, "user-a");
+
+  const pendingDb = createDb({
+    connections: [
+      {
+        _id: "connection-1",
+        createdAt: 1,
+        requestedBy: "user-a",
+        status: "pending",
+        userId1: "user-a",
+        userId2: "user-b",
+      },
+    ],
+    users: [
+      { _id: "user-a", connections: 0 },
+      { _id: "user-b", connections: 0 },
+      { _id: "user-c", connections: 0 },
+    ],
+  });
+
+  await assertRejectsWithMessage(
+    () =>
+      acceptConnection._handler(
+        {
+          auth: createAuth("user-a"),
+          db: pendingDb,
+        },
+        { connectionId: "connection-1" },
+      ),
+    /Not authorized to accept this connection request/,
+  );
+  await assertRejectsWithMessage(
+    () =>
+      rejectConnection._handler(
+        {
+          auth: createAuth("user-a"),
+          db: pendingDb,
+        },
+        { connectionId: "connection-1" },
+      ),
+    /Not authorized to reject this connection request/,
+  );
+
+  assert.equal(pendingDb.tables.connections[0].status, "pending");
+  assert.deepEqual(pendingDb.patchCalls, []);
+  assert.deepEqual(pendingDb.deleteCalls, []);
+
+  const acceptedDb = createDb({
+    connections: [
+      {
+        _id: "connection-2",
+        createdAt: 1,
+        requestedBy: "user-a",
+        status: "accepted",
+        userId1: "user-a",
+        userId2: "user-b",
+      },
+    ],
+    users: [
+      { _id: "user-a", connections: 1 },
+      { _id: "user-b", connections: 1 },
+      { _id: "user-c", connections: 0 },
+    ],
+  });
+
+  await assertRejectsWithMessage(
+    () =>
+      removeConnection._handler(
+        {
+          auth: createAuth("user-c"),
+          db: acceptedDb,
+        },
+        { connectionId: "connection-2" },
+      ),
+    /Not authorized to access this connection/,
+  );
+
+  assert.equal(acceptedDb.tables.connections.length, 1);
+  assert.deepEqual(acceptedDb.deleteCalls, []);
+  assert.deepEqual(acceptedDb.patchCalls, []);
+});
+
+test("comments bind writes to the session user and reject spoofed deletes", async () => {
+  const { addComment, deleteComment } = await commentsModulePromise;
+
+  const db = createDb({
+    comments: [
+      {
+        _id: "comment-1",
+        authorId: "user-a",
+        body: "First comment",
+        createdAt: 1,
+        postId: "post-1",
+      },
+    ],
+    posts: [
+      {
+        _id: "post-1",
+        authorId: "user-b",
+        commentsCount: 1,
+        visibility: "public",
+      },
+    ],
+    users: [{ _id: "user-a" }, { _id: "user-b" }, { _id: "user-c" }],
+  });
+  const runMutationCalls = [];
+
+  await addComment._handler(
+    {
+      auth: createAuth("user-a"),
+      db,
+      runMutation: async (reference, args) => {
+        runMutationCalls.push({ reference, args });
+        return null;
+      },
+    },
+    {
+      authorId: "user-c",
+      body: "Second comment",
+      postId: "post-1",
+    },
+  );
+
+  assert.equal(db.tables.comments.length, 2);
+  assert.equal(db.tables.comments[1].authorId, "user-a");
+  assert.equal(db.tables.posts[0].commentsCount, 2);
+  assert.equal(runMutationCalls.length, 1);
+  assert.equal(runMutationCalls[0].args.fromUserId, "user-a");
+
+  await assertRejectsWithMessage(
+    () =>
+      deleteComment._handler(
+        {
+          auth: createAuth("user-c"),
+          db,
+        },
+        {
+          commentId: "comment-1",
+          userId: "user-a",
+        },
+      ),
+    /Not authorized to delete this comment/,
+  );
+
+  assert.equal(db.tables.comments.length, 2);
+  assert.deepEqual(db.deleteCalls, []);
 });
 
 test("user profile queries and mutations omit private auth fields", async () => {

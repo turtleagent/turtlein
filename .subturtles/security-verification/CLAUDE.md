@@ -1,5 +1,5 @@
 # Current task
-Add negative tests for follows, connections, and comments identity spoofing paths called out by the new permission matrix.
+Add visibility leakage tests for posts, hashtags, search, and comments `connections`-only read paths called out by the permission matrix.
 
 # End goal with specs
 - Build a function-level permission matrix for all Convex public APIs.
@@ -20,7 +20,7 @@ Add negative tests for follows, connections, and comments identity spoofing path
 # Backlog
 - [x] Build endpoint permission matrix for `src/convex/*.ts`
 - [x] Add negative tests for messaging/notifications authz bypass
-- [ ] Add negative tests for follows/connections/comments identity spoofing <- current
-- [ ] Add visibility leakage tests for posts/hashtags/search/comments
+- [x] Add negative tests for follows/connections/comments identity spoofing
+- [ ] Add visibility leakage tests for posts/hashtags/search/comments <- current
 - [ ] Execute tests and collect evidence artifacts
 - [ ] Produce release sign-off report with blockers/non-blockers
