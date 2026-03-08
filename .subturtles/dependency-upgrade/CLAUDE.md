@@ -1,5 +1,5 @@
 # Current task
-Evaluate safest path for `react-scripts` vulnerability cluster.
+Regenerate lockfile and run full build/test suite.
 
 # End goal with specs
 - Eliminate critical vulnerabilities where practical.
@@ -20,7 +20,7 @@ Evaluate safest path for `react-scripts` vulnerability cluster.
 # Backlog
 - [x] Triage `npm audit` findings into direct vs transitive risk
 - [x] Upgrade direct vulnerable deps (`firebase`, `file-type`, others)
-- [ ] Evaluate safest path for `react-scripts` vulnerability cluster <- current
-- [ ] Regenerate lockfile and run full build/test suite
+- [x] Evaluate safest path for `react-scripts` vulnerability cluster
+- [ ] Regenerate lockfile and run full build/test suite <- current
 - [ ] Produce vulnerability delta report (before vs after)
 - [ ] Document rollback plan for dependency-related regressions
