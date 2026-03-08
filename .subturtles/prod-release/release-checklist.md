@@ -7,16 +7,22 @@
 - Baseline commit: `Fix email leak in onboarding + mobile UI fixes`
 - Freeze status: `blocked`
 
+## Approved Release Payload
+- Repo hygiene and release docs: `.gitignore`, `README.md`, `package.json`, `package-lock.json`
+- Mobile layout/header fixes: `src/Style.js`, `src/components/header/Header.js`, `src/components/header/Style.js`
+- Local verification completed on this payload:
+  - `npm run build`
+  - `npm test -- --watch=false`
+
 ## Current Blockers
 - The worktree is not clean, so `HEAD` cannot be treated as the approved release candidate yet.
-- Intended release-related changes are still uncommitted in `.gitignore`, `README.md`, `package.json`, `package-lock.json`, `src/Style.js`, `src/components/header/Header.js`, and `src/components/header/Style.js`.
-- Runtime/archive churn is also present in `.superturtle/state/*` and several `.subturtles/*` paths, which needs to be excluded from the final release commit.
+- Tracked changes outside the approved payload are still present in the worktree, including agent/runtime state churn and unrelated app/task files, which need to be resolved before the candidate SHA can be frozen from a clean worktree.
 
 ## Freeze Checklist
-1. Reduce `git status --short` to only the approved release changes, then commit them on `main`.
+1. Resolve the remaining tracked non-release changes so `git status --short` is clean at `HEAD`.
 2. Re-run `git rev-parse HEAD` and replace the baseline SHA above with the final release candidate SHA.
-3. Confirm the release candidate commit is the exact commit used for preflight, staging smoke, and production deploy.
-4. Capture command results for:
+3. Confirm the release candidate commit matches the approved payload listed above and is the exact commit used for preflight, staging smoke, and production deploy.
+4. Capture command results from the frozen candidate SHA for:
    - `npm run build`
    - `npm test -- --watch=false`
 5. Record staging smoke coverage for auth, feed, profile, and messaging before deploy.
@@ -24,7 +30,7 @@
 
 ## Release Log Fields
 - Final release candidate SHA: `PENDING`
-- Preflight result links/notes: `PENDING`
+- Preflight result links/notes: `Local build/test passed on the approved payload; rerun after freeze is still pending.`
 - Staging smoke notes: `PENDING`
 - Production deploy timestamps: `PENDING`
 - Rollback target/version: `PENDING`

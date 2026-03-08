@@ -1,5 +1,5 @@
 # Current task
-Define and freeze the release candidate commit from a clean worktree using the prepared checklist in `.subturtles/prod-release/release-checklist.md`.
+Finish freezing the release candidate commit by clearing the remaining tracked non-release churn from the worktree, then record the final SHA in `.subturtles/prod-release/release-checklist.md`.
 
 # End goal with specs
 - Stage deployment completes with smoke checks passing.
@@ -27,3 +27,4 @@ Define and freeze the release candidate commit from a clean worktree using the p
 
 ## Notes
 - 2026-03-08: Baseline SHA `cee1bd65c2d8da464f5e48de7753e26404def476` captured in `.subturtles/prod-release/release-checklist.md`; freeze remains blocked until the worktree is reduced to the approved release changes.
+- 2026-03-08: Approved release payload was verified locally with `npm run build` and `npm test -- --watch=false`; freeze still cannot be finalized while tracked changes outside that approved payload remain in the worktree.

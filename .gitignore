@@ -31,3 +31,8 @@ yarn-error.log*
 .vercel/*
 !.vercel/project.json
 .vercel
+
+# Super Turtle
+.superturtle/
+.subturtles/
+.superturtle-claude/

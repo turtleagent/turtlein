@@ -583,16 +583,21 @@ const Header = ({
 
         <Paper className={classes.header__bottom__nav}>
           {tabItems.map(({ key, icon: Icon, onClick, isActive }) => (
-            <Icon
+            <button
               key={key}
-              size={26}
-              strokeWidth={isActive ? 2.25 : 1.75}
+              type="button"
               onClick={onClick}
               aria-label={key}
-              className={`${classes.bottomNavIcon} ${
-                isActive ? classes.bottomNavIconActive : ""
+              className={`${classes.bottomNavButton} ${
+                isActive ? classes.bottomNavButtonActive : ""
               }`}
-            />
+            >
+              <Icon
+                size={24}
+                strokeWidth={isActive ? 2.25 : 1.85}
+                className={classes.bottomNavIcon}
+              />
+            </button>
           ))}
         </Paper>
       </div>

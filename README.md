@@ -1,100 +1,61 @@
-## **`Linked-In-Clone`**
+# TurtleIn
 
-![](https://img.shields.io/github/languages/code-size/phanison898/linked-in-clone?style=flat-square)
-![](https://img.shields.io/github/last-commit/phanison898/linked-in-clone?style=flat-square)
-![](https://img.shields.io/github/languages/top/phanison898/linked-in-clone?style=flat-square)
-![](https://img.shields.io/github/license/phanison898/linked-in-clone?style=flat-square)
+TurtleIn is a professional networking web app built with React and Convex.
 
----
+## Overview
+- Feed with posts, reactions, comments, reposts, hashtags, polls, and bookmarks
+- Profiles with onboarding, experience, education, and skills
+- Connections/follows and notifications
+- Messaging and company pages
 
-### 🚥 About
+## Tech Stack
+- Frontend: React 18, Material-UI v4, react-router-dom
+- Backend: Convex + Convex Auth
+- Testing: Playwright + React Testing Library
+- Deployment: Vercel (frontend) + Convex Cloud (backend)
 
-Redesigned Linked-In web application using **`React`** , **`Firebase`** , **`Material-UI`** with full responsiveness by including core functionalities like login and upload posts
+## Getting Started
+1. Install dependencies:
+```bash
+npm install
+```
+2. Configure environment in `.env.local`:
+```bash
+REACT_APP_CONVEX_URL=...
+REACT_APP_CONVEX_SITE_URL=...
+```
+3. Start dev server:
+```bash
+npm start
+```
 
-🔌 **Live Website Link** : <a href="https://phanison-linkedin-clone.web.app/">https://phanison-linkedin-clone.web.app/</a>
+## Build and Test
+- Production build:
+```bash
+npm run build
+```
+- Unit tests:
+```bash
+npm test -- --watch=false
+```
+- E2E tests:
+```bash
+npm run test:e2e
+```
 
----
+## Deployment
+- Deploy Convex backend:
+```bash
+npx convex deploy
+```
+- Deploy frontend to Vercel:
+```bash
+npx vercel --prod
+```
 
-### 📜 Specifications
+## Screenshots
+Screenshots will be added here.
 
-- Precisely designed UI, replicates the original Linked-In's UI. Thanks to **`Material-UI`**
-- Functionalities : Login with firebase google popup, posting images, videos and ofcourse plain text
-- Fully responsive design. Suites perfectly for all size devices
-- UI feels much good in mobile view
-- **`DARK MODE`** toggle feature
-
----
-
-### 🎥 Preview
-
-- 🖥 **Desktop view** : <p align="center">
-  <img width="100%" src="https://media.giphy.com/media/PTQn2S6X7XtsPD6j5j/giphy.gif" />
-  </p>
-- 📱 **Mobile view** : <p align="center">
-  <img width="35%" src="https://media.giphy.com/media/1wmUmYYmxnIZPVLVua/giphy.gif" />
-  </p>
-
----
-
-### 🛠 Tech used
-
-- React
-- React Hooks
-- Redux
-- Redux-Thunk
-- Material UI
-- Flexbox
-- Lottie-Web
-- Firebase
-  - Google authentication
-  - Firestore
-  - Storage
-  - Hosting
-
----
-
-### ⛔ Pre-requisites
-
-1. Install **`NODE`** (if not already been installed)
-2. Setup **`FIREBASE`** project and get the api config values. Checkout <a href="https://firebase.google.com/docs/web/setup?authuser=0">how to setup firebase project?</a>
-
----
-
-### ✅ How to make use of this build?
-
-1. Clone the repository
-   ```bash
-   git clone https://github.com/phanison898/linked-in-clone.git
-   ```
-2. Navigate to the cloned directory
-   ```bash
-   cd path/to/cloned/directory
-   ```
-3. Create .env file with following properties and paste firebase config values respectively
-   ```bash
-   REACT_APP_API_KEY=....................................
-   REACT_APP_AUTH_DOMAIN=................................
-   REACT_APP_PROJECT_ID=.................................
-   REACT_APP_STORAGE_BUCKET=.............................
-   REACT_APP_MESSAGING_SENDER_ID=........................
-   REACT_APP_APP_ID=.....................................
-   ```
-4. Install node packages
-   ```bash
-   npm install
-   ```
-5. Start the development server
-   ```bash
-   npm start
-   ```
-6. Happy learning 😊
-7. Please consider to star ( ⭐ ) this repo. It'll boost my confidence
-
----
-
-### ☎ Feel free to reach out to me
-
-[![Linkedin](https://img.shields.io/badge/-LinkedIn-blue?style=flat-square&logo=Linkedin&logoColor=white)](https://www.linkedin.com/in/phanison225/)
-[![Instagram](https://img.shields.io/badge/-Instagram-ff69bf?style=flat-square&logo=Instagram&logoColor=white)](https://www.instagram.com/phanison225/)
-[![Twitter](https://img.shields.io/badge/-Twitter-blue?style=flat-square&logo=Twitter&logoColor=white)](https://twitter.com/phanison225)
-[![Youtube](https://img.shields.io/badge/-Youtube-red?style=flat-square&logo=Youtube&logoColor=white)](https://youtube.com/channel/UC4FAldAo2Ow_2F447yggcqA/)
+## Notes
+- This repository no longer tracks legacy clone metadata or upstream personal links.
+- Keep secrets in local environment files (`.env.local`) and never commit them.
