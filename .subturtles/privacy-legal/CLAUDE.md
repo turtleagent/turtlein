@@ -1,5 +1,6 @@
 # Current task
-Produce sign-off checklist for pre-launch legal review.
+Privacy/legal backlog complete. Use `docs/legal-prelaunch-signoff-checklist.md` for pre-launch
+legal review and sign-off.
 
 # End goal with specs
 - Verify policy coverage for all user-data categories in the app.
@@ -23,4 +24,7 @@ Produce sign-off checklist for pre-launch legal review.
 - [x] Verify deletion/retention statements against `deleteAccount` behavior
 - [x] Verify cookie/localStorage disclosures vs frontend implementation
 - [x] Draft/patch legal text for identified gaps
-- [ ] Produce sign-off checklist for pre-launch legal review <- current
+- [x] Produce sign-off checklist for pre-launch legal review
+
+## Loop Control
+STOP
