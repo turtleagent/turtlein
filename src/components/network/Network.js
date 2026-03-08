@@ -53,7 +53,6 @@ const NetworkUserCard = React.memo(({
     setIsConnectionActionPending(true);
     try {
       await sendConnectionRequest({
-        fromUserId: authUserId,
         toUserId: candidateUser._id,
       });
     } catch (error) {
@@ -143,12 +142,10 @@ const NetworkUserCard = React.memo(({
     try {
       if (isFollowing) {
         await unfollowUser({
-          followerId: authUserId,
           followedId: candidateUser._id,
         });
       } else {
         await followUser({
-          followerId: authUserId,
           followedId: candidateUser._id,
         });
       }
@@ -319,7 +316,7 @@ const Network = ({ onNavigateProfile }) => {
   const unfollowUser = useMutation(api.follows.unfollowUser);
   const pendingRequests = useQuery(
     api.connections.listPendingRequests,
-    authUser?._id ? { userId: authUser._id } : "skip",
+    authUser?._id ? {} : "skip",
   );
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");

@@ -234,7 +234,7 @@ const Profile = ({
   const connectionStatus = useQuery(
     api.connections.getConnectionStatus,
     authUser?._id && resolvedUserId
-      ? { userId1: authUser._id, userId2: resolvedUserId }
+      ? { targetUserId: resolvedUserId }
       : "skip",
   );
   const connectionCount = useQuery(
@@ -244,13 +244,13 @@ const Profile = ({
   const mutualConnectionsCount = useQuery(
     api.connections.getMutualConnectionsCount,
     authUser?._id && resolvedUserId && authUser._id !== resolvedUserId
-      ? { viewerUserId: authUser._id, targetUserId: resolvedUserId }
+      ? { targetUserId: resolvedUserId }
       : "skip",
   );
   const isFollowing = useQuery(
     api.follows.isFollowing,
     authUser?._id && resolvedUserId && authUser._id !== resolvedUserId
-      ? { followerId: authUser._id, followedId: resolvedUserId }
+      ? { followedId: resolvedUserId }
       : "skip",
   );
   const followerCount = useQuery(
@@ -489,7 +489,6 @@ const Profile = ({
 
     try {
       await sendConnectionRequest({
-        fromUserId: authUser._id,
         toUserId: resolvedUserId,
       });
     } catch (error) {
@@ -585,12 +584,10 @@ const Profile = ({
     try {
       if (isFollowing) {
         await unfollowUser({
-          followerId: authUser._id,
           followedId: resolvedUserId,
         });
       } else {
         await followUser({
-          followerId: authUser._id,
           followedId: resolvedUserId,
         });
       }

@@ -1,6 +1,11 @@
+import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
-import type { MutationCtx } from "./_generated/server";
+import {
+  mutation,
+  query,
+  type MutationCtx,
+  type QueryCtx,
+} from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
 import { buildAuthorSummary } from "./helpers";
 
@@ -20,47 +25,79 @@ const updateUserConnectionCount = async (
   });
 };
 
+const requireAuthenticatedUserId = async (ctx: QueryCtx | MutationCtx) => {
+  const userId = await getAuthUserId(ctx);
+  if (!userId) {
+    throw new Error("Not authenticated");
+  }
+
+  return userId;
+};
+
+const requireConnectionParticipant = async (
+  ctx: MutationCtx,
+  connectionId: Id<"connections">,
+  userId: Id<"users">,
+) => {
+  const connection = await ctx.db.get(connectionId);
+  if (!connection) {
+    throw new Error("Connection not found");
+  }
+
+  if (connection.userId1 !== userId && connection.userId2 !== userId) {
+    throw new Error("Not authorized to access this connection");
+  }
+
+  return connection;
+};
+
 export const sendConnectionRequest = mutation({
   args: {
-    fromUserId: v.id("users"),
     toUserId: v.id("users"),
   },
   handler: async (ctx, args) => {
-    if (args.fromUserId === args.toUserId) {
+    const fromUserId = await requireAuthenticatedUserId(ctx);
+    if (fromUserId === args.toUserId) {
       throw new Error("Cannot connect with yourself");
     }
 
-    const [existingForward, existingReverse] = await Promise.all([
+    const [fromUser, toUser, existingForward, existingReverse] = await Promise.all([
+      ctx.db.get(fromUserId),
+      ctx.db.get(args.toUserId),
       ctx.db
         .query("connections")
         .withIndex("byUsers", (q) =>
-          q.eq("userId1", args.fromUserId).eq("userId2", args.toUserId),
+          q.eq("userId1", fromUserId).eq("userId2", args.toUserId),
         )
         .first(),
       ctx.db
         .query("connections")
         .withIndex("byUsers", (q) =>
-          q.eq("userId1", args.toUserId).eq("userId2", args.fromUserId),
+          q.eq("userId1", args.toUserId).eq("userId2", fromUserId),
         )
         .first(),
     ]);
+
+    if (!fromUser || !toUser) {
+      throw new Error("User not found");
+    }
 
     if (existingForward || existingReverse) {
       throw new Error("Connection already exists");
     }
 
     const connectionId = await ctx.db.insert("connections", {
-      userId1: args.fromUserId,
+      userId1: fromUserId,
       userId2: args.toUserId,
       status: "pending",
-      requestedBy: args.fromUserId,
+      requestedBy: fromUserId,
       createdAt: Date.now(),
     });
 
     await ctx.db.insert("notifications", {
       userId: args.toUserId,
       type: "connection_request",
-      fromUserId: args.fromUserId,
+      fromUserId,
       read: false,
       createdAt: Date.now(),
     });
@@ -74,9 +111,15 @@ export const acceptConnection = mutation({
     connectionId: v.id("connections"),
   },
   handler: async (ctx, args) => {
-    const connection = await ctx.db.get(args.connectionId);
-    if (!connection) {
-      throw new Error("Connection not found");
+    const userId = await requireAuthenticatedUserId(ctx);
+    const connection = await requireConnectionParticipant(ctx, args.connectionId, userId);
+    const recipientId =
+      connection.requestedBy === connection.userId1
+        ? connection.userId2
+        : connection.userId1;
+
+    if (recipientId !== userId) {
+      throw new Error("Not authorized to accept this connection request");
     }
 
     if (connection.status !== "accepted") {
@@ -110,19 +153,22 @@ export const rejectConnection = mutation({
     connectionId: v.id("connections"),
   },
   handler: async (ctx, args) => {
-    const connection = await ctx.db.get(args.connectionId);
-    if (!connection) {
-      throw new Error("Connection not found");
+    const userId = await requireAuthenticatedUserId(ctx);
+    const connection = await requireConnectionParticipant(ctx, args.connectionId, userId);
+    const recipientId =
+      connection.requestedBy === connection.userId1
+        ? connection.userId2
+        : connection.userId1;
+
+    if (connection.status !== "pending") {
+      throw new Error("Only pending requests can be rejected");
+    }
+
+    if (recipientId !== userId) {
+      throw new Error("Not authorized to reject this connection request");
     }
 
     await ctx.db.delete(args.connectionId);
-
-    if (connection.status === "accepted") {
-      await Promise.all([
-        updateUserConnectionCount(ctx, connection.userId1, -1),
-        updateUserConnectionCount(ctx, connection.userId2, -1),
-      ]);
-    }
   },
 });
 
@@ -131,10 +177,8 @@ export const removeConnection = mutation({
     connectionId: v.id("connections"),
   },
   handler: async (ctx, args) => {
-    const connection = await ctx.db.get(args.connectionId);
-    if (!connection) {
-      throw new Error("Connection not found");
-    }
+    const userId = await requireAuthenticatedUserId(ctx);
+    const connection = await requireConnectionParticipant(ctx, args.connectionId, userId);
 
     await ctx.db.delete(args.connectionId);
 
@@ -149,21 +193,25 @@ export const removeConnection = mutation({
 
 export const getConnectionStatus = query({
   args: {
-    userId1: v.id("users"),
-    userId2: v.id("users"),
+    targetUserId: v.id("users"),
   },
   handler: async (ctx, args) => {
+    const userId = await requireAuthenticatedUserId(ctx);
+    if (userId === args.targetUserId) {
+      return { status: "none" as const };
+    }
+
     const [forwardConnection, reverseConnection] = await Promise.all([
       ctx.db
         .query("connections")
         .withIndex("byUsers", (q) =>
-          q.eq("userId1", args.userId1).eq("userId2", args.userId2),
+          q.eq("userId1", userId).eq("userId2", args.targetUserId),
         )
         .first(),
       ctx.db
         .query("connections")
         .withIndex("byUsers", (q) =>
-          q.eq("userId1", args.userId2).eq("userId2", args.userId1),
+          q.eq("userId1", args.targetUserId).eq("userId2", userId),
         )
         .first(),
     ]);
@@ -185,7 +233,7 @@ export const getConnectionStatus = query({
       status: "pending" as const,
       connectionId: connection._id,
       direction:
-        connection.requestedBy === args.userId1
+        connection.requestedBy === userId
           ? ("sent" as const)
           : ("received" as const),
     };
@@ -256,14 +304,13 @@ export const listConnections = query({
 });
 
 export const listPendingRequests = query({
-  args: {
-    userId: v.id("users"),
-  },
-  handler: async (ctx, args) => {
+  args: {},
+  handler: async (ctx) => {
+    const userId = await requireAuthenticatedUserId(ctx);
     const pendingConnections = await ctx.db
       .query("connections")
       .withIndex("byUser2", (q) =>
-        q.eq("userId2", args.userId).eq("status", "pending"),
+        q.eq("userId2", userId).eq("status", "pending"),
       )
       .collect();
 
@@ -334,16 +381,16 @@ export const getConnectionCount = query({
 
 export const getMutualConnectionsCount = query({
   args: {
-    viewerUserId: v.id("users"),
     targetUserId: v.id("users"),
   },
   handler: async (ctx, args) => {
-    if (args.viewerUserId === args.targetUserId) {
+    const viewerUserId = await requireAuthenticatedUserId(ctx);
+    if (viewerUserId === args.targetUserId) {
       return 0;
     }
 
     const [viewerUser, targetUser] = await Promise.all([
-      ctx.db.get(args.viewerUserId),
+      ctx.db.get(viewerUserId),
       ctx.db.get(args.targetUserId),
     ]);
     if (!viewerUser || !targetUser) {
@@ -362,13 +409,13 @@ export const getMutualConnectionsCount = query({
       ctx.db
         .query("connections")
         .withIndex("byUser1", (q) =>
-          q.eq("userId1", args.viewerUserId).eq("status", "accepted"),
+          q.eq("userId1", viewerUserId).eq("status", "accepted"),
         )
         .collect(),
       ctx.db
         .query("connections")
         .withIndex("byUser2", (q) =>
-          q.eq("userId2", args.viewerUserId).eq("status", "accepted"),
+          q.eq("userId2", viewerUserId).eq("status", "accepted"),
         )
         .collect(),
       ctx.db
