@@ -1,10 +1,14 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
-import { isGuestLoginUnavailableError, loginAsGuest } from "./helpers";
+import { loginAsGuest } from "./helpers";
 
 const FEED_RECOVERY_ATTEMPTS = 4;
 
 function escapeForRegex(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function isGuestLoginUnavailable(error: unknown): boolean {
+  return error instanceof Error && error.name === "GuestLoginUnavailableError";
 }
 
 async function clickGuestIfPresent(page: Page): Promise<void> {
@@ -196,7 +200,7 @@ test.describe("Social e2e", () => {
     try {
       await loginAsGuest(page);
     } catch (error) {
-      if (!isGuestLoginUnavailableError(error)) {
+      if (!isGuestLoginUnavailable(error)) {
         throw error;
       }
       test.skip(true, "Skipped: guest login was unavailable in live deployment.");
