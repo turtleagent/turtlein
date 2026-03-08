@@ -1,5 +1,5 @@
 # Current task
-Regenerate lockfile and run full build/test suite.
+Regenerate lockfile and run full build/test suite. Build and Jest pass; Playwright is failing against the deployed site's guest login/auth flow.
 
 # End goal with specs
 - Eliminate critical vulnerabilities where practical.
@@ -22,5 +22,6 @@ Regenerate lockfile and run full build/test suite.
 - [x] Upgrade direct vulnerable deps (`firebase`, `file-type`, others)
 - [x] Evaluate safest path for `react-scripts` vulnerability cluster
 - [ ] Regenerate lockfile and run full build/test suite <- current
+  Note: `npm install --legacy-peer-deps` left `package-lock.json` unchanged. `npm run build` and `CI=true npm test -- --watchAll=false` passed. `npm run test:e2e` failed against `https://linkedin-demo-iota.vercel.app` because guest login never reaches the authenticated feed in multiple specs, and the reaction flow hits `Not authenticated`.
 - [ ] Produce vulnerability delta report (before vs after)
 - [ ] Document rollback plan for dependency-related regressions
