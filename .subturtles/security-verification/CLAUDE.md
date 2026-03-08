@@ -1,5 +1,5 @@
 # Current task
-Produce release sign-off report with blockers/non-blockers.
+All backlog items completed.
 
 # End goal with specs
 - Build a function-level permission matrix for all Convex public APIs.
@@ -23,7 +23,10 @@ Produce release sign-off report with blockers/non-blockers.
 - [x] Add negative tests for follows/connections/comments identity spoofing
 - [x] Add visibility leakage tests for posts/hashtags/search/comments
 - [x] Execute tests and collect evidence artifacts
-- [ ] Produce release sign-off report with blockers/non-blockers <- current
+- [x] Produce release sign-off report with blockers/non-blockers
 
 ## Notes
 - 2026-03-08: Captured raw verification artifacts in `.subturtles/security-verification/artifacts/` and indexed them in `.subturtles/security-verification/test-evidence.md`.
+
+## Loop Control
+STOP

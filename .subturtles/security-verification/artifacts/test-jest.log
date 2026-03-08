@@ -65,10 +65,10 @@
       at commitPassiveMountEffects_complete (node_modules/react-dom/cjs/react-dom.development.js:24891:9)
 
 PASS src/App.test.js
-  ✓ renders Convex Auth login screen when unauthenticated (139 ms)
+  ✓ renders Convex Auth login screen when unauthenticated (152 ms)
 
 Test Suites: 1 passed, 1 total
 Tests:       1 passed, 1 total
 Snapshots:   0 total
-Time:        1.752 s, estimated 2 s
+Time:        1.774 s, estimated 2 s
 Ran all test suites.
