@@ -1,5 +1,5 @@
 # Current task
-Add visibility leakage tests for posts, hashtags, search, and comments `connections`-only read paths called out by the permission matrix.
+Execute tests and collect evidence artifacts.
 
 # End goal with specs
 - Build a function-level permission matrix for all Convex public APIs.
@@ -21,6 +21,6 @@ Add visibility leakage tests for posts, hashtags, search, and comments `connecti
 - [x] Build endpoint permission matrix for `src/convex/*.ts`
 - [x] Add negative tests for messaging/notifications authz bypass
 - [x] Add negative tests for follows/connections/comments identity spoofing
-- [ ] Add visibility leakage tests for posts/hashtags/search/comments <- current
-- [ ] Execute tests and collect evidence artifacts
+- [x] Add visibility leakage tests for posts/hashtags/search/comments
+- [ ] Execute tests and collect evidence artifacts <- current
 - [ ] Produce release sign-off report with blockers/non-blockers

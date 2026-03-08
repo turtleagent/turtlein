@@ -29,6 +29,8 @@ const messagingModulePromise = import("../src/convex/messaging.ts");
 const followsModulePromise = import("../src/convex/follows.ts");
 const connectionsModulePromise = import("../src/convex/connections.ts");
 const commentsModulePromise = import("../src/convex/comments.ts");
+const hashtagsModulePromise = import("../src/convex/hashtags.ts");
+const postsModulePromise = import("../src/convex/posts.ts");
 const usersModulePromise = import("../src/convex/users.ts");
 
 function createAuth(userId = null) {
@@ -78,6 +80,20 @@ function createQuery(docs) {
         ),
       );
     },
+    order(direction = "asc") {
+      const sortedDocs = [...docs].sort((left, right) => {
+        const leftValue = left._creationTime ?? left.createdAt ?? 0;
+        const rightValue = right._creationTime ?? right.createdAt ?? 0;
+        return leftValue - rightValue;
+      });
+
+      if (direction === "desc") {
+        sortedDocs.reverse();
+      }
+
+      return createQuery(sortedDocs);
+    },
+    take: async (count) => docs.slice(0, count).map((doc) => ({ ...doc })),
     collect: async () => docs.map((doc) => ({ ...doc })),
     first: async () => (docs[0] ? { ...docs[0] } : null),
     unique: async () => {
@@ -176,6 +192,131 @@ function createStorage(urls = {}) {
   return {
     getUrl: async (storageId) => urls[storageId] ?? null,
   };
+}
+
+function createConnectionsVisibilitySeed() {
+  return {
+    comments: [
+      {
+        _id: "comment-public-1",
+        authorId: "user-b",
+        body: "Visible to everyone",
+        createdAt: 31,
+        postId: "post-public-user",
+      },
+      {
+        _id: "comment-private-1",
+        authorId: "user-b",
+        body: "Visible to connections only",
+        createdAt: 32,
+        postId: "post-private-user",
+      },
+    ],
+    connections: [
+      {
+        _id: "connection-1",
+        createdAt: 1,
+        requestedBy: "user-a",
+        status: "accepted",
+        userId1: "user-a",
+        userId2: "user-b",
+      },
+      {
+        _id: "connection-2",
+        createdAt: 2,
+        requestedBy: "user-d",
+        status: "accepted",
+        userId1: "user-d",
+        userId2: "user-b",
+      },
+    ],
+    hashtags: [
+      {
+        _id: "hashtag-1",
+        postId: "post-public-user",
+        tag: "scope",
+      },
+      {
+        _id: "hashtag-2",
+        postId: "post-private-user",
+        tag: "scope",
+      },
+    ],
+    posts: [
+      {
+        _id: "post-public-user",
+        authorId: "user-a",
+        commentsCount: 1,
+        createdAt: 10,
+        description: "Public roadmap update #scope",
+        likesCount: 1,
+        visibility: "public",
+      },
+      {
+        _id: "post-private-user",
+        authorId: "user-a",
+        commentsCount: 1,
+        createdAt: 20,
+        description: "Connections roadmap update #scope",
+        likesCount: 2,
+        visibility: "connections",
+      },
+      {
+        _id: "post-public-company",
+        authorId: "user-d",
+        commentsCount: 0,
+        companyId: "company-1",
+        createdAt: 30,
+        description: "Public company memo",
+        likesCount: 3,
+        visibility: "public",
+      },
+      {
+        _id: "post-private-company",
+        authorId: "user-d",
+        commentsCount: 0,
+        companyId: "company-1",
+        createdAt: 40,
+        description: "Connections company memo",
+        likesCount: 4,
+        visibility: "connections",
+      },
+    ],
+    users: [
+      {
+        _id: "user-a",
+        displayName: "Author A",
+        photoURL: "https://images.example/a.png",
+        title: "Engineer",
+        username: "author-a",
+      },
+      {
+        _id: "user-b",
+        displayName: "Viewer B",
+        photoURL: "https://images.example/b.png",
+        title: "Designer",
+        username: "viewer-b",
+      },
+      {
+        _id: "user-c",
+        displayName: "Viewer C",
+        photoURL: "https://images.example/c.png",
+        title: "Analyst",
+        username: "viewer-c",
+      },
+      {
+        _id: "user-d",
+        displayName: "Company Author",
+        photoURL: "https://images.example/d.png",
+        title: "Marketing Lead",
+        username: "company-author",
+      },
+    ],
+  };
+}
+
+function mapIds(rows) {
+  return rows.map((row) => row._id);
 }
 
 async function assertRejectsWithMessage(run, expectedPattern) {
@@ -520,6 +661,127 @@ test("comments bind writes to the session user and reject spoofed deletes", asyn
 
   assert.equal(db.tables.comments.length, 2);
   assert.deepEqual(db.deleteCalls, []);
+});
+
+test("comments hide connections-only threads from guests and strangers", async () => {
+  const { listComments } = await commentsModulePromise;
+  const storage = createStorage();
+
+  const guestPublicComments = await listComments._handler(
+    {
+      auth: createAuth(),
+      db: createDb(createConnectionsVisibilitySeed()),
+      storage,
+    },
+    { postId: "post-public-user" },
+  );
+  const guestPrivateComments = await listComments._handler(
+    {
+      auth: createAuth(),
+      db: createDb(createConnectionsVisibilitySeed()),
+      storage,
+    },
+    { postId: "post-private-user" },
+  );
+  const strangerPrivateComments = await listComments._handler(
+    {
+      auth: createAuth("user-c"),
+      db: createDb(createConnectionsVisibilitySeed()),
+      storage,
+    },
+    { postId: "post-private-user" },
+  );
+  const connectedPrivateComments = await listComments._handler(
+    {
+      auth: createAuth("user-b"),
+      db: createDb(createConnectionsVisibilitySeed()),
+      storage,
+    },
+    { postId: "post-private-user" },
+  );
+  const authorPrivateComments = await listComments._handler(
+    {
+      auth: createAuth("user-a"),
+      db: createDb(createConnectionsVisibilitySeed()),
+      storage,
+    },
+    { postId: "post-private-user" },
+  );
+
+  assert.deepEqual(mapIds(guestPublicComments), ["comment-public-1"]);
+  assert.deepEqual(guestPrivateComments, []);
+  assert.deepEqual(strangerPrivateComments, []);
+  assert.deepEqual(mapIds(connectedPrivateComments), ["comment-private-1"]);
+  assert.deepEqual(mapIds(authorPrivateComments), ["comment-private-1"]);
+  assert.equal(connectedPrivateComments[0].author?._id, "user-b");
+});
+
+test("post discovery queries filter connections-only posts for unauthorized viewers", async () => {
+  const { getPostsByHashtag } = await hashtagsModulePromise;
+  const { getCompanyPosts, listPostsByUser, searchPosts } = await postsModulePromise;
+  const storage = createStorage();
+
+  const guestCtx = {
+    auth: createAuth(),
+    db: createDb(createConnectionsVisibilitySeed()),
+    storage,
+  };
+  const strangerCtx = {
+    auth: createAuth("user-c"),
+    db: createDb(createConnectionsVisibilitySeed()),
+    storage,
+  };
+  const connectedCtx = {
+    auth: createAuth("user-b"),
+    db: createDb(createConnectionsVisibilitySeed()),
+    storage,
+  };
+
+  const [
+    guestUserPosts,
+    guestCompanyPosts,
+    guestSearchPosts,
+    guestHashtagPosts,
+    strangerUserPosts,
+    strangerCompanyPosts,
+    strangerSearchPosts,
+    strangerHashtagPosts,
+    connectedUserPosts,
+    connectedCompanyPosts,
+    connectedSearchPosts,
+    connectedHashtagPosts,
+  ] = await Promise.all([
+    listPostsByUser._handler(guestCtx, { authorId: "user-a" }),
+    getCompanyPosts._handler(guestCtx, { companyId: "company-1" }),
+    searchPosts._handler(guestCtx, { query: "roadmap" }),
+    getPostsByHashtag._handler(guestCtx, { tag: "#scope" }),
+    listPostsByUser._handler(strangerCtx, { authorId: "user-a" }),
+    getCompanyPosts._handler(strangerCtx, { companyId: "company-1" }),
+    searchPosts._handler(strangerCtx, { query: "roadmap" }),
+    getPostsByHashtag._handler(strangerCtx, { tag: "#scope" }),
+    listPostsByUser._handler(connectedCtx, { authorId: "user-a" }),
+    getCompanyPosts._handler(connectedCtx, { companyId: "company-1" }),
+    searchPosts._handler(connectedCtx, { query: "roadmap" }),
+    getPostsByHashtag._handler(connectedCtx, { tag: "#scope" }),
+  ]);
+
+  assert.deepEqual(mapIds(guestUserPosts), ["post-public-user"]);
+  assert.deepEqual(mapIds(guestCompanyPosts), ["post-public-company"]);
+  assert.deepEqual(mapIds(guestSearchPosts), ["post-public-user"]);
+  assert.deepEqual(mapIds(guestHashtagPosts), ["post-public-user"]);
+
+  assert.deepEqual(mapIds(strangerUserPosts), ["post-public-user"]);
+  assert.deepEqual(mapIds(strangerCompanyPosts), ["post-public-company"]);
+  assert.deepEqual(mapIds(strangerSearchPosts), ["post-public-user"]);
+  assert.deepEqual(mapIds(strangerHashtagPosts), ["post-public-user"]);
+
+  assert.deepEqual(mapIds(connectedUserPosts), ["post-private-user", "post-public-user"]);
+  assert.deepEqual(mapIds(connectedCompanyPosts), [
+    "post-private-company",
+    "post-public-company",
+  ]);
+  assert.deepEqual(mapIds(connectedSearchPosts), ["post-private-user", "post-public-user"]);
+  assert.deepEqual(mapIds(connectedHashtagPosts), ["post-private-user", "post-public-user"]);
 });
 
 test("user profile queries and mutations omit private auth fields", async () => {
